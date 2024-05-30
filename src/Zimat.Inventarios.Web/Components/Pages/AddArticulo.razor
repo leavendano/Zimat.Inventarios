@@ -14,7 +14,7 @@
 
 <PageTitle>Nuevo Artículo</PageTitle>
 
-<RadzenColumn SizeMD=12>
+@* <RadzenColumn SizeMD=12>
     <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Cannot save Product</RadzenAlert>
     <RadzenTemplateForm TItem="ArticuloDTO" Data="@product" Visible="@(product != null)" Submit="@FormSubmit">
         <RadzenRow style="margin-bottom: 1rem">
@@ -106,14 +106,15 @@
             <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancel" Variant="Variant.Flat" Click="@CancelButtonClick" />
         </RadzenStack>
     </RadzenTemplateForm>
-</RadzenColumn>
+</RadzenColumn> *@
 
 @code {
 
     protected class ArticuloDTO
     {
-        public string Clave { get; set; } = Guard.Against.NullOrEmpty(clave, nameof(clave));
-        public string Descripcion { get; set; } = Guard.Against.NullOrEmpty(descripcion, nameof(descripcion));
+        public int Id   { get; set; }
+        public string? Clave { get; set; } 
+        public string? Descripcion { get; set; } 
         public string? Codigo { get; set; }
         public string? Unidad { get; set; }
         public string? Unidefa { get; set; }
@@ -164,7 +165,7 @@
     [SupplyParameterFromForm]
     protected ArticuloDTO product { get; set; } = new();
 
-    int selectedIndex = 0;
+    //int selectedIndex = 0;
 
     protected async Task FormSubmit()
     {
@@ -172,7 +173,7 @@
         try
         {
             //await zimatService.CreateProduct(product);
-            var result = await _mediator.Send(new CreateArticuloCommand(product.Clave, product.Codigo));
+            var result = await _mediator.Send(new CreateArticuloCommand(product.Clave!,"", product.Codigo!));
             DialogService.Close(product);
         }
         catch (Exception)
