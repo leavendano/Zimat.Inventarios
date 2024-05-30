@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Ardalis.Result" />
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Zimat.Inventarios.Core\Zimat.Inventarios.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Articulos\Get\" />
+    <Folder Include="Articulos\Update\" />
+  </ItemGroup>
+
+</Project>
