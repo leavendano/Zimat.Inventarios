@@ -14,7 +14,13 @@ using MediatR;
 using Serilog;
 using Serilog.Extensions.Logging;
 using Radzen;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Zimat.Inventarios.Web;
 
+
+const string MS_OIDC_SCHEME = "MicrosoftOidc";
 var logger = Log.Logger = new LoggerConfiguration()
   .Enrich.FromLogContext()
   .WriteTo.Console()
@@ -24,6 +30,50 @@ logger.Information("Starting web host");
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host.UseSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration));
+var microsoftLogger = new SerilogLoggerFactory(logger)
+    .CreateLogger<Program>();
+
+
+builder.Services.AddAuthentication(MS_OIDC_SCHEME)
+.AddOpenIdConnect(MS_OIDC_SCHEME, options =>
+{
+    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.Authority = "https://localhost:7001/";
+    options.ClientId = "zimat_app";
+    options.ClientSecret = "Zimat_1985";
+    options.ResponseType = "code";
+    //options.SaveTokens = true;
+    //options.GetClaimsFromUserInfoEndpoint = true;
+    //options.UseTokenLifetime = false;
+    //options.Scope.Add("openid");
+    //options.Scope.Add("profile");
+    //options.TokenValidationParameters = new TokenValidationParameters{ NameClaimType = "name" };
+    // options.CallbackPath = new PathString("/signin-oidc");
+    // options.SignedOutCallbackPath = new PathString("/signout-callback-oidc");
+    // options.RemoteSignOutPath = new PathString("/signout-oidc");
+    options.MapInboundClaims = false;
+    options.TokenValidationParameters.NameClaimType = JwtRegisteredClaimNames.Name;
+    options.TokenValidationParameters.RoleClaimType = "role";
+
+    options.Events = new OpenIdConnectEvents
+    {
+        OnAccessDenied = context =>
+        {
+            context.HandleResponse();
+            context.Response.Redirect("/");
+            return Task.CompletedTask;
+        }
+    };
+})
+.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
+
+builder.Services.ConfigureCookieOidcRefresh(CookieAuthenticationDefaults.AuthenticationScheme, MS_OIDC_SCHEME);
+
+builder.Services.AddAuthorization();
+
+builder.Services.AddCascadingAuthenticationState();
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
   .AddInteractiveServerComponents()
@@ -32,9 +82,6 @@ builder.Services.AddControllers();
 builder.Services.AddRadzenComponents();
 builder.Services.AddHttpClient();
 
-builder.Host.UseSerilog((_, config) => config.ReadFrom.Configuration(builder.Configuration));
-var microsoftLogger = new SerilogLoggerFactory(logger)
-    .CreateLogger<Program>();
 
 // Configure Web Behavior
 builder.Services.Configure<CookiePolicyOptions>(options =>
@@ -89,6 +136,7 @@ app.MapControllers();
 app.UseStaticFiles();
 app.UseAntiforgery();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
+app.MapGroup("/authentication").MapLoginAndLogout();
 
 SeedDatabase(app);
 
