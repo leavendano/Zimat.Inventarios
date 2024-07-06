@@ -1,6 +1,6 @@
-﻿@page "/articulos"
+﻿@page "/documentos"
 @using Ardalis.Result
-@using Zimat.Inventarios.UseCases.Articulos
+@using Zimat.Inventarios.UseCases.Documentos
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @inject DialogService DialogService
@@ -10,12 +10,12 @@
 @inject ILogger<Articulos> logger
 @using MediatR
 @inject IMediator _mediator
-@using Zimat.Inventarios.UseCases.Articulos.Delete
-@using Zimat.Inventarios.UseCases.Articulos.List
+@using Zimat.Inventarios.UseCases.Documentos.Delete
+@using Zimat.Inventarios.UseCases.Documentos.List
 @attribute [Authorize]
 
 
-<PageTitle>Artículos</PageTitle>
+<PageTitle>Documentos</PageTitle>
 <RadzenStack>
     <RadzenRow AlignItems="AlignItems.Center">
         <RadzenColumn Size="12" SizeMD="6">
@@ -30,20 +30,20 @@
     <RadzenRow>
         <RadzenColumn SizeMD=12>
             <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
-                            Data="@articulos" TItem="ArticuloDTO" RowSelect="@EditRow">
+                            Data="@documentos" TItem="DocumentoDTO" RowSelect="@EditRow">
                 <Columns>
-                    <RadzenDataGridColumn TItem="ArticuloDTO" Property="Clave" Title="Clave">
+                    <RadzenDataGridColumn TItem="DocumentoDTO" Property="Folio" Title="Folio">
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="ArticuloDTO" Property="Descripcion" Title="Descripcion">
+                    <RadzenDataGridColumn TItem="DocumentoDTO" Property="Tipo" Title="Tipo">
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="ArticuloDTO" Property="PrecioPublico" Title="Precio">
+                    <RadzenDataGridColumn TItem="DocumentoDTO" Property="Fecha" Title="Fecha">
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="ArticuloDTO" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
-                        <Template Context="articulo">
+                    <RadzenDataGridColumn TItem="DocumentoDTO" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
+                        <Template Context="documento">
 
                             <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
                                           Shade="Shade.Lighter" Variant="Variant.Flat"
-                                          Click=@(args => GridDeleteButtonClick(args, articulo)) @onclick:stopPropagation="true" />
+                                          Click=@(args => GridDeleteButtonClick(args, documento)) @onclick:stopPropagation="true" />
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -55,63 +55,63 @@
 </RadzenStack>
 @code {
 
-    protected IEnumerable<ArticuloDTO>? articulos;
+    protected IEnumerable<DocumentoDTO>? documentos;
 
-    protected RadzenDataGrid<ArticuloDTO> grid0 = new();
+    protected RadzenDataGrid<DocumentoDTO> grid0 = new();
     protected override async Task OnInitializedAsync()
     {
 
         await base.OnInitializedAsync();
-        Result<IEnumerable<ArticuloDTO>> result = await _mediator.Send(new ListArticulosQuery(null, null));
+        Result<IEnumerable<DocumentoDTO>> result = await _mediator.Send(new ListDocumentosQuery(null, null));
 
         if (result.IsSuccess)
         {
-            articulos = result.Value;
+            documentos = result.Value;
         }
 
     }
 
     protected async Task AddButtonClick(MouseEventArgs args)
     {
-        await DialogService.OpenAsync<AddArticulo>("Nuevo Artículo", null,new DialogOptions() { Width = $"{900}px", Height = $"{600}px" });
-        Result<IEnumerable<ArticuloDTO>> result = await _mediator.Send(new ListArticulosQuery(null, null));
+       // await DialogService.OpenAsync<AddArticulo>("Nuevo Artículo", null, new DialogOptions() { Width = $"{900}px", Height = $"{600}px" });
+        Result<IEnumerable<DocumentoDTO>> result = await _mediator.Send(new ListDocumentosQuery(null, null));
 
         if (result.IsSuccess)
         {
 
-            articulos = result.Value;
+            documentos = result.Value;
             await grid0.Reload();
         }
 
     }
 
-    protected async Task EditRow(ArticuloDTO args)
+    protected async Task EditRow(DocumentoDTO args)
     {
-        await DialogService.OpenAsync<EditArticulo>("Edit Articulo", new Dictionary<string, object> { { "Id", args.Id } });
-        Result<IEnumerable<ArticuloDTO>> result = await _mediator.Send(new ListArticulosQuery(null, null));
+        //await DialogService.OpenAsync<EditArticulo>("Edit Articulo", new Dictionary<string, object> { { "Id", args.Id } });
+        Result<IEnumerable<DocumentoDTO>> result = await _mediator.Send(new ListDocumentosQuery(null, null));
         if (result.IsSuccess)
         {
 
-            articulos = result.Value;
+            documentos = result.Value;
             await grid0.Reload();
         }
     }
 
-    protected async Task GridDeleteButtonClick(MouseEventArgs args, ArticuloDTO articulo)
+    protected async Task GridDeleteButtonClick(MouseEventArgs args, DocumentoDTO articulo)
     {
         try
         {
             if (await DialogService.Confirm("Está seguro de borrar este elemento?") == true)
             {
 
-                var result = await _mediator.Send(new DeleteArticuloCommand(articulo.Id));
+                var result = await _mediator.Send(new DeleteDocumentoCommand(articulo.Id));
 
                 if (result.IsSuccess)
                 {
-                    Result<IEnumerable<ArticuloDTO>> result2 = await _mediator.Send(new ListArticulosQuery(null, null));
+                    Result<IEnumerable<DocumentoDTO>> result2 = await _mediator.Send(new ListDocumentosQuery(null, null));
                     if (result2.IsSuccess)
                     {
-                        articulos = result2.Value;
+                        documentos = result2.Value;
                         await grid0.Reload();
                     }
 
@@ -130,3 +130,4 @@
         }
     }
 }
+

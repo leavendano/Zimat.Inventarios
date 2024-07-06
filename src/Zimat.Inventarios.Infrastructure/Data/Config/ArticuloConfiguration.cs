@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using Zimat.Inventarios.Core.ContributorAggregate;
+using Zimat.Inventarios.Core.ArticuloAggregate;
 
 namespace Zimat.Inventarios.Infrastructure.Data.Config;
 public class ArticuloConfiguration : IEntityTypeConfiguration<Articulo>
@@ -10,7 +10,8 @@ public class ArticuloConfiguration : IEntityTypeConfiguration<Articulo>
     builder.Property(p => p.Descripcion)
         .HasMaxLength(DataSchemaConstants.DEFAULT_DESCRIPTION_LENGTH)
         .IsRequired();
-
+    
+        
     //builder.OwnsOne(builder => builder.Clave);
 
     //builder.Property(x => x.Status)

@@ -14,16 +14,16 @@
 
 <PageTitle>Nuevo Artículo</PageTitle>
 
-@* <RadzenColumn SizeMD=12>
+ <RadzenColumn SizeMD=12>
     <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Cannot save Product</RadzenAlert>
     <RadzenTemplateForm TItem="ArticuloDTO" Data="@product" Visible="@(product != null)" Submit="@FormSubmit">
         <RadzenRow style="margin-bottom: 1rem">
             <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="Clave" Component="producto_id" style="width: 100%" />
+                <RadzenLabel Text="Clave" Component="clave" style="width: 100%" />
             </RadzenColumn>
             <RadzenColumn SizeMD="9">
-                <RadzenNumeric style="display: block; width: 100%" @bind-Value="@product!.Id" Name="producto_id" />
-                <RadzenRequiredValidator Component="producto_id" Text="producto_id is required" />
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@product!.Clave" Name="clave" />
+                <RadzenRequiredValidator Component="clave" Text="La clave del producto es requerida" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow style="margin-bottom: 1rem">
@@ -31,7 +31,7 @@
                 <RadzenLabel Text="Descripción" Component="descripcion" style="width: 100%" />
             </RadzenColumn>
             <RadzenColumn SizeMD="9">
-                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@product!.Name" Name="descripcion" />
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@product!.Descripcion" Name="descripcion" />
                 <RadzenRequiredValidator Component="descripcion" Text="descripcion is required" />
             </RadzenColumn>
         </RadzenRow>
@@ -41,11 +41,11 @@
                 <RadzenTabsItem Text="Clasificación">
                     <RadzenRow style="margin-bottom: 1rem">
                         <RadzenColumn SizeMD="3">
-                            <RadzenLabel Text="Linea" Component="producto_id"  />
+                            <RadzenLabel Text="Linea" Component="linea"  />
                         </RadzenColumn>
                         <RadzenColumn SizeMD="9">
-                            <RadzenTextBox style="display: block;"  Name="producto_id" />
-                            <RadzenRequiredValidator Component="producto_id" Text="producto_id is required" />
+                            <RadzenTextBox style="display: block;"  Name="linea" />
+                           
                         </RadzenColumn>
                     </RadzenRow>
                     <RadzenRow style="margin-bottom: 1rem">
@@ -106,7 +106,7 @@
             <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancel" Variant="Variant.Flat" Click="@CancelButtonClick" />
         </RadzenStack>
     </RadzenTemplateForm>
-</RadzenColumn> *@
+</RadzenColumn>
 
 @code {
 
@@ -117,7 +117,6 @@
         public string? Descripcion { get; set; } 
         public string? Codigo { get; set; }
         public string? Unidad { get; set; }
-        public string? Unidefa { get; set; }
         public string? Marca { get; set; }
         public string? Modelo { get; set; }
         public string? Linea { get; set; }
@@ -143,16 +142,8 @@
         public decimal Maximo { get; set; }
         public decimal Reorden { get; set; }
         public string? Divisa { get; set; }
-        public decimal Precio1 { get; set; }
-        public decimal Precio2 { get; set; }
-        public decimal Precio3 { get; set; }
-        public decimal Precio4 { get; set; }
-        public decimal Precio5 { get; set; }
-        public decimal Factor1 { get; set; }
-        public decimal Factor2 { get; set; }
-        public decimal Factor3 { get; set; }
-        public decimal Factor4 { get; set; }
-        public decimal Factor5 { get; set; }
+        public decimal PrecioPublico { get; set; }
+        
         public decimal UltimoCosto { get; set; }
         public bool Activo { get; set; }
 
@@ -165,7 +156,7 @@
     [SupplyParameterFromForm]
     protected ArticuloDTO product { get; set; } = new();
 
-    //int selectedIndex = 0;
+    int selectedIndex = 0;
 
     protected async Task FormSubmit()
     {
@@ -173,7 +164,7 @@
         try
         {
             //await zimatService.CreateProduct(product);
-            var result = await _mediator.Send(new CreateArticuloCommand(product.Clave!,"", product.Codigo!));
+            var result = await _mediator.Send(new CreateArticuloCommand(product.Clave!,"", product.PrecioPublico));
             DialogService.Close(product);
         }
         catch (Exception)

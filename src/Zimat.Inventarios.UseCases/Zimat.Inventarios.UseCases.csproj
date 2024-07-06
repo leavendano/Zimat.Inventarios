@@ -11,8 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Articulos\Get\" />
-    <Folder Include="Articulos\Update\" />
+    <Folder Include="Documentos\Get\" />
   </ItemGroup>
 
 </Project>

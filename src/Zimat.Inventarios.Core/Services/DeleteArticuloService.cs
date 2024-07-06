@@ -2,8 +2,8 @@
 using Ardalis.SharedKernel;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Zimat.Inventarios.Core.ArticuloAggregate;
 using Zimat.Inventarios.Core.ArticuloAggregate.Events;
-using Zimat.Inventarios.Core.ContributorAggregate;
 using Zimat.Inventarios.Core.Interfaces;
 
 namespace Zimat.Inventarios.Core.Services;

@@ -28,4 +28,8 @@
     <ProjectReference Include="..\Zimat.Inventarios.UseCases\Zimat.Inventarios.UseCases.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="log\" />
+  </ItemGroup>
+
 </Project>

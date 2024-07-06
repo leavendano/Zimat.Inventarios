@@ -13,7 +13,7 @@ internal class ArticuloDeletedHandler(ILogger<ArticuloDeletedHandler> logger,
 
     await emailSender.SendEmailAsync("leavendano@gmail.com",
                                      "cfdi@infinitummail.com",
-                                     "Contributor Deleted",
+                                     "Producto eliminado",
                                      $"El Articulo con el id {domainEvent.ArticuloId} fue borrado.");
   }
 }
