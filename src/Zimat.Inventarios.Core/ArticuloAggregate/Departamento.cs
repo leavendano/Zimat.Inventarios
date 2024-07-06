@@ -1,7 +1,7 @@
-using Ardalis.GuardClauses;
+﻿using Ardalis.GuardClauses;
 using Zimat.Inventarios.Core.Base;
 
-namespace Zimat.Inventarios.Core.ContributorAggregate;
+namespace Zimat.Inventarios.Core.ArticuloAggregate;
 
 public class Departamento(string nombre) : RegisterBase
 {

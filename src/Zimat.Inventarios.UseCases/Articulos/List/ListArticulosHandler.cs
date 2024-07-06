@@ -2,7 +2,7 @@
 using Ardalis.SharedKernel;
 
 namespace Zimat.Inventarios.UseCases.Articulos.List;
-internal class ListArticulosHandler(IListArticulosQueryService _query)
+public class ListArticulosHandler(IListArticulosQueryService _query)
   : IQueryHandler<ListArticulosQuery, Result<IEnumerable<ArticuloDTO>>>
 {
   public async Task<Result<IEnumerable<ArticuloDTO>>> Handle(ListArticulosQuery request, CancellationToken cancellationToken)

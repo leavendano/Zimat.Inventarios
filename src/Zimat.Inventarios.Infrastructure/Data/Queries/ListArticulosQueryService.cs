@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Zimat.Inventarios.UseCases.Articulos.List;
 using Zimat.Inventarios.UseCases.Articulos;
 
@@ -17,7 +12,7 @@ public class ListArticulosQueryService(AppDbContext _db) : IListArticulosQuerySe
   {
     // NOTE: This will fail if testing with EF InMemory provider!
     var result = await _db.Database.SqlQuery<ArticuloDTO>(
-      $"SELECT id,clave , descripcion, unidad FROM Articulos") // don't fetch other big columns
+      $"SELECT id,clave , descripcion, precio_publico FROM Articulos") // don't fetch other big columns
       .ToListAsync();
 
     return result;

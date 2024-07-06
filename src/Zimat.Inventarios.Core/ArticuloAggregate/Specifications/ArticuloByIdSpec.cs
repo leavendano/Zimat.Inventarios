@@ -1,7 +1,8 @@
 ﻿using Ardalis.Specification;
-using Zimat.Inventarios.Core.ContributorAggregate;
+using Zimat.Inventarios.Core.ArticuloAggregate;
 
-namespace Zimat.Inventarios.Core.ArticulosAgrregate.Specifications;
+
+namespace Zimat.Inventarios.Core.ArticuloAgrregate.Specifications;
 public class ArticuloByIdSpec : Specification<Articulo>
 {
   public ArticuloByIdSpec(int articuloId)

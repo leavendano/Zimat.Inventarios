@@ -11,6 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Zimat.Inventarios.UseCases.Articulos.List;
+using Zimat.Inventarios.UseCases.Documentos.List;
+using Zimat.Inventarios.UseCases.Proveedores.List;
 
 namespace Zimat.Inventarios.Infrastructure;
 public static class InfrastructureServiceExtensions
@@ -31,6 +33,8 @@ public static class InfrastructureServiceExtensions
     services.AddScoped<IDeleteContributorService, DeleteContributorService>();
     services.AddScoped<IListArticulosQueryService, ListArticulosQueryService>();
     services.AddScoped<IDeleteArticuloService, DeleteArticuloService>();
+    services.AddScoped<IListDocumentosQueryService, ListDocumentosQueryService>();
+    services.AddScoped<IListProveedoresQueryService, ListProveedoresQueryService>();
 
     services.Configure<MailserverConfiguration>(config.GetSection("Mailserver"));
 

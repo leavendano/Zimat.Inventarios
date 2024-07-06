@@ -1,9 +1,108 @@
 ﻿@page "/edit-articulo"
 
-@inject ILogger<EditArticulo> logger
+@using MediatR
+@using Zimat.Inventarios.UseCases.Articulos.Get
+@using Zimat.Inventarios.UseCases.Articulos.Update
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject IMediator _mediator
 
-<h3>EditArticulo</h3>
+<PageTitle>Editar Producto</PageTitle>
+
+<RadzenColumn SizeMD=12>
+    <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Cannot save Product</RadzenAlert>
+    <RadzenTemplateForm TItem="ArticuloDTO" Data="@articulo" Visible="@(articulo != null)" Submit="@FormSubmit">
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Clave" Component="clave" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@articulo!.Clave" Name="clave" />
+                <RadzenRequiredValidator Component="clave" Text="La clave del artículo es requerida" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Descripción" Component="descripcion" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@articulo!.Descripcion" Name="descripcion" />
+                <RadzenRequiredValidator Component="descripcion" Text="La descripción es requerida" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Precio" Component="descripcion" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenNumeric style="display: block; width: 100%" @bind-Value="@articulo!.PrecioPublico" Name="precio" />
+                <RadzenRequiredValidator Component="precio" Text="El precio es requerida" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Save" Variant="Variant.Flat" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancel" Variant="Variant.Flat" Click="@CancelButtonClick" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenColumn>
 
 @code {
 
+
+    protected class ArticuloDTO
+    {
+        public int Id { get; set; }
+        public string Clave { get; set; } = string.Empty;
+        public string Descripcion { get; set; } = string.Empty;
+        public decimal PrecioPublico { get; set; }
+
+    }
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //product = await zimatService.GetProductByProductoId(producto_id);
+        var result = await _mediator.Send(new GetArticuloQuery(Id));
+        if (result.IsSuccess)
+        {
+            articulo.Id = result.Value.Id;
+            articulo.Clave = result.Value.Clave;
+            articulo.Descripcion = result.Value.Descripcion;
+            articulo.PrecioPublico = result.Value.PrecioPublico;
+        }
+
+    }
+    protected bool errorVisible;
+  
+    protected ArticuloDTO articulo { get; set; } = new();
+
+    protected async Task FormSubmit()
+    {
+
+        try
+        {
+
+            var result = await _mediator.Send(new UpdateArticuloCommand(articulo.Id, articulo.Descripcion, articulo.PrecioPublico));
+
+
+            DialogService.Close(articulo);
+        }
+        catch (Exception)
+        {
+            errorVisible = true;
+        }
+
+    }
+
+    protected async Task CancelButtonClick(MouseEventArgs args)
+    {
+        await Task.Run(() => DialogService.Close(null));
+    }
 }
+

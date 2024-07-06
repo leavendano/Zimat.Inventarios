@@ -1,8 +1,8 @@
-
+﻿
 using Ardalis.GuardClauses;
 using Zimat.Inventarios.Core.Base;
 
-namespace Zimat.Inventarios.Core.ContributorAggregate;
+namespace Zimat.Inventarios.Core.ArticuloAggregate;
 
 public class Unidad(string descripcion,string claveSat) : RegisterBase
 {

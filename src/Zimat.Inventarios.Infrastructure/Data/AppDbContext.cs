@@ -3,6 +3,9 @@ using Ardalis.SharedKernel;
 using Zimat.Inventarios.Core.ContributorAggregate;
 using Microsoft.EntityFrameworkCore;
 using Zimat.Inventarios.Core.Base;
+using Zimat.Inventarios.Core.ProveedorAggregate;
+using Zimat.Inventarios.Core.ArticuloAggregate;
+using Zimat.Inventarios.Core.DocumentoAggregate;
 
 namespace Zimat.Inventarios.Infrastructure.Data;
 public class AppDbContext : DbContext
@@ -18,6 +21,15 @@ public class AppDbContext : DbContext
 
   public DbSet<Contributor> Contributors => Set<Contributor>();
   public DbSet<Articulo> Articulos => Set<Articulo>();
+  public DbSet<Categoria> Categorias => Set<Categoria>();
+  public DbSet<Departamento> Departamentos => Set<Departamento>();
+  public DbSet<Familia> familias => Set<Familia>();
+  public DbSet<Linea> Linea => Set<Linea>();
+  public DbSet<Unidad> Unidades => Set<Unidad>();
+  public DbSet<Proveedor> Proveedores => Set<Proveedor>();
+  public DbSet<Documento> Documentos => Set<Documento>();
+  public DbSet<DocumentoConcepto> DocumentoConceptos => Set<DocumentoConcepto>();
+
 
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 
           => optionsBuilder.UseSnakeCaseNamingConvention();
