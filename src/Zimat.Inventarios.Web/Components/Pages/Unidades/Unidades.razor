@@ -1,0 +1,128 @@
+@page "/unidades"
+@using Ardalis.Result
+@using Zimat.Inventarios.Core.Base
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject ILogger<Unidades> logger
+@using MediatR
+@inject IMediator _mediator
+@using Zimat.Inventarios.UseCases.Unidades
+@using Zimat.Inventarios.UseCases.Unidades.Delete
+@using Zimat.Inventarios.UseCases.Unidades.List
+@attribute [Authorize]
+
+
+<PageTitle>Unidades</PageTitle>
+<RadzenStack>
+    <RadzenRow AlignItems="AlignItems.Center">
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenText Text="Unidades" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton Icon="add_circle_outline" Text="Nuevo" Click="@AddButtonClick" Variant="Variant.Flat" />
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn SizeMD=12>
+            <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
+                            Data="@unidades" TItem="UnidadDTO" RowSelect="@EditRow">
+                <Columns>
+                    <RadzenDataGridColumn TItem="UnidadDTO" Property="Descripcion" Title="Descripción">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="UnidadDTO" Property="ClaveSat" Title="Clave Sat">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="UnidadDTO" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
+                        <Template Context="unidad">
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
+                                          Shade="Shade.Lighter" Variant="Variant.Flat"
+                                          Click=@(args => GridDeleteButtonClick(args, unidad)) @onclick:stopPropagation="true" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+@code {
+
+    protected IEnumerable<UnidadDTO>? unidades;
+
+    protected RadzenDataGrid<UnidadDTO> grid0 = new();
+    protected override async Task OnInitializedAsync()
+    {
+
+        await base.OnInitializedAsync();
+        Result<IEnumerable<UnidadDTO>> result = await _mediator.Send(new ListUnidadesQuery(null, null));
+
+        if (result.IsSuccess)
+        {
+            unidades = result.Value;
+        }
+
+    }
+
+    protected async Task AddButtonClick(MouseEventArgs args)
+    {
+        UseCases.Unidades.UnidadDTO item = await DialogService.OpenAsync<AddUnidad>("Nueva Unidad", null);
+        Result<IEnumerable<UnidadDTO>> result = await _mediator.Send(new ListUnidadesQuery(null, null));
+
+        if (result.IsSuccess)
+        {
+
+            unidades = result.Value;
+            await grid0.Reload();
+        }
+
+    }
+
+    protected async Task EditRow(UnidadDTO args)
+    {
+        await DialogService.OpenAsync<EditUnidad>("Edit Unidad", new Dictionary<string, object> { { "Id",args.Id} });
+        Result<IEnumerable<UnidadDTO>> result = await _mediator.Send(new ListUnidadesQuery(null, null));
+        if (result.IsSuccess)
+        {
+
+            unidades = result.Value;
+            await grid0.Reload();
+        }
+    }
+
+    protected async Task GridDeleteButtonClick(MouseEventArgs args, UnidadDTO unidad)
+    {
+        try
+        {
+            if (await DialogService.Confirm("Está seguro de borrar este elemento?") == true)
+            {
+                var result = await _mediator.Send(new DeleteUnidadCommand(unidad.Id));
+
+                if (result.IsSuccess)
+                {
+                    Result<IEnumerable<UnidadDTO>> result2 = await _mediator.Send(new ListUnidadesQuery(null, null));
+                    if (result2.IsSuccess)
+                    {
+    
+                        unidades = result2.Value;
+                        await grid0.Reload();
+                    }
+
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            logger.LogError(0, e, "Error al eliminar un elemento");
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = $"Error",
+                    Detail = $"Unable to delete Product"
+                });
+        }
+    }
+}

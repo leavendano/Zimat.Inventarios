@@ -1,11 +1,10 @@
 ﻿using System.Reflection;
 using Ardalis.SharedKernel;
-using Zimat.Inventarios.Core.ContributorAggregate;
 using Microsoft.EntityFrameworkCore;
-using Zimat.Inventarios.Core.Base;
 using Zimat.Inventarios.Core.ProveedorAggregate;
 using Zimat.Inventarios.Core.ArticuloAggregate;
 using Zimat.Inventarios.Core.DocumentoAggregate;
+using Zimat.Inventarios.Core.UnidadAggregate;
 
 namespace Zimat.Inventarios.Infrastructure.Data;
 public class AppDbContext : DbContext
@@ -19,7 +18,7 @@ public class AppDbContext : DbContext
     _dispatcher = dispatcher;
   }
 
-  public DbSet<Contributor> Contributors => Set<Contributor>();
+ 
   public DbSet<Articulo> Articulos => Set<Articulo>();
   public DbSet<Categoria> Categorias => Set<Categoria>();
   public DbSet<Departamento> Departamentos => Set<Departamento>();
@@ -43,7 +42,7 @@ public class AppDbContext : DbContext
   public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
   {
 
-    var entries = ChangeTracker.Entries<RegisterBase>().
+    var entries = ChangeTracker.Entries<IRegisterBase>().
                  Where(x => x.State == EntityState.Added || x.State == EntityState.Modified);
 
             foreach (var entityEntry in entries)

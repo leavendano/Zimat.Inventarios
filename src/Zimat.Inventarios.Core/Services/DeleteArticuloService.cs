@@ -4,6 +4,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Zimat.Inventarios.Core.ArticuloAggregate;
 using Zimat.Inventarios.Core.ArticuloAggregate.Events;
+using Zimat.Inventarios.Core.Base;
 using Zimat.Inventarios.Core.Interfaces;
 
 namespace Zimat.Inventarios.Core.Services;
@@ -11,7 +12,7 @@ public class DeleteArticuloService(IRepository<Articulo> _repository,
   IMediator _mediator,
   ILogger<DeleteContributorService> _logger) : IDeleteArticuloService
 {
-  public async Task<Result> DeleteArticulo(int articuloId)
+  public async Task<Result> DeleteArticulo(Guid articuloId)
   {
     _logger.LogInformation("Eliminando Articulo {contributorId}", articuloId);
     Articulo? aggregateToDelete = await _repository.GetByIdAsync(articuloId);

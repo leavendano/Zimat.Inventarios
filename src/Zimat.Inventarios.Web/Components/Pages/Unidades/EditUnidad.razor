@@ -1,0 +1,88 @@
+@page "/edit-unidades"
+@using MediatR
+@using Zimat.Inventarios.UseCases.Unidades.Get
+@using Zimat.Inventarios.UseCases.Unidades.Update
+@inject IMediator _mediator
+@inject DialogService DialogService
+
+
+<PageTitle>Unidades</PageTitle>
+<RadzenColumn SizeMD=12>
+    <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Cannot save Product</RadzenAlert>
+    <RadzenTemplateForm TItem="UnidadDTO" Data="@unidad" Visible="@(unidad != null)" Submit="@FormSubmit">
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Descripción" Component="descripcion" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@unidad!.Descripcion" Name="descripcion" />
+                <RadzenRequiredValidator Component="descripcion" Text="La descripción es requerida" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Clave SAT" Component="clave_sat" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@unidad!.ClaveSat" Name="clave_sat" />
+                <RadzenRequiredValidator Component="clave_sat" Text="La clave es requerida" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Save" Variant="Variant.Flat" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancel" Variant="Variant.Flat" Click="@CancelButtonClick" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenColumn>
+
+@code{
+    protected class UnidadDTO
+    {
+        public int Id { get; set; }
+        public string Descripcion { get; set; } = string.Empty;
+        public string ClaveSat { get; set; } = string.Empty;
+
+    }
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //product = await zimatService.GetProductByProductoId(producto_id);
+        var result = await _mediator.Send(new GetUnidadQuery(Id));
+        if (result.IsSuccess)
+        {
+            unidad.Id = result.Value.Id;
+            unidad.Descripcion = result.Value.Descripcion;
+            unidad.ClaveSat = result.Value.ClaveSat;
+        }
+
+    }
+    protected bool errorVisible;
+  
+    protected UnidadDTO unidad { get; set; } = new();
+
+    protected async Task FormSubmit()
+    {
+
+        try
+        {
+
+            var result = await _mediator.Send(new UpdateUnidadCommand(unidad.Id, unidad.Descripcion, unidad.ClaveSat));
+
+            DialogService.Close(unidad);
+        }
+        catch (Exception)
+        {
+            errorVisible = true;
+        }
+
+    }
+
+    protected async Task CancelButtonClick(MouseEventArgs args)
+    {
+        await Task.Run(() => DialogService.Close(null));
+    }
+    
+}

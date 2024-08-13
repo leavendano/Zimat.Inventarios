@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Zimat.Inventarios.UseCases.Articulos.List;
 using Zimat.Inventarios.UseCases.Documentos.List;
 using Zimat.Inventarios.UseCases.Proveedores.List;
+using Zimat.Inventarios.UseCases.Unidades.List;
 
 namespace Zimat.Inventarios.Infrastructure;
 public static class InfrastructureServiceExtensions
@@ -35,7 +36,7 @@ public static class InfrastructureServiceExtensions
     services.AddScoped<IDeleteArticuloService, DeleteArticuloService>();
     services.AddScoped<IListDocumentosQueryService, ListDocumentosQueryService>();
     services.AddScoped<IListProveedoresQueryService, ListProveedoresQueryService>();
-
+    services.AddScoped<IListUnidadesQueryService, ListUnidadesQueryService>();
     services.Configure<MailserverConfiguration>(config.GetSection("Mailserver"));
 
     logger.LogInformation("{Project} services registered", "Infrastructure");

@@ -20,7 +20,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Zimat.Inventarios.Web;
 
 
-const string MS_OIDC_SCHEME = "MicrosoftOidc";
+//const string MS_OIDC_SCHEME = "MicrosoftOidc";
 var logger = Log.Logger = new LoggerConfiguration()
   .Enrich.FromLogContext()
   .WriteTo.Console()
@@ -35,24 +35,23 @@ var microsoftLogger = new SerilogLoggerFactory(logger)
     .CreateLogger<Program>();
 
 
-builder.Services.AddAuthentication(MS_OIDC_SCHEME)
-.AddOpenIdConnect(MS_OIDC_SCHEME, options =>
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+})
+.AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
 {
     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.Authority = "https://localhost:7001/";
     options.ClientId = "zimat_app";
     options.ClientSecret = "Zimat_1985";
     options.ResponseType = "code";
-    //options.SaveTokens = true;
-    //options.GetClaimsFromUserInfoEndpoint = true;
-    //options.UseTokenLifetime = false;
-    //options.Scope.Add("openid");
-    //options.Scope.Add("profile");
-    //options.TokenValidationParameters = new TokenValidationParameters{ NameClaimType = "name" };
-    // options.CallbackPath = new PathString("/signin-oidc");
-    // options.SignedOutCallbackPath = new PathString("/signout-callback-oidc");
-    // options.RemoteSignOutPath = new PathString("/signout-oidc");
     options.MapInboundClaims = false;
+    options.SaveTokens = true;
+    options.GetClaimsFromUserInfoEndpoint = true;
+    options.Scope.Add("openid");
+    options.Scope.Add("profile");
     options.TokenValidationParameters.NameClaimType = JwtRegisteredClaimNames.Name;
     options.TokenValidationParameters.RoleClaimType = "role";
 
@@ -68,7 +67,7 @@ builder.Services.AddAuthentication(MS_OIDC_SCHEME)
 })
 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
 
-builder.Services.ConfigureCookieOidcRefresh(CookieAuthenticationDefaults.AuthenticationScheme, MS_OIDC_SCHEME);
+builder.Services.ConfigureCookieOidcRefresh(CookieAuthenticationDefaults.AuthenticationScheme, OpenIdConnectDefaults.AuthenticationScheme);
 
 builder.Services.AddAuthorization();
 

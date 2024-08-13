@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Zimat.Inventarios.Core.Base;
 using Zimat.Inventarios.Core.DocumentoAggregate;
 
 
@@ -8,8 +9,15 @@ internal class DocumentoConceptoConfiguration : IEntityTypeConfiguration<Documen
 {
   public void Configure(EntityTypeBuilder<DocumentoConcepto> builder)
   {
-    //builder.HasOne<Documento>()
-    //    .WithMany()
-    //    .HasForeignKey(x => x.DocumentoId);
+    
+    builder.HasOne<Documento>()
+        .WithMany()
+        .HasForeignKey(x => x.DocumentoId)
+        .HasPrincipalKey(x => x.Id);
+
+    builder.Property(x => x.DocumentoId).HasColumnType("uuid");
+
+    builder.Property(x => x.Id).HasColumnType("uuid");
+        
   }
 }
