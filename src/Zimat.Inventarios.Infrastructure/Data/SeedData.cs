@@ -1,9 +1,8 @@
-﻿using Zimat.Inventarios.Core.ContributorAggregate;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Zimat.Inventarios.Core.ProveedorAggregate;
 using Zimat.Inventarios.Core.ArticuloAggregate;
-
+using Zimat.Inventarios.Core.UnidadAggregate;
 namespace Zimat.Inventarios.Infrastructure.Data;
 
 public static class SeedData
@@ -41,14 +40,18 @@ public static class SeedData
 
       GuardaCambios = true;
     }
+   
 
     if (!dbContext.Articulos.Any())
     {
-
-      dbContext.Articulos.Add(new Articulo("10-001", "CEMENTO GRIS TOLTECA BTO 50 / KGS", 211));
-      dbContext.Articulos.Add(new Articulo("10-004", "CEMENTO BLANCO TOLTECA BTO/25 KGS", 201));
-      dbContext.Articulos.Add(new Articulo("10-005", "MORTERO TOLTECA BTO/50 KG.", 195));
-      dbContext.Articulos.Add(new Articulo("10-101", "CAL HIDRATADA BTO 25 / KGS", 82));
+      
+      
+      var art1 = new Articulo("10-001", "CEMENTO GRIS TOLTECA BTO 50 / KGS", 211,1,"Administrador");
+      dbContext.Articulos.Add(art1);
+      var art2 = new Articulo("10-004", "CEMENTO BLANCO TOLTECA BTO/25 KGS", 201,1,"Administrador");
+      dbContext.Articulos.Add(art2);
+      dbContext.Articulos.Add(new Articulo("10-005", "MORTERO TOLTECA BTO/50 KG.", 195,1,"Administrador"));
+      dbContext.Articulos.Add(new Articulo("10-101", "CAL HIDRATADA BTO 25 / KGS", 82,1,"Administrador"));
 
       GuardaCambios = true;
     }

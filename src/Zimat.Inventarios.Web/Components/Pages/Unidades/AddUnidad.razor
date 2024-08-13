@@ -1,0 +1,106 @@
+@page "/add-unidad"
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject ILogger<AddUnidad> logger
+@using MediatR
+@using Zimat.Inventarios.UseCases.Unidades.Create
+@using Ardalis.Result
+@inject IMediator  _mediator
+@attribute [Authorize]
+
+<PageTitle>Nueva Unidad</PageTitle>
+    <RadzenColumn SizeMD=12>
+        <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">@mensajeAlerta</RadzenAlert>
+        <RadzenTemplateForm TItem="UnidadDTO" Data="@item" Visible="@(item != null)" Submit="@FormSubmit"> 
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Descripción" Component="descripcion" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@item!.Descripcion" Name="descripcion" />
+                    <RadzenRequiredValidator Component="descripcion" Text="La Descripción es requerida" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Clave SAT" Component="clave_sat" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox  Name="clave_sat" @bind-Value="@item!.ClaveSat"  Style="width: 100%;" aria-label="clave_sat" />
+                    <RadzenRequiredValidator Component="clave_sat" Text="La clave SAT es requerida" />
+                </RadzenColumn>
+            </RadzenRow>
+          <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                    <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Guardar" Variant="Variant.Flat" />
+                    <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancelar" Variant="Variant.Flat" Click="@CancelButtonClick"  />
+          </RadzenStack>
+        </RadzenTemplateForm>
+    </RadzenColumn>
+
+@code {
+
+    protected class UnidadDTO
+    {
+        
+        public string Descripcion {get; set;} = string.Empty;
+        public string ClaveSat {get; set;} = string.Empty;
+    }
+
+    protected bool errorVisible;
+    protected string mensajeAlerta = "No se guardo el registro";
+    [SupplyParameterFromForm]
+    protected UnidadDTO item {get; set;} = new();
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+    private string? NombreUsuario {get; set;}
+
+    protected override async Task OnInitializedAsync()
+    {
+        item ??= new();
+        if (authenticationState is not null)
+        {
+            var authState = await authenticationState;
+            
+             if (authState.User?.Identity is not null && authState.User.Identity.IsAuthenticated)
+             {
+                NombreUsuario = authState.User.Identity.Name;
+             }
+            
+        }
+    }
+    
+    protected async Task FormSubmit()
+    {
+        
+        try
+        {
+            
+            var result = await _mediator.Send(new CreateUnidadCommand(item.Descripcion,item.ClaveSat,NombreUsuario!));
+            DialogService.Close(item);
+            
+        }
+        catch (Exception e)
+        {
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error,
+                 Summary = e.Message,
+                  Detail = "Error Detail", Duration = 4000 });
+            mensajeAlerta = "ocurrió un error de la base de datos";
+            errorVisible = true;
+        }
+        
+    }
+
+    void OnChange(string value, string name)
+    {
+        logger.LogInformation($"{name} se cambió a  {value}");
+    }
+
+    protected async Task CancelButtonClick(MouseEventArgs args)
+    {
+        await Task.Run(() => DialogService.Close(null));
+    }
+}

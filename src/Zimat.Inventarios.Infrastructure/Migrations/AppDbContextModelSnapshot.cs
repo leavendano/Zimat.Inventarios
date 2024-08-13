@@ -24,19 +24,17 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
 
             modelBuilder.Entity("Zimat.Inventarios.Core.ArticuloAggregate.Articulo", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("Activo")
                         .HasColumnType("boolean")
                         .HasColumnName("activo");
 
-                    b.Property<string>("CategoriaId")
-                        .HasColumnType("text")
+                    b.Property<int?>("CategoriaId")
+                        .HasColumnType("integer")
                         .HasColumnName("categoria_id");
 
                     b.Property<string>("Clave")
@@ -65,10 +63,6 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     b.Property<decimal>("DescuentoMaximo")
                         .HasColumnType("numeric")
                         .HasColumnName("descuento_maximo");
-
-                    b.Property<string>("Divisa")
-                        .HasColumnType("text")
-                        .HasColumnName("divisa");
 
                     b.Property<int>("Estatus")
                         .HasColumnType("integer")
@@ -114,10 +108,6 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("precio_publico");
 
-                    b.Property<int?>("ProveedorId")
-                        .HasColumnType("integer")
-                        .HasColumnName("proveedor_id");
-
                     b.Property<decimal>("Reorden")
                         .HasColumnType("numeric")
                         .HasColumnName("reorden");
@@ -142,9 +132,9 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("ultimo_costo");
 
-                    b.Property<string>("Unidad")
-                        .HasColumnType("text")
-                        .HasColumnName("unidad");
+                    b.Property<int>("UnidadId")
+                        .HasColumnType("integer")
+                        .HasColumnName("unidad_id");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -357,55 +347,12 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     b.ToTable("unidades", (string)null);
                 });
 
-            modelBuilder.Entity("Zimat.Inventarios.Core.ContributorAggregate.Contributor", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<int>("Estatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("estatus");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("name");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("Usuario")
-                        .HasColumnType("text")
-                        .HasColumnName("usuario");
-
-                    b.HasKey("Id")
-                        .HasName("pk_contributors");
-
-                    b.ToTable("contributors", (string)null);
-                });
-
             modelBuilder.Entity("Zimat.Inventarios.Core.DocumentoAggregate.Documento", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("AlmacenId")
                         .HasColumnType("integer")
@@ -489,12 +436,10 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
 
             modelBuilder.Entity("Zimat.Inventarios.Core.DocumentoAggregate.DocumentoConcepto", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ArticuloId")
                         .HasColumnType("integer")
@@ -520,8 +465,8 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("devueltos");
 
-                    b.Property<int>("DocumentoId")
-                        .HasColumnType("integer")
+                    b.Property<Guid>("DocumentoId")
+                        .HasColumnType("uuid")
                         .HasColumnName("documento_id");
 
                     b.Property<int>("Estatus")
@@ -670,40 +615,6 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasName("pk_proveedores");
 
                     b.ToTable("proveedores", (string)null);
-                });
-
-            modelBuilder.Entity("Zimat.Inventarios.Core.ContributorAggregate.Contributor", b =>
-                {
-                    b.OwnsOne("Zimat.Inventarios.Core.ContributorAggregate.PhoneNumber", "PhoneNumber", b1 =>
-                        {
-                            b1.Property<int>("ContributorId")
-                                .HasColumnType("integer")
-                                .HasColumnName("id");
-
-                            b1.Property<string>("CountryCode")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("phone_number_country_code");
-
-                            b1.Property<string>("Extension")
-                                .HasColumnType("text")
-                                .HasColumnName("phone_number_extension");
-
-                            b1.Property<string>("Number")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("phone_number_number");
-
-                            b1.HasKey("ContributorId");
-
-                            b1.ToTable("contributors");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ContributorId")
-                                .HasConstraintName("fk_contributors_contributors_id");
-                        });
-
-                    b.Navigation("PhoneNumber");
                 });
 
             modelBuilder.Entity("Zimat.Inventarios.Core.DocumentoAggregate.DocumentoConcepto", b =>

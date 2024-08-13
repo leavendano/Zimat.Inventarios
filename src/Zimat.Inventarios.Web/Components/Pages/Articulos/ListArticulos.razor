@@ -1,0 +1,133 @@
+﻿@page "/list_articulos"
+@using Ardalis.Result
+@using Zimat.Inventarios.Core.Base
+@using Zimat.Inventarios.UseCases.Articulos
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject ILogger<ListArticulos> logger
+@using MediatR
+@inject IMediator _mediator
+@using Zimat.Inventarios.UseCases.Articulos.Delete
+@using Zimat.Inventarios.UseCases.Articulos.List
+@attribute [Authorize]
+
+
+<PageTitle>Artículos</PageTitle>
+<RadzenStack>
+    <RadzenRow AlignItems="AlignItems.Center">
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenText Text="Artículos" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton Icon="add_circle_outline" Text="Nuevo" Click="@AddButtonClick" Variant="Variant.Flat" />
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn SizeMD=12>
+            <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
+                            Data="@articulos" TItem="ArticuloDTO" RowSelect="@EditRow">
+                <Columns>
+                    <RadzenDataGridColumn TItem="ArticuloDTO" Property="Clave" Title="Clave">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="ArticuloDTO" Property="Descripcion" Title="Descripcion">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="ArticuloDTO" Property="PrecioPublico" Title="Precio">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="ArticuloDTO" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
+                        <Template Context="articulo">
+
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
+                                          Shade="Shade.Lighter" Variant="Variant.Flat"
+                                          Click=@(args => GridDeleteButtonClick(args, articulo)) @onclick:stopPropagation="true" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+
+            </RadzenDataGrid>
+
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+@code {
+
+    protected IEnumerable<ArticuloDTO>? articulos;
+
+    protected RadzenDataGrid<ArticuloDTO> grid0 = new();
+    protected override async Task OnInitializedAsync()
+    {
+
+        await base.OnInitializedAsync();
+        Result<IEnumerable<ArticuloDTO>> result = await _mediator.Send(new ListArticulosQuery(null, null));
+
+        if (result.IsSuccess)
+        {
+            articulos = result.Value;
+        }
+
+    }
+
+    protected async Task AddButtonClick(MouseEventArgs args)
+    {
+        await DialogService.OpenAsync<AddArticulo>("Nuevo Artículo", null,new DialogOptions() { Width = $"{900}px", Height = $"{600}px" });
+        Result<IEnumerable<ArticuloDTO>> result = await _mediator.Send(new ListArticulosQuery(null, null));
+
+        if (result.IsSuccess)
+        {
+
+            articulos = result.Value;
+            await grid0.Reload();
+        }
+
+    }
+
+    protected async Task EditRow(ArticuloDTO args)
+    {
+        await DialogService.OpenAsync<EditArticulo>("Edit Articulo", new Dictionary<string, object> { { "Id",args.Id} });
+        Result<IEnumerable<ArticuloDTO>> result = await _mediator.Send(new ListArticulosQuery(null, null));
+        if (result.IsSuccess)
+        {
+
+            articulos = result.Value;
+            await grid0.Reload();
+        }
+    }
+
+    protected async Task GridDeleteButtonClick(MouseEventArgs args, ArticuloDTO articulo)
+    {
+        try
+        {
+            if (await DialogService.Confirm("Está seguro de borrar este elemento?") == true)
+            {
+
+                var result = await _mediator.Send(new DeleteArticuloCommand(articulo.Id));
+
+                if (result.IsSuccess)
+                {
+                    Result<IEnumerable<ArticuloDTO>> result2 = await _mediator.Send(new ListArticulosQuery(null, null));
+                    if (result2.IsSuccess)
+                    {
+                        articulos = result2.Value;
+                        await grid0.Reload();
+                    }
+
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            logger.LogError(0, e, "Error al eliminar un elemento");
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = $"Error",
+                    Detail = $"Unable to delete Product"
+                });
+        }
+    }
+}

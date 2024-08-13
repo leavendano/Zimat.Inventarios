@@ -6,7 +6,7 @@ namespace Zimat.Inventarios.Core.ArticuloAggregate.Events;
 /// A domain event that is dispatched whenever a contributor is deleted.
 /// The DeleteContributorService is used to dispatch this event.
 /// </summary>
-internal sealed class ArticuloDeletedEvent(int articuloId) : DomainEventBase
+internal sealed class ArticuloDeletedEvent(Guid articuloId) : DomainEventBase
 {
-  public int ArticuloId { get; init; } = articuloId;
+  public Guid ArticuloId { get; init; } = articuloId;
 }
