@@ -134,7 +134,7 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "linea",
+                name: "lineas",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
@@ -148,7 +148,7 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_linea", x => x.id);
+                    table.PrimaryKey("pk_lineas", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -215,10 +215,11 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     cantidad = table.Column<decimal>(type: "numeric", nullable: false),
                     pendiente = table.Column<decimal>(type: "numeric", nullable: false),
                     devueltos = table.Column<decimal>(type: "numeric", nullable: false),
-                    p_descuento = table.Column<decimal>(type: "numeric", nullable: false),
+                    descuento = table.Column<decimal>(type: "numeric", nullable: false),
                     impuesto1 = table.Column<decimal>(type: "numeric", nullable: false),
                     impuesto2 = table.Column<decimal>(type: "numeric", nullable: false),
                     numero_serie = table.Column<string>(type: "text", nullable: true),
+                    importe = table.Column<decimal>(type: "numeric", nullable: false),
                     usuario = table.Column<string>(type: "text", nullable: true),
                     estatus = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -260,7 +261,7 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 name: "familias");
 
             migrationBuilder.DropTable(
-                name: "linea");
+                name: "lineas");
 
             migrationBuilder.DropTable(
                 name: "proveedores");

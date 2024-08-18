@@ -8,7 +8,7 @@ public class ListDocumentosQueryService(AppDbContext _db) : IListDocumentosQuery
   public async Task<IEnumerable<DocumentoDTO>> ListAsync()
   {
     var result = await _db.Database.SqlQuery<DocumentoDTO>(
-      $"SELECT id,folio , fecha, tipo_documento, cliente_id, proveedor_id, importe FROM Articulos") // don't fetch other big columns
+      $"SELECT id,folio , fecha, tipo_documento_id, cliente_id, proveedor_id, importe FROM documentos") // don't fetch other big columns
       .ToListAsync();
 
     return result;

@@ -10,10 +10,9 @@ internal class DocumentoConceptoConfiguration : IEntityTypeConfiguration<Documen
   public void Configure(EntityTypeBuilder<DocumentoConcepto> builder)
   {
     
-    builder.HasOne<Documento>()
-        .WithMany()
-        .HasForeignKey(x => x.DocumentoId)
-        .HasPrincipalKey(x => x.Id);
+    //builder.HasOne<Documento>()
+    //    .WithMany()
+    //    .HasPrincipalKey(x => x.Id);
 
     builder.Property(x => x.DocumentoId).HasColumnType("uuid");
 

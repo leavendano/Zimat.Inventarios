@@ -1,0 +1,184 @@
+﻿@page "/add-documento"
+
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject ILogger<AddDocumento> logger
+@using Zimat.Inventarios.UseCases.Documentos
+@using Zimat.Inventarios.UseCases.Documentos.Create
+@using Zimat.Inventarios.UseCases.Proveedores
+@using Zimat.Inventarios.UseCases.Proveedores.List
+@using MediatR
+@inject IMediator _mediator
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
+@attribute [Authorize]
+
+<PageTitle>Nuevo Documento</PageTitle>
+
+<RadzenColumn SizeMD=12>
+    <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">No se pudo guardar el documento</RadzenAlert>
+    <RadzenTemplateForm TItem="DocumentoDTO" Data="@documento" Visible="@(documento != null)" Submit="@FormSubmit">
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="2">
+                <RadzenLabel Text="Proveedor" Component="proveedor" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="5">
+                <RadzenDropDown @bind-Value="@documento!.ProveedorId" Data=@listadoProveedores TextProperty="@nameof(ProveedorDTO.Nombre)" ValueProperty="Id"
+                                AllowClear=false Placeholder="Seleccione un proveedor" style="display: block; width: 100%" Name="DropDownFamilia" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="1">
+                <RadzenLabel Text="Fecha" Component="fecha" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="4">
+                <RadzenDatePicker @bind-Value="@documento!.Fecha" Name="fecha" ShowCalendarWeek />
+                <RadzenRequiredValidator Component="fecha" Text="La fecha es requerida" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="2">
+                <RadzenLabel Text="Folio" Component="folio" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="4">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@documento!.Folio" Name="folio" />
+                <RadzenRequiredValidator Component="folio" Text="El folio es requerida" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="2">
+                <RadzenLabel Text="Referencia" Component="refencia" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="4">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@documento!.Referencia" Name="referencia" />
+                
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn SizeMD=12>
+                <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true"
+                ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})  Data="@conceptos" TItem="ConceptoGridModel">
+                    <HeaderTemplate>
+                        <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle" Text="Agregar fila" Click="@InsertRow" />
+                    </HeaderTemplate>
+                    <Columns>
+                        <RadzenDataGridColumn TItem="ConceptoGridModel" Property="ClaveArticulo" Title="Clave">
+                            <EditTemplate Context="concepto">
+                                <RadzenTextBox @bind-Value="concepto.ClaveArticulo" Style="width:200px; display: block" Name="clave" aria-label="Enter ship name" />
+                                <RadzenRequiredValidator Text="ShipName is required" Component="ShipName" Popup="true" />
+                            </EditTemplate>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="ConceptoGridModel" Property="Descripcion" Title="Descripcion">
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="ConceptoGridModel" Property="PrecioPublico" Title="Precio">
+                        </RadzenDataGridColumn>
+                        
+                    </Columns>
+
+                </RadzenDataGrid>
+
+            </RadzenColumn>
+        </RadzenRow>
+      
+
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Save" Variant="Variant.Flat" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancel" Variant="Variant.Flat" Click="@CancelButtonClick" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenColumn>
+
+@code {
+
+    protected class DocumentoDTO
+    {
+        public string Folio { get; set; } = "";
+        public int TipoDocumentoId { get; set; } = 1;
+        public DateTime Fecha { get; set; } = DateTime.Now;
+        public int? ClienteId { get; set; }
+        public int? ProveedorId { get; set; }
+        public int? FormaPagoId { get; set; }
+        public string Divisa { get; set; } = "MXN";
+        public decimal TipoCambio { get; set; } = 1m;
+        public decimal PDescuento { get; set; } = 0m;
+        public decimal Descuento { get; set; } = 0m;
+        public DateTime? FechaPago { get; set; }
+        public string? Referencia { get; set; }
+        public decimal Importe { get; set; } = 0;
+    }
+
+    protected class ConceptoGridModel
+    {
+        public string ClaveArticulo { get; set; } = "";
+        public string NombreArticulo { get; set; } = "";
+        public string Descripcion { get; set; } = "";
+        public decimal PrecioPublico { get; set; }
+    }
+
+    protected bool errorVisible;
+    [SupplyParameterFromForm]
+    protected DocumentoDTO documento { get; set; } = new();
+
+    protected IEnumerable<ConceptoGridModel>? conceptos;
+
+    List<ConceptoGridModel> conceptoToInsert = new List<ConceptoGridModel>();
+
+    RadzenDataGrid<ConceptoGridModel> grid0 = new();
+
+    string? UserName = null;
+    IEnumerable<ProveedorDTO>? listadoProveedores { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        UserName = user?.Identity?.Name;
+
+        var resultProveedores = await _mediator.Send(new ListProveedoresQuery(null, null));
+        if (resultProveedores.IsSuccess)
+        {
+            listadoProveedores = resultProveedores.Value;
+        }
+
+
+    }
+
+
+    protected async Task FormSubmit()
+    {
+
+        try
+        {
+            documento.Importe = 100;
+            //await zimatService.CreateProduct(product);
+            var result = await _mediator.Send(new CreateDocumentoCommand(documento.Folio!, DateTime.UtcNow,documento.TipoDocumentoId, documento.ClienteId,
+                documento.ProveedorId, documento.Importe));
+            DialogService.Close(documento);
+        }
+        catch (Exception)
+        {
+            errorVisible = true;
+        }
+
+    }
+
+    void OnChange(string value, string name)
+    {
+        logger.LogInformation($"{name} value changed to {value}");
+    }
+
+    protected async Task CancelButtonClick(MouseEventArgs args)
+    {
+        await Task.Run(() => DialogService.Close(null));
+    }
+
+    async Task InsertRow()
+    {
+        
+
+        var concepto = new ConceptoGridModel();
+        conceptoToInsert.Add(concepto);
+        await grid0.InsertRow(concepto);
+        await grid0.Reload();
+    }
+    
+}

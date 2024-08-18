@@ -19,7 +19,7 @@
 <RadzenStack>
     <RadzenRow AlignItems="AlignItems.Center">
         <RadzenColumn Size="12" SizeMD="6">
-            <RadzenText Text="Artículos" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+            <RadzenText Text="Documentos de Compra" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="6">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
@@ -34,7 +34,7 @@
                 <Columns>
                     <RadzenDataGridColumn TItem="DocumentoDTO" Property="Folio" Title="Folio">
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="DocumentoDTO" Property="Tipo" Title="Tipo">
+                    <RadzenDataGridColumn TItem="DocumentoDTO" Property="TipoDocumentoId" Title="Tipo">
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="DocumentoDTO" Property="Fecha" Title="Fecha">
                     </RadzenDataGridColumn>
@@ -73,7 +73,7 @@
 
     protected async Task AddButtonClick(MouseEventArgs args)
     {
-       // await DialogService.OpenAsync<AddArticulo>("Nuevo Artículo", null, new DialogOptions() { Width = $"{900}px", Height = $"{600}px" });
+        await DialogService.OpenAsync<AddDocumento>("Nuevo Documento", null, new DialogOptions() { Width = $"{1000}px", Height = $"{600}px" });
         Result<IEnumerable<DocumentoDTO>> result = await _mediator.Send(new ListDocumentosQuery(null, null));
 
         if (result.IsSuccess)
@@ -97,14 +97,14 @@
         }
     }
 
-    protected async Task GridDeleteButtonClick(MouseEventArgs args, DocumentoDTO articulo)
+    protected async Task GridDeleteButtonClick(MouseEventArgs args, DocumentoDTO documento)
     {
         try
         {
             if (await DialogService.Confirm("Está seguro de borrar este elemento?") == true)
             {
 
-                var result = await _mediator.Send(new DeleteDocumentoCommand(articulo.Id));
+                var result = await _mediator.Send(new DeleteDocumentoCommand(documento.Id));
 
                 if (result.IsSuccess)
                 {
