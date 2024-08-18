@@ -1,7 +1,4 @@
-﻿using System.Data.Common;
-using System.Runtime.ConstrainedExecution;
-using System.Runtime.Serialization;
-using Ardalis.GuardClauses;
+﻿using Ardalis.GuardClauses;
 using Ardalis.SharedKernel;
 using Zimat.Inventarios.Core.Base;
 using Zimat.Inventarios.Core.DocumentoAggregate.Events;

@@ -3,6 +3,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Zimat.Inventarios.Core.ProveedorAggregate;
 using Zimat.Inventarios.Core.ArticuloAggregate;
 using Zimat.Inventarios.Core.UnidadAggregate;
+using Zimat.Inventarios.Core.LineaAggregate;
+using Zimat.Inventarios.Core.FamiliaAggregate;
+using Zimat.Inventarios.Core.CategoriaAggregate;
+using Zimat.Inventarios.Core.DepartamentoAggregate;
 namespace Zimat.Inventarios.Infrastructure.Data;
 
 public static class SeedData
@@ -40,7 +44,55 @@ public static class SeedData
 
       GuardaCambios = true;
     }
-   
+
+    if (!dbContext.Lineas.Any())
+    {
+
+      dbContext.Lineas.Add(new Linea("POLVOS Y PRODUCTOS DE CONCRETO"));
+      dbContext.Lineas.Add(new Linea("ACEROS"));
+      dbContext.Lineas.Add(new Linea("LAMINA, TEJAS Y  ACCESORIOS"));
+      dbContext.Lineas.Add(new Linea("SANITARIOS"));
+
+
+      GuardaCambios = true;
+    }
+
+    if (!dbContext.Familias.Any())
+    {
+
+      dbContext.Familias.Add(new Familia("CEMEX"));
+      dbContext.Familias.Add(new Familia("MEXALIT"));
+      dbContext.Familias.Add(new Familia("DEACERO"));
+      dbContext.Familias.Add(new Familia("CERAMAT"));
+
+
+      GuardaCambios = true;
+    }
+
+
+    if (!dbContext.Categorias.Any())
+    {
+
+      dbContext.Categorias.Add(new Categoria("POLVOS"));
+      dbContext.Categorias.Add(new Categoria("ACEROS"));
+      dbContext.Categorias.Add(new Categoria("RECUBRIMIENTOS"));
+      dbContext.Categorias.Add(new Categoria("TECHADOS"));
+
+
+      GuardaCambios = true;
+    }
+    if (!dbContext.Departamentos.Any())
+    {
+
+      dbContext.Departamentos.Add(new Departamento("PINTURAS , SELLADOR Y DESOXIDA"));
+      dbContext.Departamentos.Add(new Departamento("PRODUCTOS AIRE Y EQUIPOS"));
+      dbContext.Departamentos.Add(new Departamento("PRODUCTOS ALAFLEX"));
+      dbContext.Departamentos.Add(new Departamento("PRODUCTOS ALLAPSA"));
+
+
+      GuardaCambios = true;
+    }
+
 
     if (!dbContext.Articulos.Any())
     {

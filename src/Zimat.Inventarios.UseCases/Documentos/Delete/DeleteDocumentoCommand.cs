@@ -7,4 +7,4 @@ using Ardalis.Result;
 using Ardalis.SharedKernel;
 
 namespace Zimat.Inventarios.UseCases.Documentos.Delete;
-public record DeleteDocumentoCommand(int DocumentoId) : ICommand<Result>;
+public record DeleteDocumentoCommand(Guid DocumentoId) : ICommand<Result>;

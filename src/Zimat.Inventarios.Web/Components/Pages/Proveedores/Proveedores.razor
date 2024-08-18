@@ -30,8 +30,8 @@
     </RadzenRow>
     <RadzenRow>
         <RadzenColumn SizeMD=12>
-            <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
-                            Data="@proveedores" TItem="ProveedorDTO" RowSelect="@EditRow">
+            <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" 
+                    ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30}) Data="@proveedores" TItem="ProveedorDTO" RowSelect="@EditRow">
                 <Columns>
                     <RadzenDataGridColumn TItem="ProveedorDTO" Property="Clave" Title="Clave">
                     </RadzenDataGridColumn>

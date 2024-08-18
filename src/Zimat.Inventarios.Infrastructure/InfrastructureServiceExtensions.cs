@@ -14,6 +14,10 @@ using Zimat.Inventarios.UseCases.Articulos.List;
 using Zimat.Inventarios.UseCases.Documentos.List;
 using Zimat.Inventarios.UseCases.Proveedores.List;
 using Zimat.Inventarios.UseCases.Unidades.List;
+using Zimat.Inventarios.UseCases.Lineas.List;
+using Zimat.Inventarios.UseCases.Familias.List;
+using Zimat.Inventarios.UseCases.Categorias.List;
+using Zimat.Inventarios.UseCases.Departamentos.List;
 
 namespace Zimat.Inventarios.Infrastructure;
 public static class InfrastructureServiceExtensions
@@ -37,6 +41,10 @@ public static class InfrastructureServiceExtensions
     services.AddScoped<IListDocumentosQueryService, ListDocumentosQueryService>();
     services.AddScoped<IListProveedoresQueryService, ListProveedoresQueryService>();
     services.AddScoped<IListUnidadesQueryService, ListUnidadesQueryService>();
+    services.AddScoped<IListLineasQueryService, ListLineasQueryService>();
+    services.AddScoped<IListFamiliasQueryService, ListFamiliasQueryService>();
+    services.AddScoped<IListCategoriasQueryService, ListCategoriasQueryService>();
+    services.AddScoped<IListDepartamentosQueryService, ListDepartamentosQueryService>();
     services.Configure<MailserverConfiguration>(config.GetSection("Mailserver"));
 
     logger.LogInformation("{Project} services registered", "Infrastructure");

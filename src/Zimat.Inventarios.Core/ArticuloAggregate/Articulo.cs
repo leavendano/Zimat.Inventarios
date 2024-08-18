@@ -20,7 +20,7 @@ public class Articulo : EntityBase<Guid>, IAggregateRoot, IRegisterBase
 		Usuario = usuario;
 		Estatus = 1;
 	}
-  	public string Clave {get; private set;}
+  public string Clave {get; private set;}
 	public string Descripcion { get; private set;} 
 	public string? Codigo { get; set;}
 	public int UnidadId  { get; set;} 
@@ -38,16 +38,16 @@ public class Articulo : EntityBase<Guid>, IAggregateRoot, IRegisterBase
 	public DateTime? UltimaVenta  { get; set;}
 	public decimal Existencia { get; set;}=0;
 	public decimal Minimo  { get; set;} = 0;
-  	public decimal Maximo { get; set; } = 0;
-  	public decimal Reorden { get; set; } = 0;
-  	public decimal PrecioPublico { get; private set;} 
-  	public decimal DescuentoMaximo { get; set;}
+  public decimal Maximo { get; set; } = 0;
+  public decimal Reorden { get; set; } = 0;
+  public decimal PrecioPublico { get; private set;} 
+  public decimal DescuentoMaximo { get; set;}
 	public decimal? UltimoCosto { get; set;}
-  	public bool Activo { get; set; } = true;
-  	public string? Usuario { get; set;}	
-  	public int Estatus { get; set;}
-  	public DateTime CreatedAt { get; set;}
-  	public DateTime UpdatedAt { get; set;}
+  public bool Activo { get; set; } = true;
+  public string? Usuario { get; set;}	
+  public int Estatus { get; set;}
+  public DateTime CreatedAt { get; set;}
+  public DateTime UpdatedAt { get; set;}
 
 
 	public void UpdateDescripcion(string newName)
