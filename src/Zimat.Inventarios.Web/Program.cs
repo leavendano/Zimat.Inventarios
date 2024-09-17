@@ -62,8 +62,18 @@ builder.Services.AddAuthentication(options =>
             context.HandleResponse();
             context.Response.Redirect("/");
             return Task.CompletedTask;
-        }
-    };
+        },
+      OnRemoteFailure = ctx =>
+    {
+      if (ctx.Failure?.Message == "Correlation failed.")
+      {
+        ctx.Response.Redirect("/");
+        ctx.HandleResponse();
+      }
+
+      return Task.CompletedTask;
+    }
+  };
 })
 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -115,6 +125,8 @@ else
 }
 
 var app = builder.Build();
+
+
 
 if (app.Environment.IsDevelopment())
 {
