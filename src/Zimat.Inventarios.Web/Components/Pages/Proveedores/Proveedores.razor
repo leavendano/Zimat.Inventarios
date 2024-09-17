@@ -74,7 +74,7 @@
 
     protected async Task AddButtonClick(MouseEventArgs args)
     {
-        await DialogService.OpenAsync<AddArticulo>("Nuevo Artículo", null, new DialogOptions() { Width = $"{900}px", Height = $"{600}px" });
+        //await DialogService.OpenAsync<AddArticulo>("Nuevo Artículo", null, new DialogOptions() { Width = $"{900}px", Height = $"{600}px" });
         Result<IEnumerable<ProveedorDTO>> result = await _mediator.Send(new ListProveedoresQuery(null, null));
 
         if (result.IsSuccess)
