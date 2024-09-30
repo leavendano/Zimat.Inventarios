@@ -74,7 +74,11 @@
 
     protected async Task AddButtonClick(MouseEventArgs args)
     {
-        await DialogService.OpenAsync<AddDocumento>("Nuevo Documento", null, new DialogOptions() { Width = $"{1000}px", Height = $"{600}px" });
+
+        var options = new DialogOptions();
+        string additionalStyle ="min-width:fit-content;min-height:fit-content;height:fit-content;width:fit-content;border: 1px solid black;";
+        options.Style = additionalStyle;
+        await DialogService.OpenAsync<AddDocumento>("Nuevo Documento", null, options);
         Result<IEnumerable<DocumentoDTO>> result = await _mediator.Send(new ListDocumentosQuery(null, null));
 
         if (result.IsSuccess)
