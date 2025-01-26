@@ -105,6 +105,7 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     fecha_pago = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     referencia = table.Column<string>(type: "text", nullable: true),
                     importe = table.Column<decimal>(type: "numeric", nullable: false),
+                    documento_relacionado_id = table.Column<Guid>(type: "uuid", nullable: false),
                     usuario = table.Column<string>(type: "text", nullable: true),
                     estatus = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -208,7 +209,7 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     documento_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    articulo_id = table.Column<int>(type: "integer", nullable: false),
+                    articulo_id = table.Column<Guid>(type: "uuid", nullable: false),
                     precio = table.Column<decimal>(type: "numeric", nullable: false),
                     costo = table.Column<decimal>(type: "numeric", nullable: false),
                     costo_promedio = table.Column<decimal>(type: "numeric", nullable: false),

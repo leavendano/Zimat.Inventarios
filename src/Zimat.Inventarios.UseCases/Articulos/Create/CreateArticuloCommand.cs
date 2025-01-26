@@ -1,7 +1,7 @@
 ﻿using System;
 
 using Ardalis.Result;
-using Zimat.Inventarios.Core.Base;
+
 
 namespace Zimat.Inventarios.UseCases.Articulos.Create;
 

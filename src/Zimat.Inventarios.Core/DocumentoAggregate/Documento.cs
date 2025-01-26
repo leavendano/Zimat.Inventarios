@@ -28,7 +28,12 @@ public class Documento : EntityBase<Guid>, IAggregateRoot, IRegisterBase
     public DateTime? FechaPago  { get; set; }
     public string? Referencia { get; set; }
     public decimal Importe {  get; set; } 
-
+    public decimal Impuesto1 { get; set; } = 0;
+    public decimal Impuesto2 { get; set; } = 0;
+    public Guid? DocumentoRelacionadoId { get; set; }
+    public bool Pagado { get; set; } = false;
+    public decimal SaldoAnticipo { get; set; } = 0;
+    
 
     public string? Usuario { get; set;}	
   	public int Estatus { get; set;} = 1;

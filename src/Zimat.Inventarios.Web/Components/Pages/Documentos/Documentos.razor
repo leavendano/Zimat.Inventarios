@@ -63,7 +63,7 @@
     {
 
         await base.OnInitializedAsync();
-        Result<IEnumerable<DocumentoDTO>> result = await _mediator.Send(new ListDocumentosQuery(null, null));
+        Result<IEnumerable<DocumentoDTO>> result = await _mediator.Send(new ListDocumentosQuery(null,null,null, null));
 
         if (result.IsSuccess)
         {
@@ -79,7 +79,7 @@
         string additionalStyle ="min-width:fit-content;min-height:fit-content;height:fit-content;width:fit-content;border: 1px solid black;";
         options.Style = additionalStyle;
         await DialogService.OpenAsync<AddDocumento>("Nuevo Documento", null, options);
-        Result<IEnumerable<DocumentoDTO>> result = await _mediator.Send(new ListDocumentosQuery(null, null));
+        Result<IEnumerable<DocumentoDTO>> result = await _mediator.Send(new ListDocumentosQuery(null,null,null, null));
 
         if (result.IsSuccess)
         {
@@ -93,7 +93,7 @@
     protected async Task EditRow(DocumentoDTO args)
     {
         //await DialogService.OpenAsync<EditArticulo>("Edit Articulo", new Dictionary<string, object> { { "Id", args.Id } });
-        Result<IEnumerable<DocumentoDTO>> result = await _mediator.Send(new ListDocumentosQuery(null, null));
+        Result<IEnumerable<DocumentoDTO>> result = await _mediator.Send(new ListDocumentosQuery(null,null,null, null));
         if (result.IsSuccess)
         {
 
@@ -113,7 +113,7 @@
 
                 if (result.IsSuccess)
                 {
-                    Result<IEnumerable<DocumentoDTO>> result2 = await _mediator.Send(new ListDocumentosQuery(null, null));
+                    Result<IEnumerable<DocumentoDTO>> result2 = await _mediator.Send(new ListDocumentosQuery(null,null,null, null));
                     if (result2.IsSuccess)
                     {
                         documentos = result2.Value;

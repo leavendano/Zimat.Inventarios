@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Zimat.Inventarios.Infrastructure.Data;
@@ -11,9 +12,11 @@ using Zimat.Inventarios.Infrastructure.Data;
 namespace Zimat.Inventarios.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241105034028_SaldoAnticipo")]
+    partial class SaldoAnticipo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -282,14 +285,6 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     b.Property<decimal>("Importe")
                         .HasColumnType("numeric")
                         .HasColumnName("importe");
-
-                    b.Property<decimal>("Impuesto1")
-                        .HasColumnType("numeric")
-                        .HasColumnName("impuesto1");
-
-                    b.Property<decimal>("Impuesto2")
-                        .HasColumnType("numeric")
-                        .HasColumnName("impuesto2");
 
                     b.Property<decimal>("PDescuento")
                         .HasColumnType("numeric")
