@@ -42,7 +42,7 @@ public class Articulo : EntityBase<Guid>, IAggregateRoot, IRegisterBase
   public decimal Reorden { get; set; } = 0;
   public decimal PrecioPublico { get; private set;} 
   public decimal DescuentoMaximo { get; set;}
-	public decimal? UltimoCosto { get; set;}
+  public decimal? UltimoCosto { get; set;}
   public bool Activo { get; set; } = true;
   public string? Usuario { get; set;}	
   public int Estatus { get; set;}

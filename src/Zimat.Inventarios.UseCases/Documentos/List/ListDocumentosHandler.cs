@@ -15,7 +15,7 @@ namespace Zimat.Inventarios.UseCases.Documentos.List;
 {
   public async Task<Result<IEnumerable<DocumentoDTO>>> Handle(ListDocumentosQuery request, CancellationToken cancellationToken)
   {
-    var result = await _query.ListAsync();
+    var result = await _query.ListAsync(request.ProveedorId,request.TipoDocumentoId);
 
     return Result.Success(result);
   }

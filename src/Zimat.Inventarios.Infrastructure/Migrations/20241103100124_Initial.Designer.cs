@@ -12,7 +12,7 @@ using Zimat.Inventarios.Infrastructure.Data;
 namespace Zimat.Inventarios.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240814211215_Initial")]
+    [Migration("20241103100124_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -257,6 +257,10 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("divisa");
 
+                    b.Property<Guid>("DocumentoRelacionadoId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("documento_relacionado_id");
+
                     b.Property<int>("Estatus")
                         .HasColumnType("integer")
                         .HasColumnName("estatus");
@@ -323,8 +327,8 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<int>("ArticuloId")
-                        .HasColumnType("integer")
+                    b.Property<Guid>("ArticuloId")
+                        .HasColumnType("uuid")
                         .HasColumnName("articulo_id");
 
                     b.Property<decimal>("Cantidad")
