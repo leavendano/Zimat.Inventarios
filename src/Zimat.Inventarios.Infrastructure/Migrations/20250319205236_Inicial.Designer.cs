@@ -12,8 +12,8 @@ using Zimat.Inventarios.Infrastructure.Data;
 namespace Zimat.Inventarios.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241103100124_Initial")]
-    partial class Initial
+    [Migration("20250319205236_Inicial")]
+    partial class Inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -240,8 +240,8 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("almacen_id");
 
-                    b.Property<int?>("ClienteId")
-                        .HasColumnType("integer")
+                    b.Property<Guid?>("ClienteId")
+                        .HasColumnType("uuid")
                         .HasColumnName("cliente_id");
 
                     b.Property<DateTime>("CreatedAt")
@@ -257,7 +257,7 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("divisa");
 
-                    b.Property<Guid>("DocumentoRelacionadoId")
+                    b.Property<Guid?>("DocumentoRelacionadoId")
                         .HasColumnType("uuid")
                         .HasColumnName("documento_relacionado_id");
 
@@ -286,17 +286,33 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("importe");
 
+                    b.Property<decimal>("Impuesto1")
+                        .HasColumnType("numeric")
+                        .HasColumnName("impuesto1");
+
+                    b.Property<decimal>("Impuesto2")
+                        .HasColumnType("numeric")
+                        .HasColumnName("impuesto2");
+
                     b.Property<decimal>("PDescuento")
                         .HasColumnType("numeric")
                         .HasColumnName("p_descuento");
 
-                    b.Property<int?>("ProveedorId")
-                        .HasColumnType("integer")
+                    b.Property<bool>("Pagado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("pagado");
+
+                    b.Property<Guid?>("ProveedorId")
+                        .HasColumnType("uuid")
                         .HasColumnName("proveedor_id");
 
                     b.Property<string>("Referencia")
                         .HasColumnType("text")
                         .HasColumnName("referencia");
+
+                    b.Property<decimal>("SaldoAnticipo")
+                        .HasColumnType("numeric")
+                        .HasColumnName("saldo_anticipo");
 
                     b.Property<decimal>("TipoCambio")
                         .HasColumnType("numeric")
@@ -486,12 +502,14 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
 
             modelBuilder.Entity("Zimat.Inventarios.Core.ProveedorAggregate.Proveedor", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activo");
 
                     b.Property<string>("Calle")
                         .HasColumnType("text")

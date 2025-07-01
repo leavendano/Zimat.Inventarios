@@ -237,8 +237,8 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("almacen_id");
 
-                    b.Property<int?>("ClienteId")
-                        .HasColumnType("integer")
+                    b.Property<Guid?>("ClienteId")
+                        .HasColumnType("uuid")
                         .HasColumnName("cliente_id");
 
                     b.Property<DateTime>("CreatedAt")
@@ -299,8 +299,8 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("pagado");
 
-                    b.Property<int?>("ProveedorId")
-                        .HasColumnType("integer")
+                    b.Property<Guid?>("ProveedorId")
+                        .HasColumnType("uuid")
                         .HasColumnName("proveedor_id");
 
                     b.Property<string>("Referencia")
@@ -499,12 +499,14 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
 
             modelBuilder.Entity("Zimat.Inventarios.Core.ProveedorAggregate.Proveedor", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean")
+                        .HasColumnName("activo");
 
                     b.Property<string>("Calle")
                         .HasColumnType("text")

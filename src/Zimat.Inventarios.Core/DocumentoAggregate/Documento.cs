@@ -18,8 +18,8 @@ public class Documento : EntityBase<Guid>, IAggregateRoot, IRegisterBase
 
     public int? AlmacenId { get; set; } 
     public DateTime Fecha { get; set; } 
-    public int? ClienteId { get; set; }
-    public int? ProveedorId { get; set; }
+    public Guid? ClienteId { get; set; }
+    public Guid? ProveedorId { get; set; }
     public int? FormaPagoId { get; set; }
     public string Divisa { get; set; } = "MXN";
     public decimal TipoCambio { get; set; } = 1m;
@@ -40,7 +40,7 @@ public class Documento : EntityBase<Guid>, IAggregateRoot, IRegisterBase
   	public DateTime CreatedAt { get; set;}
   	public DateTime UpdatedAt { get; set;}
 
-    public Documento(string folio,DateTime fecha,int? clienteId, int? proveedorId,decimal importe) : base()
+    public Documento(string folio,DateTime fecha,Guid? clienteId, Guid? proveedorId,decimal importe) : base()
     {
         Folio = Guard.Against.NullOrEmpty(folio, nameof(folio));
         Fecha = Guard.Against.OutOfSQLDateRange(fecha, nameof(fecha));

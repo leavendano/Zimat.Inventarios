@@ -3,24 +3,39 @@ using Ardalis.SharedKernel;
 using Zimat.Inventarios.Core.Base;
 
 namespace Zimat.Inventarios.Core.ProveedorAggregate;
-public class Proveedor(string clave,string nombre, string rfc, string codigoPostal ) : RegisterBase, IAggregateRoot
+public class Proveedor : EntityBase<Guid>, IAggregateRoot, IRegisterBase
 {
-  public string Clave {  get; private set; } = Guard.Against.NullOrEmpty(clave,nameof(clave));
-  public string Nombre {  get; private set; } = Guard.Against.NullOrEmpty(nombre, nameof(nombre));
+  public Proveedor(string clave,string nombre, string rfc, string codigoPostal ) : base()
+  {
+    Clave = Guard.Against.NullOrEmpty(clave,nameof(clave));
+    Nombre = Guard.Against.NullOrEmpty(nombre, nameof(nombre));
+    Rfc = Guard.Against.NullOrEmpty(rfc, nameof(rfc));
+    CodigoPostal = Guard.Against.NullOrEmpty(codigoPostal, nameof(codigoPostal));
+    Id = new UuidV7().Value;
+    Estatus = 1;
+  }
+  public string Clave {  get; private set; } 
+  public string Nombre {  get; private set; } 
   public string? Calle {  get; set; }
   public string? NumeroExterior {  get; set; }
   public string? Colonia { get;set; }
   public string? Ciudad { get;set; }
   public string? Estado { get; set; }
-  public string CodigoPostal { get; private set; } = Guard.Against.NullOrEmpty(codigoPostal, nameof(codigoPostal));
+  public string CodigoPostal { get; private set; } 
   public string? Telefono { get; set; }
   public string? Email { get; set; }
   public string? Clasificacion { get; set; }
   public DateTime? UltimaCompra {  get; set; }
   public string? Contacto { get; set; }
-  public string Rfc { get; private set;} = Guard.Against.NullOrEmpty(rfc, nameof(rfc));
+  public string Rfc { get; private set;} 
   public int DiasCredito { get; set; } = 0;
   public string? CuentaContable {  get; set; }
   public int TipoProveedor { get; set; } = 1; 
+  public bool Activo { get; set; } = true;
+  public string? Usuario { get; set;}	
+  public int Estatus { get; set;}
+  public DateTime CreatedAt { get; set;}
+  public DateTime UpdatedAt { get; set;}
+
 
 }

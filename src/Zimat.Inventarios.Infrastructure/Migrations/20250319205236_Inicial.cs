@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Zimat.Inventarios.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Inicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -95,8 +95,8 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     tipo_documento_id = table.Column<int>(type: "integer", nullable: false),
                     almacen_id = table.Column<int>(type: "integer", nullable: true),
                     fecha = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    cliente_id = table.Column<int>(type: "integer", nullable: true),
-                    proveedor_id = table.Column<int>(type: "integer", nullable: true),
+                    cliente_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    proveedor_id = table.Column<Guid>(type: "uuid", nullable: true),
                     forma_pago_id = table.Column<int>(type: "integer", nullable: true),
                     divisa = table.Column<string>(type: "text", nullable: false),
                     tipo_cambio = table.Column<decimal>(type: "numeric", nullable: false),
@@ -105,7 +105,11 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     fecha_pago = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     referencia = table.Column<string>(type: "text", nullable: true),
                     importe = table.Column<decimal>(type: "numeric", nullable: false),
-                    documento_relacionado_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    impuesto1 = table.Column<decimal>(type: "numeric", nullable: false),
+                    impuesto2 = table.Column<decimal>(type: "numeric", nullable: false),
+                    documento_relacionado_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    pagado = table.Column<bool>(type: "boolean", nullable: false),
+                    saldo_anticipo = table.Column<decimal>(type: "numeric", nullable: false),
                     usuario = table.Column<string>(type: "text", nullable: true),
                     estatus = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -156,8 +160,7 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 name: "proveedores",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     clave = table.Column<string>(type: "text", nullable: false),
                     nombre = table.Column<string>(type: "text", nullable: false),
                     calle = table.Column<string>(type: "text", nullable: true),
@@ -175,6 +178,7 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     dias_credito = table.Column<int>(type: "integer", nullable: false),
                     cuenta_contable = table.Column<string>(type: "text", nullable: true),
                     tipo_proveedor = table.Column<int>(type: "integer", nullable: false),
+                    activo = table.Column<bool>(type: "boolean", nullable: false),
                     usuario = table.Column<string>(type: "text", nullable: true),
                     estatus = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),

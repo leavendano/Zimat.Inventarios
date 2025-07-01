@@ -1,0 +1,112 @@
+@page "/punto_venta"
+@using Ardalis.Result
+@using Zimat.Inventarios.Core.Base
+@using Zimat.Inventarios.UseCases.Articulos
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject ILogger<PuntoVenta> logger
+@using MediatR
+@inject IMediator _mediator
+@using Zimat.Inventarios.UseCases.Articulos.Delete
+@using Zimat.Inventarios.UseCases.Articulos.List
+@attribute [Authorize]
+<PageTitle>Punto de Venta</PageTitle>
+
+<RadzenDataList WrapItems="true" AllowPaging="false" Data="@articulos" TItem="ArticuloDTO">
+    <Template Context="articulo">
+        <RadzenCard  Style="width:250px;" class="rz-py-4 rz-px-0" >
+            <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center">
+                <RadzenImage Path="images/image-not-found.png"  AlternateText="@(articulo.Descripcion )" />
+                <RadzenStack Gap="0">
+                    
+                    <RadzenText TextStyle="TextStyle.Body1"><b>@(articulo?.Descripcion)</b></RadzenText>
+                    <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">Código</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1"><b>@(articulo.Clave)</b></RadzenText>
+                </RadzenStack>
+            </RadzenStack>
+            
+            <RadzenStack Orientation="Orientation.Vertical"  JustifyContent="JustifyContent.End">
+                <RadzenRow >
+                    <RadzenColumn Size="8" >
+                        <RadzenButton Click=@(args => OnClick("Agregado al carrito")) Text="Agregar" ButtonStyle="ButtonStyle.Primary" style="position: sticky; top: 10px;"/>
+                    </RadzenColumn>
+                    <RadzenColumn Size="4" class="rz-text-align-end">
+                        <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", articulo.PrecioPublico)}") />
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenStack>
+        </RadzenCard>
+    </Template>
+</RadzenDataList>
+
+<RadzenPager ShowPagingSummary="true" PagingSummaryFormat="@pagingSummaryFormat" HorizontalAlign="HorizontalAlign.Right" Count="count" PageSize="@pageSize" PageNumbersCount="5" PageChanged="@PageChanged" />
+
+
+@code {
+
+    string pagingSummaryFormat = "Displaying page {0} of {1} (total {2} records)";
+    int pageSize = 4;
+    int count;
+    protected IEnumerable<ArticuloDTO>? articulos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        try
+        {
+            Result<IEnumerable<ArticuloDTO>> result = await _mediator.Send(new ListArticulosQuery(null, null));
+            if (result.IsSuccess)
+            {
+                articulos = result.Value;
+                count = articulos?.Count() ?? 0;
+                if (count == 0)
+                {
+                    NotificationService.Notify(new NotificationMessage 
+                    { 
+                        Severity = NotificationSeverity.Info, 
+                        Summary = "Información", 
+                        Detail = "No se encontraron artículos." 
+                    });
+                }
+                else
+                {
+                    NotificationService.Notify(new NotificationMessage 
+                    { 
+                        Severity = NotificationSeverity.Success, 
+                        Summary = "Éxito", 
+                        Detail = $"{count} artículos cargados." 
+                    });
+                }
+            }
+            else
+            {
+                NotificationService.Notify(new NotificationMessage 
+                { 
+                    Severity = NotificationSeverity.Error, 
+                    Summary = "Error", 
+                    Detail = result.Errors.FirstOrDefault() 
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error al cargar los artículos");
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "No se pudieron cargar los artículos." });
+        }
+    }
+
+    async Task PageChanged(PagerEventArgs args)
+    {
+         Result<IEnumerable<ArticuloDTO>> result = await _mediator.Send(new ListArticulosQuery(null, null));
+            if (result.IsSuccess)
+            {
+                articulos = result.Value;
+            }
+    }
+
+    private void OnClick(string text)
+    {
+        NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Button Clicked", Detail = text });
+    }
+}

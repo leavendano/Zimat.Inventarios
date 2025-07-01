@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 using Ardalis.Result;
 
 namespace Zimat.Inventarios.UseCases.Documentos.Create;
-public record CreateDocumentoCommand(string Folio, DateTime Fecha, int TipoDocumentoId, int? ClienteId, int? ProveedorId, 
+public record CreateDocumentoCommand(string Folio, DateTime Fecha, int TipoDocumentoId, Guid? ClienteId, Guid? ProveedorId, 
         decimal Importe, Guid? DocumentoRelacionadoId, IEnumerable<DocumentoConceptoDTO>? conceptos) : Ardalis.SharedKernel.ICommand<Result<Guid>>;

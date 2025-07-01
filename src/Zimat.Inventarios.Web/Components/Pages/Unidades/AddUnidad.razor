@@ -75,23 +75,32 @@
     
     protected async Task FormSubmit()
     {
-        
         try
         {
-            
-            var result = await _mediator.Send(new CreateUnidadCommand(item.Descripcion,item.ClaveSat,NombreUsuario!));
+            var result = await _mediator.Send(new CreateUnidadCommand(item.Descripcion, item.ClaveSat, NombreUsuario!));
+            NotificationService.Notify(new NotificationMessage 
+            { 
+                Severity = NotificationSeverity.Success,
+                Summary = "Unidad creada",
+                Detail = "La unidad se ha creado correctamente",
+                Duration = 4000 
+            });
+            errorVisible = false;
             DialogService.Close(item);
-            
         }
         catch (Exception e)
         {
-            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error,
-                 Summary = e.Message,
-                  Detail = "Error Detail", Duration = 4000 });
-            mensajeAlerta = "ocurrió un error de la base de datos";
+            NotificationService.Notify(new NotificationMessage 
+            { 
+                Severity = NotificationSeverity.Error,
+                Summary = "Error al crear la unidad",
+                Detail = e.Message,
+                Duration = 4000 
+            });
+            mensajeAlerta = $"Error: {e.Message}";
             errorVisible = true;
+            logger.LogError(e, "Error al crear la unidad");
         }
-        
     }
 
     void OnChange(string value, string name)
