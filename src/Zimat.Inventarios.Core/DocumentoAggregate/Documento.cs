@@ -36,19 +36,21 @@ public class Documento : EntityBase<Guid>, IAggregateRoot, IRegisterBase
     
 
     public string? Usuario { get; set;}	
-  	public int Estatus { get; set;} = 1;
+  	public int Estado { get; set;}
   	public DateTime CreatedAt { get; set;}
   	public DateTime UpdatedAt { get; set;}
 
-    public Documento(string folio,DateTime fecha,Guid? clienteId, Guid? proveedorId,decimal importe) : base()
-    {
-        Folio = Guard.Against.NullOrEmpty(folio, nameof(folio));
-        Fecha = Guard.Against.OutOfSQLDateRange(fecha, nameof(fecha));
-        ClienteId = clienteId;
-        ProveedorId = proveedorId;
-        Importe = Guard.Against.NegativeOrZero(importe, nameof(importe));
-        Id = new UuidV7().Value;
-        _conceptos = new List<DocumentoConcepto>();
+  public Documento(string folio, DateTime fecha, Guid? clienteId, Guid? proveedorId, decimal importe) : base()
+  {
+    Folio = Guard.Against.NullOrEmpty(folio, nameof(folio));
+    Fecha = Guard.Against.OutOfSQLDateRange(fecha, nameof(fecha));
+    ClienteId = clienteId;
+    ProveedorId = proveedorId;
+    Importe = Guard.Against.NegativeOrZero(importe, nameof(importe));
+    Id = new UuidV7().Value;
+    _conceptos = new List<DocumentoConcepto>();
+    CreatedAt = DateTime.UtcNow;
+    Estado = 1; // Activo por defecto
     }
 
     public void AddConcepto(DocumentoConcepto newItem)

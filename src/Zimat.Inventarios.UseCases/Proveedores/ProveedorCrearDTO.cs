@@ -26,7 +26,7 @@ namespace Zimat.Inventarios.UseCases.Proveedores;
     {
       Proveedor item = new Proveedor(Clave,Nombre,Rfc,CodigoPostal);
       item.Email = Email;
-      item.Estatus = 1;
+      item.Estado = 1;
       item.Calle = Calle;
       item.Ciudad = Ciudad;
       item.Estado = Estado;

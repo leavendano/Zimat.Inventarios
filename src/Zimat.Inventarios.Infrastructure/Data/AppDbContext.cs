@@ -41,6 +41,7 @@ public class AppDbContext : DbContext
   {
     base.OnModelCreating(modelBuilder);
     modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+    //modelBuilder.Entity<IRegisterBase>().HasQueryFilter(p => !p.Activo);
   }
 
   public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())

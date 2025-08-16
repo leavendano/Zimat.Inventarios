@@ -20,25 +20,28 @@ public class DocumentoConcepto : EntityBase<Guid>, IRegisterBase
   public string? NumeroSerie { get; set; }
   public decimal Importe { get; set; } = 0;
 
-  public DocumentoConcepto(Guid documentoId,Guid articuloId,decimal precio,decimal costo,decimal cantidad,decimal impuesto1)
+  public DocumentoConcepto(Guid documentoId, Guid articuloId, decimal precio, decimal costo, decimal cantidad, decimal impuesto1)
   {
-    DocumentoId  = Guard.Against.Null(documentoId,nameof(documentoId));
-    ArticuloId = Guard.Against.Null(articuloId,nameof(articuloId));
-    Precio  = Guard.Against.NegativeOrZero(precio,nameof(precio));
-    Costo  = Guard.Against.Negative(costo,nameof(costo));
-    CostoPromedio  = 0;
-    Cantidad  = Guard.Against.NegativeOrZero(cantidad,nameof(cantidad));
-    Pendiente  = Guard.Against.NegativeOrZero(cantidad, nameof(cantidad));
-    Devueltos  = 0;
-    Descuento  = 0;
-    Impuesto1  = Guard.Against.Negative(impuesto1, nameof(impuesto1));
-    Impuesto2  = 0; 
-    Importe  = 0;
+    DocumentoId = Guard.Against.Null(documentoId, nameof(documentoId));
+    ArticuloId = Guard.Against.Null(articuloId, nameof(articuloId));
+    Precio = Guard.Against.NegativeOrZero(precio, nameof(precio));
+    Costo = Guard.Against.Negative(costo, nameof(costo));
+    CostoPromedio = 0;
+    Cantidad = Guard.Against.NegativeOrZero(cantidad, nameof(cantidad));
+    Pendiente = Guard.Against.NegativeOrZero(cantidad, nameof(cantidad));
+    Devueltos = 0;
+    Descuento = 0;
+    Impuesto1 = Guard.Against.Negative(impuesto1, nameof(impuesto1));
+    Impuesto2 = 0;
+    Importe = 0;
     base.Id = new UuidV7().Value;
+    Estado = 1; // Activo por defecto
+    CreatedAt = DateTime.UtcNow;
+    UpdatedAt = DateTime.UtcNow;
   }
 
   public string? Usuario { get; set;}	
-  public int Estatus { get; set;} = 1;
+  public int Estado { get; set;}
   public DateTime CreatedAt { get; set;}
   public DateTime UpdatedAt { get; set;}
 

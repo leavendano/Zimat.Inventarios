@@ -8,7 +8,7 @@ public class Departamento(string nombre, string usuario = "ADMINISTRADOR") : Ent
 {
   public string Nombre { get; set; } = Guard.Against.NullOrEmpty(nombre, nameof(nombre));
   public string? Usuario { get; set; } = Guard.Against.NullOrEmpty(usuario, nameof(usuario));
-  public int Estatus { get; set; } = 1;
+  public int Estado { get; set; } = 1;
   public DateTime CreatedAt { get; set; }
   public DateTime UpdatedAt { get; set; }
 

@@ -12,7 +12,6 @@ public class Proveedor : EntityBase<Guid>, IAggregateRoot, IRegisterBase
     Rfc = Guard.Against.NullOrEmpty(rfc, nameof(rfc));
     CodigoPostal = Guard.Against.NullOrEmpty(codigoPostal, nameof(codigoPostal));
     Id = new UuidV7().Value;
-    Estatus = 1;
   }
   public string Clave {  get; private set; } 
   public string Nombre {  get; private set; } 
@@ -31,9 +30,8 @@ public class Proveedor : EntityBase<Guid>, IAggregateRoot, IRegisterBase
   public int DiasCredito { get; set; } = 0;
   public string? CuentaContable {  get; set; }
   public int TipoProveedor { get; set; } = 1; 
-  public bool Activo { get; set; } = true;
-  public string? Usuario { get; set;}	
-  public int Estatus { get; set;}
+   public string? Usuario { get; set;}	
+  public bool Estado { get; set;} = true;
   public DateTime CreatedAt { get; set;}
   public DateTime UpdatedAt { get; set;}
 

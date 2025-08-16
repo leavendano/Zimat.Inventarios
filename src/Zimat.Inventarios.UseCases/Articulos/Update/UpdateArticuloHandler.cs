@@ -29,7 +29,7 @@ public class UpdateArticuloHandler(IRepository<Articulo> _repository, IEmailSend
     await _repository.UpdateAsync(existingArticulo, cancellationToken);
 
     return Result.Success(new ArticuloDTO(existingArticulo.Id,
-      existingArticulo.Clave, existingArticulo.Descripcion,existingArticulo.PrecioPublico,existingArticulo.UltimoCosto,
+      existingArticulo.Clave, existingArticulo.Descripcion,existingArticulo.PrecioPublico,existingArticulo.CostoUnitario,
       existingArticulo.Impuesto1,""));
   }
 }
