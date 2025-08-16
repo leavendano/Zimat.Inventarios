@@ -8,8 +8,8 @@ public class Categoria(string descripcion, decimal margen = 0, string usuario = 
 {
   public string Descripcion { get; set; } = Guard.Against.NullOrEmpty(descripcion, nameof(descripcion));
   public decimal Margen { get; set; } = Guard.Against.Negative(margen, nameof(margen));
-  public string? Usuario { get; set; } = Guard.Against.NullOrEmpty(usuario, nameof(usuario));
-  public int Estado { get; set; } = 1;
+  public string? User { get; set; } = Guard.Against.NullOrEmpty(usuario, nameof(usuario));
+  public int Status { get; set; } = RegisterStatus.Activo; // Activo por defecto
   public DateTime CreatedAt { get; set; }
   public DateTime UpdatedAt { get; set; }
 

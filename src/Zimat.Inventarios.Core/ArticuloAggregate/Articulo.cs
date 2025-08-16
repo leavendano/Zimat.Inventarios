@@ -15,8 +15,8 @@ public class Articulo : EntityBase<Guid>, IAggregateRoot, IRegisterBase
     PrecioPublico = Guard.Against.NegativeOrZero(precioPublico, nameof(precioPublico));
     Id = UuidV7.NewGuid();
     UnidadId = Guard.Against.NullOrEmpty(unidadId, nameof(unidadId));
-    Usuario = usuario;
-    Estado = 1; // Activo por defecto
+    User = usuario;
+    Status = RegisterStatus.Activo; // Activo por defecto
     StockActual = 0;
     StockMinimo = 0;
     StockMaximo = 0;
@@ -53,8 +53,8 @@ public class Articulo : EntityBase<Guid>, IAggregateRoot, IRegisterBase
   public string? RutaImagen { get; set; }
   
   public decimal PesoNeto { get; set; }
-  public string? Usuario { get; set; }	
-  public int Estado { get; set;}
+  public string? User { get; set; }	
+  public int Status { get; set;}
   public DateTime CreatedAt { get; set;}
   public DateTime UpdatedAt { get; set;}
 

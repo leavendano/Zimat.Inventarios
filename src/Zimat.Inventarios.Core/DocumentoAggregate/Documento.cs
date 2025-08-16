@@ -33,10 +33,8 @@ public class Documento : EntityBase<Guid>, IAggregateRoot, IRegisterBase
     public Guid? DocumentoRelacionadoId { get; set; }
     public bool Pagado { get; set; } = false;
     public decimal SaldoAnticipo { get; set; } = 0;
-    
-
-    public string? Usuario { get; set;}	
-  	public int Estado { get; set;}
+    public string? User { get; set;}	
+  	public int Status { get; set;}
   	public DateTime CreatedAt { get; set;}
   	public DateTime UpdatedAt { get; set;}
 
@@ -48,9 +46,9 @@ public class Documento : EntityBase<Guid>, IAggregateRoot, IRegisterBase
     ProveedorId = proveedorId;
     Importe = Guard.Against.NegativeOrZero(importe, nameof(importe));
     Id = new UuidV7().Value;
-    _conceptos = new List<DocumentoConcepto>();
+    _conceptos = [];
     CreatedAt = DateTime.UtcNow;
-    Estado = 1; // Activo por defecto
+    Status = 1; // Activo por defecto
     }
 
     public void AddConcepto(DocumentoConcepto newItem)
@@ -58,6 +56,8 @@ public class Documento : EntityBase<Guid>, IAggregateRoot, IRegisterBase
     Guard.Against.Null(newItem, nameof(newItem));
     _conceptos.Add(newItem);
     Importe += newItem.Importe;
+    Impuesto1 += newItem.Impuesto1;
+    Impuesto2 += newItem.Impuesto2;
 
     var newItemAddedEvent = new NewConceptoAddedEvent(this, newItem);
     base.RegisterDomainEvent(newItemAddedEvent);

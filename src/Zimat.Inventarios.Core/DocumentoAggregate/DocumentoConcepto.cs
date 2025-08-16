@@ -35,13 +35,13 @@ public class DocumentoConcepto : EntityBase<Guid>, IRegisterBase
     Impuesto2 = 0;
     Importe = 0;
     base.Id = new UuidV7().Value;
-    Estado = 1; // Activo por defecto
+    Status = 1; // Activo por defecto
     CreatedAt = DateTime.UtcNow;
     UpdatedAt = DateTime.UtcNow;
   }
 
-  public string? Usuario { get; set;}	
-  public int Estado { get; set;}
+  public string? User { get; set;}	
+  public int Status { get; set;}
   public DateTime CreatedAt { get; set;}
   public DateTime UpdatedAt { get; set;}
 
