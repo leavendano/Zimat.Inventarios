@@ -8,7 +8,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <NoWarn>1591</NoWarn> <!-- Remove this to turn on warnings for missing XML Comments -->
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
   </PropertyGroup>
 </Project>

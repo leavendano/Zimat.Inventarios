@@ -88,7 +88,7 @@
     bool sidebarExpanded = true;
     string searchText = "";
     string selectedCategory = "Productos";
-    IEnumerable<string> searchCategories = new[] { "Productos", "Clientes", "Proveedores" };
+    IEnumerable<string> searchCategories = new[] { "Productos", "Categorias", "Departamentos" };
 
     void SidebarToggleClick()
     {
@@ -100,14 +100,14 @@
         // Implementar la lógica de búsqueda según la categoría seleccionada
         switch (selectedCategory)
         {
-            case "Productos":
-                NavigationManager.NavigateTo($"/list_articulos?search={searchText}");
+            case "Todos":
+                NavigationManager.NavigateTo($"/punto_venta?search={searchText}");
                 break;
             case "Clientes":
                 // Implementar cuando se tenga la vista de clientes
                 break;
             case "Proveedores":
-                NavigationManager.NavigateTo($"/proveedores?search={searchText}");
+                NavigationManager.NavigateTo($"/punto_venta?search={searchText}");
                 break;
         }
     }

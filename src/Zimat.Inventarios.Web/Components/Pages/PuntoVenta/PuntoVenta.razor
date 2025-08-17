@@ -19,26 +19,25 @@
 <RadzenRow>
     <RadzenColumn Size="8">
 
-<RadzenDataList WrapItems="true" AllowPaging="false" Data="@articulos" TItem="ArticuloListarDTO">
+<RadzenDataList WrapItems="true" AllowPaging="false" Data="@articulos" TItem="ArticuloListarDTO" Style="display:flex; flex-wrap:wrap; gap:15px;">
     <Template Context="articulo">
-        <RadzenCard  Style="width:250px;" class="rz-py-4 rz-px-0" >
-            <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center">
-                <RadzenImage Path="images/image-not-found.png"  AlternateText="@(articulo.Descripcion )" />
-                <RadzenStack Gap="0">
-                    
-                    <RadzenText TextStyle="TextStyle.Body1"><b>@(articulo?.Descripcion)</b></RadzenText>
-                    <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">Código</RadzenText>
+        <RadzenCard  Style="width:250px; height:320px; display:flex; flex-direction:column; padding:0; flex-shrink:0;" class="rz-py-0 rz-px-0" >
+            <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Style="flex-grow:1;">
+                <RadzenImage Path="@articulo.RutaImagen" AlternateText="@(articulo.Descripcion)" Style="width:100%; height:120px; object-fit:cover;" />
+                <RadzenStack Gap="0" Style="text-align:center; flex-grow:1; justify-content:center; padding:10px;">
+                    <RadzenText TextStyle="TextStyle.Body1" Style="font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:200px;"><b>@(articulo?.Descripcion)</b></RadzenText>
+                    <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-mb-0">Código</RadzenText>
                     <RadzenText TextStyle="TextStyle.Body1"><b>@(articulo.Clave)</b></RadzenText>
                 </RadzenStack>
             </RadzenStack>
             
-            <RadzenStack Orientation="Orientation.Vertical"  JustifyContent="JustifyContent.End">
+            <RadzenStack Orientation="Orientation.Vertical" Style="margin-top:auto; padding:10px;">
                 <RadzenRow >
-                    <RadzenColumn Size="8" >
-                        <RadzenButton Click=@(args => AddToCart(articulo)) Text="Agregar" ButtonStyle="ButtonStyle.Primary" style="position: sticky; top: 10px;"/>
+                    <RadzenColumn Size="6" >
+                        <RadzenButton Click=@(args => AddToCart(articulo)) Text="Agregar" ButtonStyle="ButtonStyle.Primary" Style="width:100%; height:40px; font-size:14px;"/>
                     </RadzenColumn>
-                    <RadzenColumn Size="4" class="rz-text-align-end">
-                        <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", articulo.PrecioPublico)}") />
+                    <RadzenColumn Size="6">
+                        <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", articulo.PrecioPublico)}") Style="font-size:14px; width:100%; height:40px; text-align:center; display:flex; align-items:center; justify-content:center;" />
                     </RadzenColumn>
                 </RadzenRow>
             </RadzenStack>

@@ -12,7 +12,8 @@ public class ListArticulosQueryService(AppDbContext _db) : IListArticulosQuerySe
   {
     // NOTE: This will fail if testing with EF InMemory provider!
     var result = await _db.Database.SqlQuery<ArticuloListarDTO>(
-      $"SELECT a.id,clave , a.descripcion, precio_publico, costo_unitario as ultimo_costo, impuesto1, u.descripcion as unidad FROM articulos a LEFT JOIN public.unidades u ON u.id = a.unidad_id ORDER BY a.clave" ).ToListAsync();
+      $@"SELECT a.id,clave , a.descripcion, precio_publico, costo_unitario as ultimo_costo, impuesto1, u.descripcion as unidad, ruta_imagen  
+      FROM articulos a LEFT JOIN public.unidades u ON u.id = a.unidad_id ORDER BY a.clave" ).ToListAsync();
 
     return result;
   }
