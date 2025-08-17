@@ -38,14 +38,14 @@
 @code{
     protected class UnidadDTO
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string Descripcion { get; set; } = string.Empty;
         public string ClaveSat { get; set; } = string.Empty;
 
     }
 
     [Parameter]
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

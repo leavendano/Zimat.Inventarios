@@ -9,6 +9,7 @@ using Zimat.Inventarios.Core.CategoriaAggregate;
 using Zimat.Inventarios.Core.DepartamentoAggregate;
 using Zimat.Inventarios.Core.FamiliaAggregate;
 using Zimat.Inventarios.Core.LineaAggregate;
+using Zimat.Inventarios.Core.ClienteAggregate;
 
 namespace Zimat.Inventarios.Infrastructure.Data;
 public class AppDbContext : DbContext
@@ -24,12 +25,15 @@ public class AppDbContext : DbContext
 
  
   public DbSet<Articulo> Articulos => Set<Articulo>();
+  public DbSet<ArticuloUnidad> ArticuloUnidades => Set<ArticuloUnidad>();
+  public DbSet<Precio> Precios => Set<Precio>();
   public DbSet<Categoria> Categorias => Set<Categoria>();
   public DbSet<Departamento> Departamentos => Set<Departamento>();
   public DbSet<Familia> Familias => Set<Familia>();
   public DbSet<Linea> Lineas => Set<Linea>();
   public DbSet<Unidad> Unidades => Set<Unidad>();
   public DbSet<Proveedor> Proveedores => Set<Proveedor>();
+  public DbSet<Cliente> Clientes => Set<Cliente>();
   public DbSet<Documento> Documentos => Set<Documento>();
   public DbSet<DocumentoConcepto> DocumentoConceptos => Set<DocumentoConcepto>();
 

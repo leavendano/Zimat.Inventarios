@@ -5,21 +5,23 @@ using Zimat.Inventarios.Core.Base;
 
 namespace Zimat.Inventarios.Core.UnidadAggregate;
 
-public class Unidad(string descripcion, string claveSat, string usuario = "ADMINISTRADOR") :
- EntityBase<Guid>, IRegisterBase
+public class Unidad : EntityBase<Guid>, IRegisterBase, IAggregateRoot
 {
-    public Unidad(string descripcion, string claveSat, string usuario = "ADMINISTRADOR", Guid? id = null) :
-         this(descripcion, claveSat, usuario)
+    public Unidad(string descripcion, string claveSat, string user = "Administrador") : base()
     {
-        Id = id ?? UuidV7.NewGuid();
+
+        Descripcion  = Guard.Against.NullOrEmpty(descripcion, nameof(descripcion));
+        ClaveSat = Guard.Against.NullOrEmpty(claveSat,nameof(claveSat));
+        Id =  UuidV7.NewGuid();
+        User  = Guard.Against.NullOrEmpty(user,nameof(user));
         Status = RegisterStatus.Activo; // Activo por defecto
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
     }
     
-    public string Descripcion { get; set; } = Guard.Against.NullOrEmpty(descripcion, nameof(descripcion));
-    public string ClaveSat { get; set; } = Guard.Against.NullOrEmpty(claveSat,nameof(claveSat));
-    public string? User { get; set; } = Guard.Against.NullOrEmpty(usuario,nameof(usuario));
+    public string Descripcion { get; set; }
+    public string ClaveSat { get; set; } 
+    public string? User { get; set; } 
     public int Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

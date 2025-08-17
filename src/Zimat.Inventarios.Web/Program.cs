@@ -8,6 +8,7 @@ using Zimat.Inventarios.Infrastructure.Data;
 using Zimat.Inventarios.Infrastructure.Email;
 using Zimat.Inventarios.UseCases.Documentos.Create;
 using Zimat.Inventarios.Web.Components;
+using Zimat.Inventarios.Web.Services;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using MediatR;
@@ -90,6 +91,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddControllers();
 builder.Services.AddRadzenComponents();
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<CartService>();
 
 
 // Configure Web Behavior

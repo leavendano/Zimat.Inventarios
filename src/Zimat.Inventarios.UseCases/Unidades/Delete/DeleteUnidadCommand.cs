@@ -3,4 +3,4 @@ using Ardalis.SharedKernel;
 
 namespace Zimat.Inventarios.UseCases.Unidades.Delete;
 
-public record DeleteUnidadCommand(int UnidadId) : ICommand<Result>;
+public record DeleteUnidadCommand(Guid UnidadId) : ICommand<Result>;

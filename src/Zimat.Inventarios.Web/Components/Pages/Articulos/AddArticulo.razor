@@ -205,7 +205,7 @@
         public string Clave { get; set; } = "";
         public string? Descripcion { get; set; } 
         public string? Codigo { get; set; }
-        public int UnidadId { get; set; }
+        public Guid UnidadId { get; set; }
         public string? Marca { get; set; }
         public string? Modelo { get; set; }
         public int? LineaId { get; set; }
@@ -292,7 +292,7 @@
         try
         {
             //await zimatService.CreateProduct(product);
-            var result = await _mediator.Send(new CreateArticuloCommand(product.Clave!,product.Descripcion!, product.Precio1,1,UserName));
+            var result = await _mediator.Send(new CreateArticuloCommand(product.Clave!,product.Descripcion!, product.Precio1,product.UnidadId,UserName));
             DialogService.Close(product);
         }
         catch (Exception)

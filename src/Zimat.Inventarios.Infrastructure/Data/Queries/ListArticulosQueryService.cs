@@ -8,11 +8,12 @@ public class ListArticulosQueryService(AppDbContext _db) : IListArticulosQuerySe
   // You can use EF, Dapper, SqlClient, etc. for queries -
   // this is just an example
 
-  public async Task<IEnumerable<ArticuloDTO>> ListAsync()
+  public async Task<IEnumerable<ArticuloListarDTO>> ListAsync()
   {
     // NOTE: This will fail if testing with EF InMemory provider!
-    var result = await _db.Database.SqlQuery<ArticuloDTO>(
-      $"SELECT a.id,clave , a.descripcion, precio_publico, ultimo_costo, impuesto1, u.descripcion as unidad FROM articulos a LEFT JOIN public.unidades u ON u.id = a.unidad_id ORDER BY a.clave" ).ToListAsync();
+    var result = await _db.Database.SqlQuery<ArticuloListarDTO>(
+      $@"SELECT a.id,clave , a.descripcion, precio_publico, costo_unitario as ultimo_costo, impuesto1, u.descripcion as unidad, ruta_imagen  
+      FROM articulos a LEFT JOIN public.unidades u ON u.id = a.unidad_id ORDER BY a.clave" ).ToListAsync();
 
     return result;
   }

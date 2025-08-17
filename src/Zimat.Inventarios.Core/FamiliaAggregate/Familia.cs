@@ -4,12 +4,23 @@ using Zimat.Inventarios.Core.Base;
 
 namespace Zimat.Inventarios.Core.FamiliaAggregate;
 
-public class Familia(string descripcion, decimal margen = 0, string usuario = "ADMINISTRADOR") : EntityBase, IAggregateRoot, IRegisterBase
+public class Familia : EntityBase<Guid>, IAggregateRoot, IRegisterBase
 {
-  public string Descripcion { get; set; } = Guard.Against.NullOrEmpty(descripcion, nameof(descripcion));
-  public decimal Margen { get; set; } = Guard.Against.Negative(margen, nameof(margen));
-  public string? Usuario { get; set; } = Guard.Against.NullOrEmpty(usuario, nameof(usuario));
-  public int Estado { get; set; } = 1;
+
+  public Familia(string descripcion, decimal margen = 0, string user = "Administrador") : base()
+  {
+    Descripcion  = Guard.Against.NullOrEmpty(descripcion, nameof(descripcion));
+    Margen  = Guard.Against.Negative(margen, nameof(margen));
+    User  = Guard.Against.NullOrEmpty(user, nameof(user));
+    Id = UuidV7.NewGuid();
+    Status = RegisterStatus.Activo; // Activo por defecto
+    CreatedAt = DateTime.UtcNow;
+    UpdatedAt = DateTime.UtcNow;
+  }
+  public string Descripcion { get; set; } 
+  public decimal Margen { get; set; } 
+  public string? User { get; set; } 
+  public int Status { get; set; }
   public DateTime CreatedAt { get; set; }
   public DateTime UpdatedAt { get; set; }
 }

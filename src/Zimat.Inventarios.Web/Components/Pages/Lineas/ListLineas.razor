@@ -1,0 +1,184 @@
+@page "/lineas"
+@using Ardalis.Result
+@using Zimat.Inventarios.Core.Base
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject ILogger<ListLineas> logger
+@using MediatR
+@inject IMediator _mediator
+@using Zimat.Inventarios.UseCases.Lineas
+@using Zimat.Inventarios.UseCases.Lineas.List
+@using Zimat.Inventarios.UseCases.Lineas.Create
+@using Zimat.Inventarios.UseCases.Lineas.Delete
+@using Zimat.Inventarios.UseCases.Lineas.Update
+@attribute [Authorize]
+
+
+<PageTitle>Lineas</PageTitle>
+<RadzenStack>
+    <RadzenRow AlignItems="AlignItems.Center">
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenText Text="Lineas" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton Icon="add_circle_outline" Text="Nuevo" Click="@AddButtonClick" Variant="Variant.Flat" />
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn SizeMD=12>
+            <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
+                            Data="@lineas" TItem="LineaDTO" RowSelect="@EditRow">
+                <Columns>
+                    <RadzenDataGridColumn TItem="LineaDTO" Property="Descripcion" Title="Descripción">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="LineaDTO" Property="Margen" Title="Margen">
+                        <Template Context="linea">
+                            @($"{linea.Margen:P2}")
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="LineaDTO" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
+                        <Template Context="linea">
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
+                                          Shade="Shade.Lighter" Variant="Variant.Flat"
+                                          Click=@(args => GridDeleteButtonClick(args, linea)) @onclick:stopPropagation="true" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+@code {
+
+    protected IEnumerable<LineaDTO>? lineas;
+
+    protected RadzenDataGrid<LineaDTO> grid0 = new();
+    protected override async Task OnInitializedAsync()
+    {
+
+        await base.OnInitializedAsync();
+        Result<IEnumerable<LineaDTO>> result = await _mediator.Send(new ListLineasQuery(null, null));
+
+        if (result.IsSuccess)
+        {
+            lineas = result.Value;
+        }
+
+    }
+
+    protected async Task AddButtonClick(MouseEventArgs args)
+    {
+        try
+        {
+            var dialogParams = new Dictionary<string, object>
+            {
+                ["OnLineaCreated"] = EventCallback.Factory.Create(this, RefreshGrid)
+            };
+            
+            await DialogService.OpenAsync<AddLinea>("Nueva Línea", dialogParams, new DialogOptions() 
+            { 
+                Width = "600px", 
+                Height = "400px", 
+                Resizable = true, 
+                Draggable = true 
+            });
+        }
+        catch (Exception e)
+        {
+            logger.LogError(0, e, "Error al abrir diálogo de nueva línea");
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "No se pudo abrir el diálogo para crear nueva línea"
+            });
+        }
+    }
+
+    protected async Task EditRow(LineaDTO args)
+    {
+        try
+        {
+            var dialogParams = new Dictionary<string, object>
+            {
+                ["Id"] = args.Id,
+                ["OnLineaUpdated"] = EventCallback.Factory.Create(this, RefreshGrid)
+            };
+            
+            await DialogService.OpenAsync<EditLinea>("Editar Línea", dialogParams, new DialogOptions() 
+            { 
+                Width = "600px", 
+                Height = "400px", 
+                Resizable = true, 
+                Draggable = true 
+            });
+        }
+        catch (Exception e)
+        {
+            logger.LogError(0, e, "Error al abrir diálogo de edición de línea");
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "No se pudo abrir el diálogo para editar la línea"
+            });
+        }
+    }
+
+    protected async Task GridDeleteButtonClick(MouseEventArgs args, LineaDTO linea)
+    {
+        try
+        {
+            if (await DialogService.Confirm("¿Está seguro de borrar este elemento?") == true)
+            {
+                var result = await _mediator.Send(new DeleteLineaCommand(linea.Id));
+
+                if (result.IsSuccess)
+                {
+                    await RefreshGrid();
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Éxito",
+                        Detail = "Línea eliminada correctamente"
+                    });
+                }
+                else
+                {
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error",
+                        Detail = "No se pudo eliminar la línea"
+                    });
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            logger.LogError(0, e, "Error al eliminar un elemento");
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = $"Error",
+                    Detail = $"Unable to delete Linea"
+                });
+        }
+    }
+
+    protected async Task RefreshGrid()
+    {
+        Result<IEnumerable<LineaDTO>> result = await _mediator.Send(new ListLineasQuery(null, null));
+        if (result.IsSuccess)
+        {
+            lineas = result.Value;
+            await grid0.Reload();
+        }
+    }
+}

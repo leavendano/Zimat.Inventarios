@@ -17,7 +17,7 @@ public class GetArticuloHandler(IReadRepository<Articulo> _repository)
     var spec = new ArticuloByIdSpec(request.ArticuloId);
     var entity = await _repository.FirstOrDefaultAsync(spec, cancellationToken);
     if (entity == null) return Result.NotFound();
-
-    return new ArticuloDTO(entity.Id,entity.Clave, entity.Descripcion, entity.PrecioPublico,entity.CostoUnitario,entity.Impuesto1,"");
+    
+    return new ArticuloDTO(entity.Id,entity.Clave, entity.Descripcion, entity.PrecioPublico,entity.CostoUnitario,entity.Impuesto1, entity.UnidadId);
   }
 }
