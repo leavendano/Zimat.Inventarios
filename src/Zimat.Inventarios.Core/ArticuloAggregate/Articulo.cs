@@ -8,14 +8,14 @@ public class Articulo : EntityBase<Guid>, IAggregateRoot, IRegisterBase
 {
 
 
-  public Articulo(string clave, string descripcion, decimal precioPublico, Guid unidadId, string? usuario) : base()
+  public Articulo(string clave, string descripcion, decimal precioPublico, Guid unidadId, string? user) : base()
   {
     Clave = Guard.Against.NullOrEmpty(clave, nameof(clave));
     Descripcion = Guard.Against.NullOrEmpty(descripcion, nameof(descripcion));
     PrecioPublico = Guard.Against.NegativeOrZero(precioPublico, nameof(precioPublico));
     Id = UuidV7.NewGuid();
     UnidadId = Guard.Against.NullOrEmpty(unidadId, nameof(unidadId));
-    User = usuario;
+    User = user;
     Status = RegisterStatus.Activo; // Activo por defecto
     StockActual = 0;
     StockMinimo = 0;

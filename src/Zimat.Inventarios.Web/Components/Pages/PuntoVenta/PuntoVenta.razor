@@ -13,7 +13,7 @@
 @attribute [Authorize]
 <PageTitle>Punto de Venta</PageTitle>
 
-<RadzenDataList WrapItems="true" AllowPaging="false" Data="@articulos" TItem="ArticuloDTO">
+<RadzenDataList WrapItems="true" AllowPaging="false" Data="@articulos" TItem="ArticuloListarDTO">
     <Template Context="articulo">
         <RadzenCard  Style="width:250px;" class="rz-py-4 rz-px-0" >
             <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center">
@@ -48,14 +48,14 @@
     string pagingSummaryFormat = "Displaying page {0} of {1} (total {2} records)";
     int pageSize = 4;
     int count;
-    protected IEnumerable<ArticuloDTO>? articulos;
+    protected IEnumerable<ArticuloListarDTO>? articulos;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         try
         {
-            Result<IEnumerable<ArticuloDTO>> result = await _mediator.Send(new ListArticulosQuery(null, null));
+            Result<IEnumerable<ArticuloListarDTO>> result = await _mediator.Send(new ListArticulosQuery(null, null));
             if (result.IsSuccess)
             {
                 articulos = result.Value;
@@ -98,7 +98,7 @@
 
     async Task PageChanged(PagerEventArgs args)
     {
-         Result<IEnumerable<ArticuloDTO>> result = await _mediator.Send(new ListArticulosQuery(null, null));
+         Result<IEnumerable<ArticuloListarDTO>> result = await _mediator.Send(new ListArticulosQuery(null, null));
             if (result.IsSuccess)
             {
                 articulos = result.Value;

@@ -20,8 +20,8 @@
                                   Style="width: 100px;" />
                     <RadzenTextBox Placeholder="Buscar..." 
                                  @bind-Value="@searchText" 
-                                 Change="@(args => Search())" />
-                                 //Style="width: 300px;" />
+                                 Change="@(args => Search())" 
+                                 Style="width: 300px;" />
                     <RadzenButton Icon="search" 
                                 ButtonStyle="ButtonStyle.Primary" 
                                 Click="@Search"/>
