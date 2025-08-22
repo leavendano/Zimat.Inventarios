@@ -15,16 +15,8 @@
             </RadzenColumn>
             <RadzenColumn Size="8">
                 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Left" Gap="1rem" Style="width: 100%;">
-                    <RadzenDropDown Data="@searchCategories" 
-                                  @bind-Value="selectedCategory"
-                                  Style="width: 100px;" />
-                    <RadzenTextBox Placeholder="Buscar..." 
-                                 @bind-Value="@searchText" 
-                                 Change="@(args => Search())" 
-                                 Style="width: 300px;" />
-                    <RadzenButton Icon="search" 
-                                ButtonStyle="ButtonStyle.Primary" 
-                                Click="@Search"/>
+                  
+                   
                 </RadzenStack>
             </RadzenColumn>
             <RadzenColumn Size="2">
@@ -87,8 +79,8 @@
 @code {
     bool sidebarExpanded = true;
     string searchText = "";
-    string selectedCategory = "Productos";
-    IEnumerable<string> searchCategories = new[] { "Productos", "Categorias", "Departamentos" };
+    
+   
 
     void SidebarToggleClick()
     {
@@ -98,17 +90,9 @@
     void Search()
     {
         // Implementar la lógica de búsqueda según la categoría seleccionada
-        switch (selectedCategory)
-        {
-            case "Todos":
-                NavigationManager.NavigateTo($"/punto_venta?search={searchText}");
-                break;
-            case "Clientes":
-                // Implementar cuando se tenga la vista de clientes
-                break;
-            case "Proveedores":
-                NavigationManager.NavigateTo($"/punto_venta?search={searchText}");
-                break;
-        }
+        
+        NavigationManager.NavigateTo($"/punto_venta?search={searchText}");
+               
+        
     }
 }

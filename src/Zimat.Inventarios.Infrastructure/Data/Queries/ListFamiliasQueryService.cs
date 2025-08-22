@@ -8,7 +8,7 @@ public class ListFamiliasQueryService(AppDbContext _db) : IListFamiliasQueryServ
   public async Task<IEnumerable<FamiliaDTO>> ListAsync()
   {
     var result = await _db.Database.SqlQuery<FamiliaDTO>(
-     $"SELECT id,descripcion, margen FROM familias WHERE estatus = 1") // don't fetch other big columns
+     $"SELECT id,descripcion, margen FROM familias WHERE status = 1") // don't fetch other big columns
      .ToListAsync();
 
     return result;

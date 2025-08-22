@@ -18,7 +18,8 @@ public class UpdateArticuloHandler(IRepository<Articulo> _repository, IEmailSend
     var precioAnterior = existingArticulo.PrecioPublico;
     existingArticulo.UpdateDescripcion(request.Descripcion!);
     existingArticulo.UpdatePrecio(request.PrecioPublico);
-    if(precioAnterior != request.PrecioPublico)
+    existingArticulo.RutaImagen = request.RutaImagen;
+    if (precioAnterior != request.PrecioPublico)
     {
       await emailSender.SendEmailAsync("leavendano@gmail.com",
                                     "cfdi@infinitummail.com",
@@ -30,6 +31,6 @@ public class UpdateArticuloHandler(IRepository<Articulo> _repository, IEmailSend
 
     return Result.Success(new ArticuloDTO(existingArticulo.Id,
       existingArticulo.Clave, existingArticulo.Descripcion,existingArticulo.PrecioPublico,existingArticulo.CostoUnitario,
-      existingArticulo.Impuesto1,existingArticulo.UnidadId));
+      existingArticulo.Impuesto1,existingArticulo.UnidadId,existingArticulo.RutaImagen));
   }
 }

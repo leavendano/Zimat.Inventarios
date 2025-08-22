@@ -1,12 +1,20 @@
-using Ardalis.GuardClauses;
+﻿using Ardalis.GuardClauses;
 using Ardalis.SharedKernel;
+using Zimat.Inventarios.Core.ArticuloAggregate.Events;
 using Zimat.Inventarios.Core.Base;
+using Zimat.Inventarios.Core.DocumentoAggregate;
 
 namespace Zimat.Inventarios.Core.ArticuloAggregate;
 
 public class ArticuloUnidad : EntityBase<Guid>, IRegisterBase
 {
-    public Guid ArticuloId { get; set; }
+  private readonly List<Precio> _precios;
+
+  public IEnumerable<Precio> Conceptos
+  {
+    get { return _precios; }
+  }
+  public Guid ArticuloId { get; set; }
     public Guid UnidadId { get; set; }
     public decimal FactorConversion { get; set; }
     public string? User { get; set; }
@@ -24,5 +32,14 @@ public class ArticuloUnidad : EntityBase<Guid>, IRegisterBase
         Status = RegisterStatus.Activo; // Activo por defecto
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
+        _precios = [];
+     }
+
+    public void AddPrecio(Precio newItem)
+    {
+      Guard.Against.Null(newItem, nameof(newItem));
+      _precios.Add(newItem);
+      var newItemAddedEvent = new NewPrecioAddedEvent(this, newItem);
+      base.RegisterDomainEvent(newItemAddedEvent);
     }
 }

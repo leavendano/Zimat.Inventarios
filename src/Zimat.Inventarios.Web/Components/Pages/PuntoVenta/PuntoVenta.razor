@@ -17,27 +17,46 @@
 <PageTitle>Punto de Venta</PageTitle>
 
 <RadzenRow>
+    <RadzenColumn Size="12">
+         <RadzenTextBox Placeholder="Buscar..." 
+                                 @bind-Value="@searchText" 
+                                 Change="@(args => Search())" 
+                                 Style="width: 600px;" />
+                    <RadzenButton Icon="search" 
+                                ButtonStyle="ButtonStyle.Primary" 
+                                Click="@Search"/>
+    </RadzenColumn>
+</RadzenRow>
+
+<RadzenRow>
     <RadzenColumn Size="8">
 
 <RadzenDataList WrapItems="true" AllowPaging="false" Data="@articulos" TItem="ArticuloListarDTO" Style="display:flex; flex-wrap:wrap; gap:15px;">
     <Template Context="articulo">
-        <RadzenCard  Style="width:250px; height:320px; display:flex; flex-direction:column; padding:0; flex-shrink:0;" class="rz-py-0 rz-px-0" >
+        <RadzenCard  Style="width:200px; height:400px; display:flex; flex-direction:column; padding:0; flex-shrink:0;" class="rz-py-0 rz-px-0" >
             <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Style="flex-grow:1;">
-                <RadzenImage Path="@articulo.RutaImagen" AlternateText="@(articulo.Descripcion)" Style="width:100%; height:120px; object-fit:cover;" />
+                <RadzenImage Path="@articulo.RutaImagen" AlternateText="@(articulo.Descripcion)" Style="width:100%; height:200px; object-fit:cover;" />
                 <RadzenStack Gap="0" Style="text-align:center; flex-grow:1; justify-content:center; padding:10px;">
-                    <RadzenText TextStyle="TextStyle.Body1" Style="font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:200px;"><b>@(articulo?.Descripcion)</b></RadzenText>
-                    <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-mb-0">Código</RadzenText>
-                    <RadzenText TextStyle="TextStyle.Body1"><b>@(articulo.Clave)</b></RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1" Style="font-weight:normal; overflow:hidden; text-overflow:ellipsis; white-space:normal; max-width:200px;">@(articulo?.Descripcion)</RadzenText>
+                    <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="width:100%;">
+                        <RadzenColumn Size="6">
+                             <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-mb-0">Clave</RadzenText>
+                        </RadzenColumn>
+                        <RadzenColumn Size="6">
+                            <RadzenText TextStyle="TextStyle.Body1">@(articulo.Clave)</RadzenText>
+                        </RadzenColumn>
+                   </RadzenRow>
+                   
                 </RadzenStack>
             </RadzenStack>
             
             <RadzenStack Orientation="Orientation.Vertical" Style="margin-top:auto; padding:10px;">
                 <RadzenRow >
                     <RadzenColumn Size="6" >
-                        <RadzenButton Click=@(args => AddToCart(articulo)) Text="Agregar" ButtonStyle="ButtonStyle.Primary" Style="width:100%; height:40px; font-size:14px;"/>
+                        <RadzenButton Click=@(args => AddToCart(articulo)) Text="Agregar" ButtonStyle="ButtonStyle.Light" Style="width:100%; height:30px; font-size:12px;"/>
                     </RadzenColumn>
                     <RadzenColumn Size="6">
-                        <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", articulo.PrecioPublico)}") Style="font-size:14px; width:100%; height:40px; text-align:center; display:flex; align-items:center; justify-content:center;" />
+                        <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", articulo.PrecioPublico)}") Style="font-size:12px; width:100%; height:30px; text-align:center; display:flex; align-items:center; justify-content:center;" />
                     </RadzenColumn>
                 </RadzenRow>
             </RadzenStack>
@@ -136,9 +155,10 @@
 
 @code {
 
-    string pagingSummaryFormat = "Displaying page {0} of {1} (total {2} records)";
+    string pagingSummaryFormat = "Presentando página {0} de {1} (total {2} registros)";
     int pageSize = 4;
     int count;
+    string searchText = "";
     protected IEnumerable<ArticuloListarDTO>? articulos;
     
     protected override void OnInitialized()
@@ -156,7 +176,7 @@
         await base.OnInitializedAsync();
         try
         {
-            Result<IEnumerable<ArticuloListarDTO>> result = await _mediator.Send(new ListArticulosQuery(null, null));
+            Result<IEnumerable<ArticuloListarDTO>> result = await _mediator.Send(new ListArticulosQuery(null,0, pageSize));
             if (result.IsSuccess)
             {
                 articulos = result.Value;
@@ -199,7 +219,7 @@
 
     async Task PageChanged(PagerEventArgs args)
     {
-         Result<IEnumerable<ArticuloListarDTO>> result = await _mediator.Send(new ListArticulosQuery(null, null));
+         Result<IEnumerable<ArticuloListarDTO>> result = await _mediator.Send(new ListArticulosQuery(null,args.Skip, args.Top));
             if (result.IsSuccess)
             {
                 articulos = result.Value;
@@ -252,5 +272,54 @@
             Summary = "Venta", 
             Detail = $"Procesando venta por {String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", CartService.Total)}" 
         });
+    }
+
+     async Task Search()
+    {
+        // Implementar la lógica de búsqueda según la categoría seleccionada
+        try
+        {
+            Result<IEnumerable<ArticuloListarDTO>> result = await _mediator.Send(new ListArticulosQuery(searchText,null, null));
+            if (result.IsSuccess)
+            {
+                articulos = result.Value;
+                count = articulos?.Count() ?? 0;
+                if (count == 0)
+                {
+                    NotificationService.Notify(new NotificationMessage 
+                    { 
+                        Severity = NotificationSeverity.Info, 
+                        Summary = "Información", 
+                        Detail = "No se encontraron artículos." 
+                    });
+                }
+                else
+                {
+                    NotificationService.Notify(new NotificationMessage 
+                    { 
+                        Severity = NotificationSeverity.Success, 
+                        Summary = "Éxito", 
+                        Detail = $"{count} artículos cargados." 
+                    });
+                }
+            }
+            else
+            {
+                NotificationService.Notify(new NotificationMessage 
+                { 
+                    Severity = NotificationSeverity.Error, 
+                    Summary = "Error", 
+                    Detail = result.Errors.FirstOrDefault() 
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error al cargar los artículos");
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "No se pudieron cargar los artículos." });
+        } 
+       
+               
+        
     }
 }

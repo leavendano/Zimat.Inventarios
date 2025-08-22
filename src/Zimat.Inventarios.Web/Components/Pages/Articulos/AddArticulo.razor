@@ -208,10 +208,10 @@
         public Guid UnidadId { get; set; }
         public string? Marca { get; set; }
         public string? Modelo { get; set; }
-        public int? LineaId { get; set; }
-        public int? FamiliaId { get; set; }
-        public int? CategoriaId { get; set; }
-        public int? DepartamentoId { get; set; }
+        public Guid? LineaId { get; set; }
+        public Guid? FamiliaId { get; set; }
+        public Guid? CategoriaId { get; set; }
+        public Guid? DepartamentoId { get; set; }
         public string? Valdep { get; set; }
         public string? Ubicacion { get; set; }
         public bool Series { get; set; }
@@ -292,7 +292,8 @@
         try
         {
             //await zimatService.CreateProduct(product);
-            var result = await _mediator.Send(new CreateArticuloCommand(product.Clave!,product.Descripcion!, product.Precio1,product.UnidadId,UserName));
+            var result = await _mediator.Send(new CreateArticuloCommand(product.Clave!,product.Descripcion!, product.Precio1,product.UnidadId,
+                   product.CategoriaId,product.LineaId,product.FamiliaId,product.DepartamentoId,UserName));
             DialogService.Close(product);
         }
         catch (Exception)

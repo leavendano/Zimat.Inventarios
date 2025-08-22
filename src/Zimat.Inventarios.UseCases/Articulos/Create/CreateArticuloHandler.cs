@@ -12,7 +12,13 @@ public class CreateArticuloHandler(IRepository<Articulo> _repository)
     CancellationToken cancellationToken)
   {
     var newArticulo = new Articulo(request.Clave,request.Descripcion, request.PrecioPublico,request.UnidadId,request.UserName);
-  
+
+    newArticulo.CategoriaId = request.CategoriaId;
+    newArticulo.LineaId = request.LineaId;
+    newArticulo.FamiliaId = request.FamiliaId;
+    newArticulo.DepartamentoId = request.DepartamentoId;
+    newArticulo.RutaImagen = request.RutaImagen;
+
     var createdItem = await _repository.AddAsync(newArticulo, cancellationToken);
 
     return createdItem.Id;

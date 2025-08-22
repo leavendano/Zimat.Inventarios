@@ -30,10 +30,10 @@ public class Articulo : EntityBase<Guid>, IAggregateRoot, IRegisterBase
   public Guid UnidadId  { get; set;} 
   public string? Marca  { get; set;}
   public string? Modelo  { get; set;}
-  public int? LineaId  { get; set;} 
-  public int? FamiliaId  { get; set;}
-  public int? CategoriaId  { get; set;}
-  public int? DepartamentoId  { get; set;}
+  public Guid? LineaId  { get; set;} 
+  public Guid? FamiliaId  { get; set;}
+  public Guid? CategoriaId  { get; set;}
+  public Guid? DepartamentoId  { get; set;}
   public string? Ubicacion  { get; set;}
   public bool Series  { get; set;}
   public decimal Impuesto1 { get; set;}

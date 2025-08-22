@@ -7,7 +7,7 @@ public class ListArticulosHandler(IListArticulosQueryService _query)
 {
   public async Task<Result<IEnumerable<ArticuloListarDTO>>> Handle(ListArticulosQuery request, CancellationToken cancellationToken)
   {
-    var result = await _query.ListAsync();
+    var result = await _query.ListAsync(request.filtro,request.Skip,request.Take);
 
     return Result.Success(result);
   }

@@ -1,9 +1,9 @@
-using Ardalis.SharedKernel;
+﻿using Ardalis.SharedKernel;
 
 namespace Zimat.Inventarios.Core.DocumentoAggregate.Events;
 
 /// <summary>
-/// A domain event that is dispatched whenever a contributor is deleted.
+/// A domain event that is dispatched whenever a documento is added.
 /// The DeleteContributorService is used to dispatch this event.
 /// </summary>
 internal sealed class NewConceptoAddedEvent(Documento documento,DocumentoConcepto concepto) : DomainEventBase

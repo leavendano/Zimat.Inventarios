@@ -271,7 +271,7 @@
             listadoProveedores = resultProveedores.Value;
         }
 
-        var result = await _mediator.Send(new ListArticulosQuery(null, null));
+        var result = await _mediator.Send(new ListArticulosQuery(null,null, null));
         if (result.IsSuccess)
         {
             articulos = result.Value;

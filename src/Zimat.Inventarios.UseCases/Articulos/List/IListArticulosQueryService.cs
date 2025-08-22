@@ -1,5 +1,5 @@
 ﻿namespace Zimat.Inventarios.UseCases.Articulos.List;
 public interface IListArticulosQueryService
 {
-  Task<IEnumerable<ArticuloListarDTO>> ListAsync();
+  Task<IEnumerable<ArticuloListarDTO>> ListAsync(string? filtro,int? skip, int? take);
 }
