@@ -29,8 +29,8 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<int?>("CategoriaId")
-                        .HasColumnType("integer")
+                    b.Property<Guid?>("CategoriaId")
+                        .HasColumnType("uuid")
                         .HasColumnName("categoria_id");
 
                     b.Property<string>("Clave")
@@ -58,8 +58,8 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<int?>("DepartamentoId")
-                        .HasColumnType("integer")
+                    b.Property<Guid?>("DepartamentoId")
+                        .HasColumnType("uuid")
                         .HasColumnName("departamento_id");
 
                     b.Property<string>("Descripcion")
@@ -72,8 +72,8 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("descuento_maximo");
 
-                    b.Property<int?>("FamiliaId")
-                        .HasColumnType("integer")
+                    b.Property<Guid?>("FamiliaId")
+                        .HasColumnType("uuid")
                         .HasColumnName("familia_id");
 
                     b.Property<decimal>("Impuesto1")
@@ -84,8 +84,8 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("impuesto2");
 
-                    b.Property<int?>("LineaId")
-                        .HasColumnType("integer")
+                    b.Property<Guid?>("LineaId")
+                        .HasColumnType("uuid")
                         .HasColumnName("linea_id");
 
                     b.Property<string>("Marca")
@@ -875,9 +875,9 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
             modelBuilder.Entity("Zimat.Inventarios.Core.ArticuloAggregate.Precio", b =>
                 {
                     b.HasOne("Zimat.Inventarios.Core.ArticuloAggregate.ArticuloUnidad", null)
-                        .WithMany()
+                        .WithMany("Conceptos")
                         .HasForeignKey("ArticuloUnidadId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_precios_articulo_unidades_articulo_unidad_id");
                 });
@@ -905,6 +905,11 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_documento_conceptos_documentos_documento_id");
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.ArticuloAggregate.ArticuloUnidad", b =>
+                {
+                    b.Navigation("Conceptos");
                 });
 
             modelBuilder.Entity("Zimat.Inventarios.Core.DocumentoAggregate.Documento", b =>

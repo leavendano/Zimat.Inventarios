@@ -30,125 +30,141 @@
 
 <RadzenRow>
     <RadzenColumn Size="8">
-
-<RadzenDataList WrapItems="true" AllowPaging="false" Data="@articulos" TItem="ArticuloListarDTO" Style="display:flex; flex-wrap:wrap; gap:15px;">
-    <Template Context="articulo">
-        <RadzenCard  Style="width:200px; height:400px; display:flex; flex-direction:column; padding:0; flex-shrink:0;" class="rz-py-0 rz-px-0" >
-            <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Style="flex-grow:1;">
-                <RadzenImage Path="@articulo.RutaImagen" AlternateText="@(articulo.Descripcion)" Style="width:100%; height:200px; object-fit:cover;" />
-                <RadzenStack Gap="0" Style="text-align:center; flex-grow:1; justify-content:center; padding:10px;">
-                    <RadzenText TextStyle="TextStyle.Body1" Style="font-weight:normal; overflow:hidden; text-overflow:ellipsis; white-space:normal; max-width:200px;">@(articulo?.Descripcion)</RadzenText>
-                    <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="width:100%;">
-                        <RadzenColumn Size="6">
-                             <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-mb-0">Clave</RadzenText>
-                        </RadzenColumn>
-                        <RadzenColumn Size="6">
-                            <RadzenText TextStyle="TextStyle.Body1">@(articulo.Clave)</RadzenText>
-                        </RadzenColumn>
-                   </RadzenRow>
-                   
-                </RadzenStack>
-            </RadzenStack>
-            
-            <RadzenStack Orientation="Orientation.Vertical" Style="margin-top:auto; padding:10px;">
-                <RadzenRow >
-                    <RadzenColumn Size="6" >
-                        <RadzenButton Click=@(args => AddToCart(articulo)) Text="Agregar" ButtonStyle="ButtonStyle.Light" Style="width:100%; height:30px; font-size:12px;"/>
-                    </RadzenColumn>
-                    <RadzenColumn Size="6">
-                        <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", articulo.PrecioPublico)}") Style="font-size:12px; width:100%; height:30px; text-align:center; display:flex; align-items:center; justify-content:center;" />
-                    </RadzenColumn>
-                </RadzenRow>
-            </RadzenStack>
-        </RadzenCard>
-    </Template>
-</RadzenDataList>
-
-<RadzenPager ShowPagingSummary="true" PagingSummaryFormat="@pagingSummaryFormat" HorizontalAlign="HorizontalAlign.Right" Count="count" PageSize="@pageSize" PageNumbersCount="5" PageChanged="@PageChanged" />
+        <RadzenDataList WrapItems="true" AllowPaging="false" Data="@articulos" TItem="ArticuloListarDTO" Style="display:flex; flex-wrap:wrap; gap:15px;">
+            <Template Context="articulo">
+                <RadzenCard  Style="width:200px; height:400px; display:flex; flex-direction:column; padding:0; flex-shrink:0;" class="rz-py-0 rz-px-0" >
+                    <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Style="flex-grow:1;">
+                        <RadzenImage Path="@articulo.RutaImagen" AlternateText="@(articulo.Descripcion)" Style="width:100%; height:200px; object-fit:cover;" />
+                        <RadzenStack Gap="0" Style="text-align:center; flex-grow:1; justify-content:center; padding:10px;">
+                            <RadzenText TextStyle="TextStyle.Body1" Style="font-weight:normal; overflow:hidden; text-overflow:ellipsis; white-space:normal; max-width:200px;">@(articulo?.Descripcion)</RadzenText>
+                            <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Left" Style="width:100%;">
+                                <RadzenColumn Size="6">
+                                    <RadzenText TextStyle="TextStyle.Caption" class="rz-display-flex rz-mt-2 rz-mb-0">Clave</RadzenText>
+                                </RadzenColumn>
+                                <RadzenColumn Size="6">
+                                    <RadzenText TextStyle="TextStyle.Caption">@(articulo.Clave)</RadzenText>
+                                </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Left" Style="width:100%;">
+                                <RadzenColumn Size="6">
+                                    <RadzenText TextStyle="TextStyle.Caption" class="rz-display-flex rz-mt-2 rz-mb-0">Disponible</RadzenText>
+                                </RadzenColumn>
+                                <RadzenColumn Size="6">
+                                    <RadzenText TextStyle="TextStyle.Caption">@(articulo.StockActual)</RadzenText>
+                                </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Left" Style="width:100%;">
+                                <RadzenColumn Size="6">
+                                    <RadzenText TextStyle="TextStyle.Caption" class="rz-display-flex rz-mt-2 rz-mb-0">Precio</RadzenText>
+                                </RadzenColumn>
+                                <RadzenColumn Size="6">
+                                    <RadzenText TextStyle="TextStyle.Caption">@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", articulo.PrecioPublico)}")</RadzenText>
+                                </RadzenColumn>
+                        </RadzenRow>
+                        
+                        </RadzenStack>
+                    </RadzenStack>
+                    
+                    <RadzenStack Orientation="Orientation.Vertical" Style="margin-top:auto; padding:1px;">
+                        <RadzenRow Style="margin-top:auto; padding:1px;">
+                            <RadzenColumn Size="6" Style="margin-top:auto; padding:1px;">
+                                <RadzenButton Click=@(args => AddToCart(articulo)) Text="Agregar" ButtonStyle="ButtonStyle.Info" Style="width:100%; height:20px; font-size:12px;border-radius: 0" Variant="Variant.Outlined"/>
+                            </RadzenColumn>
+                            <RadzenColumn Size="6" Style="margin-top:auto; padding:1px;">
+                                <RadzenNumeric @bind-Value="articulo.Cantidad" Min="0" Max="100" Step="1" Placeholder="Enter a number between 0 and 100" 
+                                        Style="width:100%; height:35px; font-size:12px;border-radius: 0"/>
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenCard>
+            </Template>
+        </RadzenDataList>
+        <RadzenPager ShowPagingSummary="true" PagingSummaryFormat="@pagingSummaryFormat" HorizontalAlign="HorizontalAlign.Right" Count="count" PageSize="@pageSize" PageNumbersCount="5" PageChanged="@PageChanged" />
     </RadzenColumn>
     
     <RadzenColumn Size="4">
         <RadzenCard Style="position: sticky; top: 20px; max-height: 80vh; overflow-y: auto;">
-            <RadzenStack>
-                <RadzenText TextStyle="TextStyle.H5" Text="Carrito de Compras" />
-                <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="@($"{CartService.TotalItems} artículos")" />
-                
-                @if (CartService.Items.Any())
-                {
-                    <RadzenStack Gap="0.5rem">
-                        @foreach (var item in CartService.Items)
-                        {
-                            <RadzenCard Style="padding: 0.5rem;">
-                                <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
-                                    <RadzenText TextStyle="TextStyle.Caption" Text="@item.Descripcion" />
-                                    <RadzenRow AlignItems="AlignItems.Center">
-                                        <RadzenColumn Size="6">
-                                            <RadzenNumeric @bind-Value="item.Cantidad" 
-                                                         Min="1" 
-                                                         Change="@((int value) => UpdateQuantity(item.ArticuloId, value))" 
-                                                         Style="width: 60px;" />
-                                        </RadzenColumn>
-                                        <RadzenColumn Size="6" class="rz-text-align-end">
-                                            <RadzenButton Icon="delete" 
-                                                        ButtonStyle="ButtonStyle.Danger" 
-                                                        Size="ButtonSize.ExtraSmall" 
-                                                        Click="@(args => RemoveFromCart(item.ArticuloId))" />
-                                        </RadzenColumn>
-                                    </RadzenRow>
-                                    <RadzenText TextStyle="TextStyle.Caption" Text="@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", item.Total)}")" />
-                                </RadzenStack>
-                            </RadzenCard>
-                        }
-                    </RadzenStack>
+                <RadzenStack>
+                    <RadzenText TextStyle="TextStyle.H5" Text="Carrito de Compras" />
+                    <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="@($"{CartService.TotalItems} artículos")" />
                     
-                    <div style="border-top: 1px solid #ccc; margin: 0.5rem 0;"></div>
-                    
-                    <RadzenStack Gap="0.25rem">
-                        <RadzenRow>
-                            <RadzenColumn Size="6">
-                                <RadzenText TextStyle="TextStyle.Body2" Text="Subtotal:" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="6" class="rz-text-align-end">
-                                <RadzenText TextStyle="TextStyle.Body2" Text="@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", CartService.Subtotal)}")" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow>
-                            <RadzenColumn Size="6">
-                                <RadzenText TextStyle="TextStyle.Body2" Text="Impuestos:" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="6" class="rz-text-align-end">
-                                <RadzenText TextStyle="TextStyle.Body2" Text="@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", CartService.TotalImpuestos)}")" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                        <RadzenRow>
-                            <RadzenColumn Size="6">
-                                <RadzenText TextStyle="TextStyle.H6" Text="Total:" />
-                            </RadzenColumn>
-                            <RadzenColumn Size="6" class="rz-text-align-end">
-                                <RadzenText TextStyle="TextStyle.H6" Text="@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", CartService.Total)}")" />
-                            </RadzenColumn>
-                        </RadzenRow>
-                    </RadzenStack>
-                    
-                    <div style="border-top: 1px solid #ccc; margin: 0.5rem 0;"></div>
-                    
-                    <RadzenStack>
-                        <RadzenButton Text="Procesar Venta" 
-                                    ButtonStyle="ButtonStyle.Success" 
-                                    Click="@ProcessSale" 
-                                    Style="width: 100%;" />
-                        <RadzenButton Text="Limpiar Carrito" 
-                                    ButtonStyle="ButtonStyle.Light" 
-                                    Click="@ClearCart" 
-                                    Style="width: 100%;" />
-                    </RadzenStack>
-                }
-                else
-                {
-                    <RadzenText TextStyle="TextStyle.Body2" Text="El carrito está vacío" class="rz-text-align-center" />
-                }
-            </RadzenStack>
-        </RadzenCard>
+                    @if (CartService.Items.Any())
+                    {
+                        <RadzenStack Gap="0.5rem">
+                            @foreach (var item in CartService.Items)
+                            {
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="7">
+                                        <RadzenText TextStyle="TextStyle.Caption" Text="@item.Descripcion" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="2">
+                                                <RadzenNumeric @bind-Value="item.Cantidad" 
+                                                            Min="1" 
+                                                            Change="@((int value) => UpdateQuantity(item.ArticuloId, value))" 
+                                                            TextStyle="TextStyle.Caption" 
+                                                            Style="--rz-input-font-size: small; --rz-input-height: 24px;" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="1" class="rz-text-align-end">
+                                        <RadzenButton Icon="delete" 
+                                                    ButtonStyle="ButtonStyle.Danger" 
+                                                    Size="ButtonSize.ExtraSmall" 
+                                                    Click="@(args => RemoveFromCart(item.ArticuloId))" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="2" class="rz-text-align-end">   
+                                        <RadzenText TextStyle="TextStyle.Caption" Text="@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", item.Total)}")" />
+                                    </RadzenColumn>
+                                </RadzenRow>
+                            }
+                        </RadzenStack>
+                        
+                        <div style="border-top: 1px solid #ccc; margin: 0.5rem 0;"></div>
+                        
+                        <RadzenStack Gap="0.25rem">
+                            <RadzenRow>
+                                <RadzenColumn Size="6">
+                                    <RadzenText TextStyle="TextStyle.Body2" Text="Subtotal:" />
+                                </RadzenColumn>
+                                <RadzenColumn Size="6" class="rz-text-align-end">
+                                    <RadzenText TextStyle="TextStyle.Body2" Text="@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", CartService.Subtotal)}")" />
+                                </RadzenColumn>
+                            </RadzenRow>
+                            <RadzenRow>
+                                <RadzenColumn Size="6">
+                                    <RadzenText TextStyle="TextStyle.Body2" Text="Impuestos:" />
+                                </RadzenColumn>
+                                <RadzenColumn Size="6" class="rz-text-align-end">
+                                    <RadzenText TextStyle="TextStyle.Body2" Text="@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", CartService.TotalImpuestos)}")" />
+                                </RadzenColumn>
+                            </RadzenRow>
+                            <RadzenRow>
+                                <RadzenColumn Size="6">
+                                    <RadzenText TextStyle="TextStyle.H6" Text="Total:" />
+                                </RadzenColumn>
+                                <RadzenColumn Size="6" class="rz-text-align-end">
+                                    <RadzenText TextStyle="TextStyle.H6" Text="@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", CartService.Total)}")" />
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenStack>
+                        
+                        <div style="border-top: 1px solid #ccc; margin: 0.5rem 0;"></div>
+                        
+                        <RadzenStack>
+                            <RadzenButton Text="Procesar Venta" 
+                                        ButtonStyle="ButtonStyle.Success" 
+                                        Click="@ProcessSale" 
+                                        Style="width: 100%;" />
+                            <RadzenButton Text="Limpiar Carrito" 
+                                        ButtonStyle="ButtonStyle.Light" 
+                                        Click="@ClearCart" 
+                                        Style="width: 100%;" />
+                        </RadzenStack>
+                    }
+                    else
+                    {
+                        <RadzenText TextStyle="TextStyle.Body2" Text="El carrito está vacío" class="rz-text-align-center" />
+                    }
+                </RadzenStack>
+            </RadzenCard>
     </RadzenColumn>
 </RadzenRow>
 
@@ -160,6 +176,7 @@
     int count;
     string searchText = "";
     protected IEnumerable<ArticuloListarDTO>? articulos;
+   
     
     protected override void OnInitialized()
     {

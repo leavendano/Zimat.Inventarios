@@ -18,10 +18,10 @@ public class PrecioConfiguration : IEntityTypeConfiguration<Precio>
 
         builder.Property(x => x.Id).HasColumnType("uuid");
 
-        builder.HasOne<ArticuloUnidad>()
+        /* builder.HasOne<ArticuloUnidad>()
             .WithMany()
             .HasForeignKey(x => x.ArticuloUnidadId)
             .OnDelete(DeleteBehavior.Restrict)
-            .IsRequired();
+            .IsRequired(); */
     }
 }

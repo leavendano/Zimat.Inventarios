@@ -215,10 +215,10 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     unidad_id = table.Column<Guid>(type: "uuid", nullable: false),
                     marca = table.Column<string>(type: "text", nullable: true),
                     modelo = table.Column<string>(type: "text", nullable: true),
-                    linea_id = table.Column<int>(type: "integer", nullable: true),
-                    familia_id = table.Column<int>(type: "integer", nullable: true),
-                    categoria_id = table.Column<int>(type: "integer", nullable: true),
-                    departamento_id = table.Column<int>(type: "integer", nullable: true),
+                    linea_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    familia_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    categoria_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    departamento_id = table.Column<Guid>(type: "uuid", nullable: true),
                     ubicacion = table.Column<string>(type: "text", nullable: true),
                     series = table.Column<bool>(type: "boolean", nullable: false),
                     impuesto1 = table.Column<decimal>(type: "numeric", nullable: false),
@@ -338,7 +338,7 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         column: x => x.articulo_unidad_id,
                         principalTable: "articulo_unidades",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

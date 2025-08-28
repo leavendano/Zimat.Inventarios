@@ -1,10 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text;
-using Humanizer;
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Crypto;
-using Zimat.Inventarios.Core.ArticuloAggregate;
-using Zimat.Inventarios.Core.UnidadAggregate;
 using Zimat.Inventarios.UseCases.Articulos;
 using Zimat.Inventarios.UseCases.Articulos.List;
 
@@ -17,7 +13,8 @@ public class ListArticulosQueryService(AppDbContext _db) : IListArticulosQuerySe
   public async Task<IEnumerable<ArticuloListarDTO>> ListAsync(string? filtro, int? skip, int? take)
   {
     // NOTE: This will fail if testing with EF InMemory provider!
-    var stringBuilder = new StringBuilder("SELECT a.id,clave , a.descripcion, precio_publico, costo_unitario as ultimo_costo, impuesto1, u.descripcion as unidad, ruta_imagen  FROM articulos a LEFT JOIN public.unidades u ON u.id = a.unidad_id ");
+    var stringBuilder = new StringBuilder(@"SELECT a.id,clave , a.descripcion, precio_publico, costo_unitario as ultimo_costo, impuesto1,
+          u.descripcion as unidad, stock_actual, ruta_imagen, 1 as cantidad  FROM articulos a LEFT JOIN public.unidades u ON u.id = a.unidad_id ");
     
 
     if (!String.IsNullOrEmpty(filtro))
