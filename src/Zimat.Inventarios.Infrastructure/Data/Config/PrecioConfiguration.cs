@@ -18,6 +18,8 @@ public class PrecioConfiguration : IEntityTypeConfiguration<Precio>
 
         builder.Property(x => x.Id).HasColumnType("uuid");
 
+        builder.HasIndex(c => new { c.ArticuloUnidadId,c.NumeroLista}).IsUnique();
+
         /* builder.HasOne<ArticuloUnidad>()
             .WithMany()
             .HasForeignKey(x => x.ArticuloUnidadId)

@@ -1,0 +1,202 @@
+@page "/carrito"
+@using Zimat.Inventarios.Web.Services
+@inject CartService CartService
+@inject NotificationService NotificationService
+@inject NavigationManager Navigation
+@attribute [Authorize]
+@implements IDisposable
+<PageTitle>Carrito de Compras</PageTitle>
+
+<RadzenRow>
+    <RadzenColumn Size="12">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" class="rz-mb-4">
+            <RadzenButton Icon="arrow_back" 
+                        ButtonStyle="ButtonStyle.Light" 
+                        Click="@GoBack" 
+                        Text="Volver" />
+            <RadzenText TextStyle="TextStyle.H4" Text="Carrito de Compras" />
+            <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="@($"{CartService.TotalItems} artículos")" />
+        </RadzenStack>
+    </RadzenColumn>
+</RadzenRow>
+
+<RadzenRow>
+    <RadzenColumn Size="12">
+        @if (CartService.Items.Any())
+        {
+            <RadzenCard>
+                <RadzenStack Gap="1rem">
+                    @foreach (var item in CartService.Items)
+                    {
+                        
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="5">
+                               
+                                    <RadzenText TextStyle="TextStyle.Body1" Text="@item.Descripcion" />
+                                
+                            </RadzenColumn>
+                            <RadzenColumn Size="2" class="rz-text-align-center">
+                                <RadzenText TextStyle="TextStyle.Body1" Text="@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", item.PrecioUnitario)}")" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="2">
+                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                                    <RadzenButton Icon="@(item.Cantidad <=1 ? "delete" : "remove")" 
+                                                ButtonStyle="ButtonStyle.Dark" Variant="Variant.Outlined"
+                                                Click="@(() => UpdateQuantity(item.ArticuloId, item.Cantidad - 1))"  />
+                                    <RadzenNumeric @bind-Value="item.Cantidad" 
+                                                Min="1" ShowUpDown="false"
+                                                Change="@((decimal value) => UpdateQuantity(item.ArticuloId, value))" 
+                                                Style="width: 100px;" />
+                                    <RadzenButton Icon="add" 
+                                                ButtonStyle="ButtonStyle.Dark" Variant="Variant.Outlined"
+                                                Click="@(() => UpdateQuantity(item.ArticuloId, item.Cantidad + 1))" />
+                                </RadzenStack>
+                            </RadzenColumn>
+                            <RadzenColumn Size="2" class="rz-text-align-center">
+                                
+                                   
+                                    <RadzenText TextStyle="TextStyle.Body1" Text="@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", item.Total)}")" />
+                                
+                            </RadzenColumn>
+                            <RadzenColumn Size="1" class="rz-text-align-center">
+                                <RadzenButton Icon="delete" 
+                                            ButtonStyle="ButtonStyle.Danger" 
+                                            Click="@(args => RemoveFromCart(item.ArticuloId))"  />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        
+                    }
+                </RadzenStack>
+            </RadzenCard>
+            
+            <RadzenCard class="rz-mt-4">
+                <RadzenStack Gap="1rem">
+                    <RadzenText TextStyle="TextStyle.H5" Text="Resumen de la Compra" />
+                    
+                    <RadzenRow>
+                        <RadzenColumn Size="6">
+                            <RadzenText TextStyle="TextStyle.Body1" Text="Subtotal:" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="6" class="rz-text-align-end">
+                            <RadzenText TextStyle="TextStyle.Body1" Text="@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", CartService.Subtotal)}")" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    
+                    <RadzenRow>
+                        <RadzenColumn Size="6">
+                            <RadzenText TextStyle="TextStyle.Body1" Text="Impuestos:" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="6" class="rz-text-align-end">
+                            <RadzenText TextStyle="TextStyle.Body1" Text="@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", CartService.TotalImpuestos)}")" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    
+                    <div style="border-top: 2px solid #ccc; margin: 1rem 0;"></div>
+                    
+                    <RadzenRow>
+                        <RadzenColumn Size="6">
+                            <RadzenText TextStyle="TextStyle.H5" Text="Total:" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="6" class="rz-text-align-end">
+                            <RadzenText TextStyle="TextStyle.H5" Text="@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", CartService.Total)}")" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    
+                    <div style="border-top: 1px solid #ccc; margin: 1rem 0;"></div>
+                    
+                    <RadzenRow>
+                        <RadzenColumn Size="6">
+                            <RadzenButton Text="Limpiar Carrito" 
+                                        ButtonStyle="ButtonStyle.Light" 
+                                        Click="@ClearCart" 
+                                        Style="width: 100%;" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="6">
+                            <RadzenButton Text="Procesar Venta" 
+                                        ButtonStyle="ButtonStyle.Success" 
+                                        Click="@ProcessSale" 
+                                        Style="width: 100%;" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenStack>
+            </RadzenCard>
+        }
+        else
+        {
+            <RadzenCard>
+                <RadzenStack AlignItems="AlignItems.Center" Gap="2rem" Style="padding: 3rem;">
+                    <RadzenIcon Icon="shopping_cart" Style="font-size: 4rem; color: #ccc;" />
+                    <RadzenText TextStyle="TextStyle.H5" Text="El carrito está vacío" class="rz-text-align-center" />
+                    <RadzenText TextStyle="TextStyle.Body1" Text="Agrega algunos productos desde el punto de venta" class="rz-text-align-center" />
+                    <RadzenButton Text="Ir al Punto de Venta" 
+                                ButtonStyle="ButtonStyle.Primary" 
+                                Click="@GoToPointOfSale" />
+                </RadzenStack>
+            </RadzenCard>
+        }
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    protected override void OnInitialized()
+    {
+        CartService.OnCartChanged += StateHasChanged;
+    }
+    
+    public void Dispose()
+    {
+        CartService.OnCartChanged -= StateHasChanged;
+    }
+
+    private void RemoveFromCart(Guid articuloId)
+    {
+        CartService.RemoveItem(articuloId);
+        NotificationService.Notify(new NotificationMessage 
+        { 
+            Severity = NotificationSeverity.Info, 
+            Summary = "Removido", 
+            Detail = "Artículo removido del carrito" 
+        });
+    }
+    
+    private void UpdateQuantity(Guid articuloId, decimal cantidad)
+    {
+        if (cantidad < 1)
+        {
+            RemoveFromCart(articuloId);
+            return;
+        }
+        CartService.UpdateQuantity(articuloId, cantidad);
+    }
+    
+    private void ClearCart()
+    {
+        CartService.Clear();
+        NotificationService.Notify(new NotificationMessage 
+        { 
+            Severity = NotificationSeverity.Info, 
+            Summary = "Carrito", 
+            Detail = "Carrito limpiado" 
+        });
+    }
+    
+    private void ProcessSale()
+    {
+        NotificationService.Notify(new NotificationMessage 
+        { 
+            Severity = NotificationSeverity.Info, 
+            Summary = "Venta", 
+            Detail = $"Procesando venta por {String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", CartService.Total)}" 
+        });
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/punto_venta");
+    }
+    
+    private void GoToPointOfSale()
+    {
+        Navigation.NavigateTo("/punto_venta");
+    }
+}

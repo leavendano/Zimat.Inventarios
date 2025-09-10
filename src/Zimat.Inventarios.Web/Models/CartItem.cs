@@ -6,7 +6,7 @@ public class CartItem
     public string Clave { get; set; } = string.Empty;
     public string Descripcion { get; set; } = string.Empty;
     public decimal PrecioUnitario { get; set; }
-    public int Cantidad { get; set; }
+    public decimal Cantidad { get; set; }
     public string Unidad { get; set; } = string.Empty;
     public decimal Impuesto1 { get; set; }
     

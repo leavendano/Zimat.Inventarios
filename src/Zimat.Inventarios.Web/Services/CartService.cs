@@ -11,7 +11,7 @@ public class CartService
     
     public IReadOnlyList<CartItem> Items => _items.AsReadOnly();
     
-    public int TotalItems => _items.Sum(item => item.Cantidad);
+    public decimal TotalItems => _items.Sum(item => item.Cantidad);
     
     public decimal Subtotal => _items.Sum(item => item.Subtotal);
     
@@ -19,7 +19,7 @@ public class CartService
     
     public decimal Total => _items.Sum(item => item.Total);
     
-    public void AddItem(ArticuloListarDTO articulo, int cantidad = 1)
+    public void AddItem(ArticuloPrecioListarDTO articulo, decimal cantidad = 1)
     {
         var existingItem = _items.FirstOrDefault(item => item.ArticuloId == articulo.Id);
         
@@ -54,7 +54,7 @@ public class CartService
         }
     }
     
-    public void UpdateQuantity(Guid articuloId, int cantidad)
+    public void UpdateQuantity(Guid articuloId, decimal cantidad)
     {
         var item = _items.FirstOrDefault(item => item.ArticuloId == articuloId);
         if (item != null)

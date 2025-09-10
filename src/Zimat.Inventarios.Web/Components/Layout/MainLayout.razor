@@ -9,18 +9,16 @@
 
 <RadzenLayout style="grid-template-areas: 'rz-sidebar rz-header' 'rz-sidebar rz-body';">
     <RadzenHeader>
-        <RadzenRow JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center" Gap="0">
+        <RadzenRow  Gap="0">
             <RadzenColumn Size="2">
-                <RadzenSidebarToggle Click="@SidebarToggleClick"></RadzenSidebarToggle>
-            </RadzenColumn>
-            <RadzenColumn Size="8">
-                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Left" Gap="1rem" Style="width: 100%;">
-                  
-                   
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="0" > 
+                    <RadzenSidebarToggle Click="@SidebarToggleClick"></RadzenSidebarToggle>
                 </RadzenStack>
             </RadzenColumn>
-            <RadzenColumn Size="2">
-                <LogInOrOut/>
+            <RadzenColumn Size="10">
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="10px"> 
+                   <LogInOrOut/>
+                </RadzenStack>  
             </RadzenColumn>
         </RadzenRow>
     </RadzenHeader>

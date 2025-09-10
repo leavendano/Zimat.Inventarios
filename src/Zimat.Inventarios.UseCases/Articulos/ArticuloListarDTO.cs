@@ -1,8 +1,17 @@
 ﻿namespace Zimat.Inventarios.UseCases.Articulos;
 
-public record ArticuloListarDTO(Guid Id, string Clave, string Descripcion, decimal PrecioPublico, decimal? UltimoCosto,
-  decimal Impuesto1, string Unidad, decimal StockActual, string? RutaImagen)
+public class ArticuloListarDTO
 {
-  public string ClaveDescripcion { get; } = Clave + " " + Descripcion;
+  public Guid Id { get; set; }
+  public string Clave { get; set; } = string.Empty;
+  public string Descripcion { get; set; } = string.Empty;
+  public decimal PrecioPublico { get; set; }
+  public decimal? UltimoCosto { get; set; }
+  public decimal Impuesto1 { get; set; }
+  public Guid UnidadId { get; set; }
+  public string Unidad { get; set; } = string.Empty;
+  public decimal StockActual { get; set; } = 0;
+  public string? RutaImagen { get; set; }
   public decimal Cantidad { get; set; } = 1;
+  public string ClaveDescripcion => Clave + " " + Descripcion;
 }

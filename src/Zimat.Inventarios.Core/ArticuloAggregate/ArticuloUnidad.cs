@@ -16,6 +16,7 @@ public class ArticuloUnidad : EntityBase<Guid>, IRegisterBase
   }
   public Guid ArticuloId { get; set; }
     public Guid UnidadId { get; set; }
+    public string? Unidad { get; set; }
     public decimal FactorConversion { get; set; }
     public string? User { get; set; }
     public int Status { get; set; }

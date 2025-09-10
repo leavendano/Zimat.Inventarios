@@ -27,5 +27,7 @@ public class ArticuloUnidadConfiguration : IEntityTypeConfiguration<ArticuloUnid
             .HasForeignKey(x => x.UnidadId)
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired();
+
+        builder.HasIndex(c => new { c.ArticuloId,c.UnidadId}).IsUnique();
     }
 }

@@ -254,7 +254,7 @@
         var user = authstate.User;
         UserName = user?.Identity?.Name;
 
-        var resultUnidades = await _mediator.Send(new ListUnidadesQuery(null, null));
+        var resultUnidades = await _mediator.Send(new ListUnidadesQuery(null, null, null));
         if (resultUnidades.IsSuccess)
         {
             listadoUnidades = resultUnidades.Value;
