@@ -1,0 +1,103 @@
+@page "/edit-cliente"
+@using MediatR
+@using Zimat.Inventarios.UseCases.Clientes.Get
+@using Zimat.Inventarios.UseCases.Clientes.Update
+@inject IMediator _mediator
+@inject DialogService DialogService
+
+<PageTitle>Editar Cliente</PageTitle>
+<RadzenColumn SizeMD=12>
+    <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">No se puede guardar el Cliente</RadzenAlert>
+    <RadzenTemplateForm TItem="ClienteDTO" Data="@cliente" Visible="@(cliente != null)" Submit="@FormSubmit">
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Clave" Component="clave" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@cliente!.Clave" Name="clave" />
+                <RadzenRequiredValidator Component="clave" Text="La clave es requerida" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Nombre" Component="nombre" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@cliente!.Nombre" Name="nombre" />
+                <RadzenRequiredValidator Component="nombre" Text="El nombre es requerido" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="RFC" Component="rfc" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@cliente!.Rfc" Name="rfc" />
+                <RadzenRequiredValidator Component="rfc" Text="El RFC es requerido" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Código Postal" Component="codigo_postal" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@cliente!.CodigoPostal" Name="codigo_postal" />
+                <RadzenRequiredValidator Component="codigo_postal" Text="El código postal es requerido" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Guardar" Variant="Variant.Flat" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancelar" Variant="Variant.Flat" Click="@CancelButtonClick" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenColumn>
+
+@code{
+    protected class ClienteDTO
+    {
+        public Guid Id { get; set; }
+        public string Clave { get; set; } = string.Empty;
+        public string Nombre { get; set; } = string.Empty;
+        public string Rfc { get; set; } = string.Empty;
+        public string CodigoPostal { get; set; } = string.Empty;
+    }
+
+    [Parameter]
+    public Guid Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await _mediator.Send(new GetClienteQuery(Id));
+        if (result.IsSuccess)
+        {
+            cliente.Id = result.Value.Id;
+            cliente.Clave = result.Value.Clave;
+            cliente.Nombre = result.Value.Nombre;
+            cliente.Rfc = result.Value.Rfc;
+            cliente.CodigoPostal = result.Value.CodigoPostal;
+        }
+    }
+
+    protected bool errorVisible;
+
+    protected ClienteDTO cliente { get; set; } = new();
+
+    protected async Task FormSubmit()
+    {
+        try
+        {
+            var result = await _mediator.Send(new UpdateClienteCommand(cliente.Id, cliente.Clave, cliente.Nombre, cliente.Rfc, cliente.CodigoPostal));
+
+            DialogService.Close(cliente);
+        }
+        catch (Exception)
+        {
+            errorVisible = true;
+        }
+    }
+
+    protected async Task CancelButtonClick(MouseEventArgs args)
+    {
+        await Task.Run(() => DialogService.Close(null));
+    }
+}

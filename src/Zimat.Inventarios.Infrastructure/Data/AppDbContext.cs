@@ -10,6 +10,7 @@ using Zimat.Inventarios.Core.DepartamentoAggregate;
 using Zimat.Inventarios.Core.FamiliaAggregate;
 using Zimat.Inventarios.Core.LineaAggregate;
 using Zimat.Inventarios.Core.ClienteAggregate;
+using Zimat.Inventarios.Core.UsuarioAggregate;
 
 namespace Zimat.Inventarios.Infrastructure.Data;
 public class AppDbContext : DbContext
@@ -36,6 +37,7 @@ public class AppDbContext : DbContext
   public DbSet<Cliente> Clientes => Set<Cliente>();
   public DbSet<Documento> Documentos => Set<Documento>();
   public DbSet<DocumentoConcepto> DocumentoConceptos => Set<DocumentoConcepto>();
+  public DbSet<Usuario> Usuarios => Set<Usuario>();
 
 
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 

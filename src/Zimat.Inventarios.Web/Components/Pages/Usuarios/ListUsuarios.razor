@@ -1,0 +1,149 @@
+@page "/usuarios"
+@using Ardalis.Result
+@using Zimat.Inventarios.UseCases.Usuarios
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject ILogger<ListUsuarios> logger
+@using MediatR
+@inject IMediator _mediator
+@using Zimat.Inventarios.UseCases.Usuarios.Delete
+@using Zimat.Inventarios.UseCases.Usuarios.List
+@attribute [Authorize]
+
+
+<PageTitle>Usuarios</PageTitle>
+<RadzenStack>
+    <RadzenRow AlignItems="AlignItems.Center">
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenText Text="Usuarios" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton Icon="add_circle_outline" Text="Nuevo" Click="@AddButtonClick" Variant="Variant.Flat" />
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn SizeMD=12>
+            <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true"
+                    ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30}) Data="@usuarios" TItem="UsuarioDTO" RowSelect="@EditRow">
+                <Columns>
+                    <RadzenDataGridColumn TItem="UsuarioDTO" Property="Clave" Title="Clave">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="UsuarioDTO" Property="Nombre" Title="Nombre">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="UsuarioDTO" Property="Email" Title="Email">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="UsuarioDTO" Property="Nivel" Title="Nivel">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="UsuarioDTO" Property="EsVendedor" Title="Es Vendedor">
+                        <Template Context="usuario">
+                            <RadzenCheckBox Value="usuario.EsVendedor" Disabled="true" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="UsuarioDTO" Property="Comision" Title="Comisión">
+                        <Template Context="usuario">
+                            @usuario.Comision.ToString("C")
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="UsuarioDTO" Property="ListaPrecio" Title="Lista Precio">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="UsuarioDTO" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
+                        <Template Context="usuario">
+
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
+                                          Shade="Shade.Lighter" Variant="Variant.Flat"
+                                          Click=@(args => GridDeleteButtonClick(args, usuario)) @onclick:stopPropagation="true" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+
+            </RadzenDataGrid>
+
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+@code {
+
+    protected IEnumerable<UsuarioDTO>? usuarios;
+
+    protected RadzenDataGrid<UsuarioDTO> grid0 = new();
+    protected override async Task OnInitializedAsync()
+    {
+
+        await base.OnInitializedAsync();
+        Result<IEnumerable<UsuarioDTO>> result = await _mediator.Send(new ListUsuariosQuery(null, null, null));
+
+        if (result.IsSuccess)
+        {
+            usuarios = result.Value;
+        }
+
+    }
+
+    protected async Task AddButtonClick(MouseEventArgs args)
+    {
+        var options = new DialogOptions();
+        string additionalStyle = "min-width:fit-content;min-height:fit-content;height:fit-content;width:fit-content;border: 1px solid black;";
+        options.Style = additionalStyle;
+        await DialogService.OpenAsync<AddUsuario>("Nuevo Usuario", null, options);
+        Result<IEnumerable<UsuarioDTO>> result = await _mediator.Send(new ListUsuariosQuery(null, null, null));
+
+        if (result.IsSuccess)
+        {
+
+            usuarios = result.Value;
+            await grid0.Reload();
+        }
+
+    }
+
+    protected async Task EditRow(UsuarioDTO args)
+    {
+        await DialogService.OpenAsync<EditUsuario>("Edit Usuario", new Dictionary<string, object> { { "Id", args.Id } });
+        Result<IEnumerable<UsuarioDTO>> result = await _mediator.Send(new ListUsuariosQuery(null, null, null));
+        if (result.IsSuccess)
+        {
+
+            usuarios = result.Value;
+            await grid0.Reload();
+        }
+    }
+
+    protected async Task GridDeleteButtonClick(MouseEventArgs args, UsuarioDTO item)
+    {
+        try
+        {
+            if (await DialogService.Confirm("Está seguro de borrar este elemento?") == true)
+            {
+
+                var result = await _mediator.Send(new DeleteUsuarioCommand(item.Id));
+
+                if (result.IsSuccess)
+                {
+                    Result<IEnumerable<UsuarioDTO>> result2 = await _mediator.Send(new ListUsuariosQuery(null, null, null));
+                    if (result2.IsSuccess)
+                    {
+                        usuarios = result2.Value;
+                        await grid0.Reload();
+                    }
+
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            logger.LogError(0, e, "Error al eliminar un usuario");
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = $"Error",
+                    Detail = $"Unable to delete Usuario"
+                });
+        }
+    }
+}

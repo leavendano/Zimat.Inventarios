@@ -1,0 +1,133 @@
+@page "/add-cliente"
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject ILogger<AddCliente> logger
+@using MediatR
+@using Zimat.Inventarios.UseCases.Clientes.Create
+@using Ardalis.Result
+@inject IMediator  _mediator
+@attribute [Authorize]
+
+<PageTitle>Nuevo Cliente</PageTitle>
+    <RadzenColumn SizeMD=12>
+        <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">@mensajeAlerta</RadzenAlert>
+        <RadzenTemplateForm TItem="ClienteDTO" Data="@item" Visible="@(item != null)" Submit="@FormSubmit">
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Clave" Component="clave" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@item!.Clave" Name="clave" />
+                    <RadzenRequiredValidator Component="clave" Text="La Clave es requerida" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Nombre" Component="nombre" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@item!.Nombre" Name="nombre" />
+                    <RadzenRequiredValidator Component="nombre" Text="El Nombre es requerido" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="RFC" Component="rfc" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox Name="rfc" @bind-Value="@item!.Rfc" Style="width: 100%;" aria-label="rfc" />
+                    <RadzenRequiredValidator Component="rfc" Text="El RFC es requerido" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Código Postal" Component="codigo_postal" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox Name="codigo_postal" @bind-Value="@item!.CodigoPostal" Style="width: 100%;" aria-label="codigo_postal" />
+                    <RadzenRequiredValidator Component="codigo_postal" Text="El Código Postal es requerido" />
+                </RadzenColumn>
+            </RadzenRow>
+          <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                    <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Guardar" Variant="Variant.Flat" />
+                    <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancelar" Variant="Variant.Flat" Click="@CancelButtonClick"  />
+          </RadzenStack>
+        </RadzenTemplateForm>
+    </RadzenColumn>
+
+@code {
+
+    protected class ClienteDTO
+    {
+        public string Clave {get; set;} = string.Empty;
+        public string Nombre {get; set;} = string.Empty;
+        public string Rfc {get; set;} = string.Empty;
+        public string CodigoPostal {get; set;} = string.Empty;
+    }
+
+    protected bool errorVisible;
+    protected string mensajeAlerta = "No se guardó el registro";
+    [SupplyParameterFromForm]
+    protected ClienteDTO item {get; set;} = new();
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+    private string? NombreUsuario {get; set;}
+
+    protected override async Task OnInitializedAsync()
+    {
+        item ??= new();
+        if (authenticationState is not null)
+        {
+            var authState = await authenticationState;
+
+             if (authState.User?.Identity is not null && authState.User.Identity.IsAuthenticated)
+             {
+                NombreUsuario = authState.User.Identity.Name;
+             }
+        }
+    }
+
+    protected async Task FormSubmit()
+    {
+        try
+        {
+            var result = await _mediator.Send(new CreateClienteCommand(item.Clave, item.Nombre, item.Rfc, item.CodigoPostal, NombreUsuario!));
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Cliente creado",
+                Detail = "El cliente se ha creado correctamente",
+                Duration = 4000
+            });
+            errorVisible = false;
+            DialogService.Close(item);
+        }
+        catch (Exception e)
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error al crear el cliente",
+                Detail = e.Message,
+                Duration = 4000
+            });
+            mensajeAlerta = $"Error: {e.Message}";
+            errorVisible = true;
+            logger.LogError(e, "Error al crear el cliente");
+        }
+    }
+
+    void OnChange(string value, string name)
+    {
+        logger.LogInformation($"{name} se cambió a  {value}");
+    }
+
+    protected async Task CancelButtonClick(MouseEventArgs args)
+    {
+        await Task.Run(() => DialogService.Close(null));
+    }
+}

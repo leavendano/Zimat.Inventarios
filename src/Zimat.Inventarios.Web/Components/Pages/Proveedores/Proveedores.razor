@@ -63,7 +63,7 @@
     {
 
         await base.OnInitializedAsync();
-        Result<IEnumerable<ProveedorDTO>> result = await _mediator.Send(new ListProveedoresQuery(null, null));
+        Result<IEnumerable<ProveedorDTO>> result = await _mediator.Send(new ListProveedoresQuery(null, null,null));
 
         if (result.IsSuccess)
         {
@@ -78,7 +78,7 @@
         string additionalStyle ="min-width:fit-content;min-height:fit-content;height:fit-content;width:fit-content;border: 1px solid black;";
         options.Style = additionalStyle;
         await DialogService.OpenAsync<AddProveedor>("Nuevo Elemento", null, options);
-        Result<IEnumerable<ProveedorDTO>> result = await _mediator.Send(new ListProveedoresQuery(null, null));
+        Result<IEnumerable<ProveedorDTO>> result = await _mediator.Send(new ListProveedoresQuery(null, null,null));
 
         if (result.IsSuccess)
         {
@@ -92,7 +92,7 @@
     protected async Task EditRow(ProveedorDTO args)
     {
         await DialogService.OpenAsync<EditArticulo>("Edit Articulo", new Dictionary<string, object> { { "Id", args.Id } });
-        Result<IEnumerable<ProveedorDTO>> result = await _mediator.Send(new ListProveedoresQuery(null, null));
+        Result<IEnumerable<ProveedorDTO>> result = await _mediator.Send(new ListProveedoresQuery(null, null,null));
         if (result.IsSuccess)
         {
 
@@ -112,7 +112,7 @@
 
                 if (result.IsSuccess)
                 {
-                    Result<IEnumerable<ProveedorDTO>> result2 = await _mediator.Send(new ListProveedoresQuery(null, null));
+                    Result<IEnumerable<ProveedorDTO>> result2 = await _mediator.Send(new ListProveedoresQuery(null, null,null));
                     if (result2.IsSuccess)
                     {
                         proveedores = result2.Value;

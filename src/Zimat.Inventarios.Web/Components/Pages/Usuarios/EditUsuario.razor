@@ -1,0 +1,133 @@
+@page "/edit-usuario"
+@using MediatR
+@using Zimat.Inventarios.UseCases.Usuarios.Get
+@using Zimat.Inventarios.UseCases.Usuarios.Update
+@inject IMediator _mediator
+@inject DialogService DialogService
+
+<PageTitle>Editar Usuario</PageTitle>
+<RadzenColumn SizeMD=12>
+    <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">No se puede guardar el Usuario</RadzenAlert>
+    <RadzenTemplateForm TItem="UsuarioForm" Data="@usuario" Visible="@(usuario != null)" Submit="@FormSubmit">
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Clave" Component="clave" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@usuario!.Clave" Name="clave" Disabled="true" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Nombre" Component="nombre" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@usuario!.Nombre" Name="nombre" Disabled="true" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Email" Component="email" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@usuario!.Email" Name="email" />
+                <RadzenRequiredValidator Component="email" Text="El email es requerido" />
+                <RadzenEmailValidator Component="email" Text="Email no válido" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Nivel" Component="nivel" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@usuario!.Nivel" Name="nivel" />
+                <RadzenRequiredValidator Component="nivel" Text="El nivel es requerido" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Es Vendedor" Component="esVendedor" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenCheckBox @bind-Value="@usuario!.EsVendedor" Name="esVendedor" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Comisión" Component="comision" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenNumeric @bind-Value="@usuario!.Comision" Name="comision" Style="width: 100%;" ShowUpDown="false" Format="C" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Lista de Precio" Component="listaPrecio" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenNumeric @bind-Value="@usuario!.ListaPrecio" Name="listaPrecio" Style="width: 100%;" ShowUpDown="false" />
+                <RadzenRequiredValidator Component="listaPrecio" Text="La lista de precio es requerida" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Guardar" Variant="Variant.Flat" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancelar" Variant="Variant.Flat" Click="@CancelButtonClick" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenColumn>
+
+@code{
+    protected class UsuarioForm
+    {
+        public Guid Id { get; set; }
+        public string Clave { get; set; } = string.Empty;
+        public string Nombre { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Nivel { get; set; } = string.Empty;
+        public bool EsVendedor { get; set; } = false;
+        public decimal Comision { get; set; } = 0m;
+        public int ListaPrecio { get; set; } = 1;
+    }
+
+    [Parameter]
+    public Guid Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await _mediator.Send(new GetUsuarioQuery(Id));
+        if (result.IsSuccess)
+        {
+            usuario.Id = result.Value.Id;
+            usuario.Clave = result.Value.Clave;
+            usuario.Nombre = result.Value.Nombre;
+            usuario.Email = result.Value.Email;
+            usuario.Nivel = result.Value.Nivel;
+            usuario.EsVendedor = result.Value.EsVendedor;
+            usuario.Comision = result.Value.Comision;
+            usuario.ListaPrecio = result.Value.ListaPrecio;
+        }
+    }
+
+    protected bool errorVisible;
+
+    protected UsuarioForm usuario { get; set; } = new();
+
+    protected async Task FormSubmit()
+    {
+        try
+        {
+            var result = await _mediator.Send(new UpdateUsuarioCommand(usuario.Id, usuario.Clave, usuario.Nombre, usuario.Email, usuario.Nivel, usuario.EsVendedor, usuario.Comision, usuario.ListaPrecio));
+
+            DialogService.Close(usuario);
+        }
+        catch (Exception)
+        {
+            errorVisible = true;
+        }
+    }
+
+    protected async Task CancelButtonClick(MouseEventArgs args)
+    {
+        await Task.Run(() => DialogService.Close(null));
+    }
+}

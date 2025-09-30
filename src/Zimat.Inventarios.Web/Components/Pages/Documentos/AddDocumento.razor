@@ -265,7 +265,7 @@
         var user = authstate.User;
         UserName = user?.Identity?.Name;
 
-        var resultProveedores = await _mediator.Send(new ListProveedoresQuery(null, null));
+        var resultProveedores = await _mediator.Send(new ListProveedoresQuery(null, null,null));
         if (resultProveedores.IsSuccess)
         {
             listadoProveedores = resultProveedores.Value;

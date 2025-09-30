@@ -7,6 +7,8 @@ using Zimat.Inventarios.Core.LineaAggregate;
 using Zimat.Inventarios.Core.FamiliaAggregate;
 using Zimat.Inventarios.Core.CategoriaAggregate;
 using Zimat.Inventarios.Core.DepartamentoAggregate;
+using Zimat.Inventarios.Core.ClienteAggregate;
+using Zimat.Inventarios.Core.UsuarioAggregate;
 namespace Zimat.Inventarios.Infrastructure.Data;
 
 public static class SeedData
@@ -42,6 +44,29 @@ public static class SeedData
       dbContext.Proveedores.Add(new Proveedor("001", "CEMEX S.A.B. SA DE CV", "CME820101LJ4", "01180"));
       dbContext.Proveedores.Add(new Proveedor("002", "MEXALIT INDUSTRIAL, SA DE CV", "MIN920101UR1", "01180"));
       dbContext.Proveedores.Add(new Proveedor("004", "DEACERO, SAPI DE CV", "DEA7103086X2", "67128"));
+
+      GuardaCambios = true;
+    }
+
+
+    if (!dbContext.Clientes.Any())
+    {
+
+      dbContext.Clientes.Add(new Cliente("0", "PUBLICO EN GENERAL", "XAXX010101000", "71980"));
+      dbContext.Clientes.Add(new Cliente("408", "RODOLFO LUJAN RUIZ", "LURR720417KNA", "70934"));
+      dbContext.Clientes.Add(new Cliente("15928", "EDILBERTO MENDOZA", "XAXX010101000", "71980"));
+      dbContext.Clientes.Add(new Cliente("18482", "SILVANO CORTES CRUZ", "XAXX010101000", "71980"));
+
+      GuardaCambios = true;
+    }
+
+    if (!dbContext.Clientes.Any())
+    {
+
+      dbContext.Usuarios.Add(new Usuario("HDH", "Hilda Díaz Hernández", "zimat.mostrador1@gmail.com", "2",true));
+      dbContext.Usuarios.Add(new Usuario("JJC", "Jose Luis Jimenez Carbajal", "zimat.mostrador1@gmail.com", "12",true));
+      dbContext.Usuarios.Add(new Usuario("HZG", "Homero Ziga Gopar", "gerencia.general@zimat-concretos.com", "1",false));
+      dbContext.Usuarios.Add(new Usuario("AOV", "Adriana Olivera Vásquez", "zimatfacturacion@gmail.com", "2",true));
 
       GuardaCambios = true;
     }

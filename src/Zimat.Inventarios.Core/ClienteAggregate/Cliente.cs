@@ -16,6 +16,8 @@ public class Cliente : EntityBase<Guid>, IAggregateRoot, IRegisterBase
         Status = RegisterStatus.Activo; // Activo por defecto
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
+        DiasCredito = 0;
+        Pais = "México";
     }
 
     public string Clave { get; private set; }
@@ -25,15 +27,39 @@ public class Cliente : EntityBase<Guid>, IAggregateRoot, IRegisterBase
     public string? Colonia { get; set; }
     public string? Ciudad { get; set; }
     public string? Estado { get; set; }
+    public string? Pais { get; set; }
     public string CodigoPostal { get; private set; }
     public string? Telefono { get; set; }
     public string? Email { get; set; }
-    public string? Contacto { get; set; }
+    public string? ContactoVentas { get; set; }
+    public string? ContactoPago { get; set; }
     public string Rfc { get; private set; }
+
+    public void UpdateClave(string newClave)
+    {
+        Clave = Guard.Against.NullOrEmpty(newClave, nameof(newClave));
+    }
+
+    public void UpdateNombre(string newNombre)
+    {
+        Nombre = Guard.Against.NullOrEmpty(newNombre, nameof(newNombre));
+    }
+
+    public void UpdateRfc(string newRfc)
+    {
+        Rfc = Guard.Against.NullOrEmpty(newRfc, nameof(newRfc));
+    }
+
+    public void UpdateCodigoPostal(string newCodigoPostal)
+    {
+        CodigoPostal = Guard.Against.NullOrEmpty(newCodigoPostal, nameof(newCodigoPostal));
+    }
     public string? RegimenFiscal { get; set; }
     public string? UsoCfdi { get; set; }
     public string? Observaciones { get; set; }
-    public int DiasCredito { get; set; } = 0;
+    public int DiasCredito { get; set; } 
+    public decimal LimiteCredito { get; set; }
+    public decimal Saldo { get; set; }
     public string? User { get; set;}
     public int Status { get; set;}
     public DateTime CreatedAt { get; set;}

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Zimat.Inventarios.Infrastructure.Data;
@@ -11,9 +12,11 @@ using Zimat.Inventarios.Infrastructure.Data;
 namespace Zimat.Inventarios.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250925044525_CambiosCliente")]
+    partial class CambiosCliente
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -865,67 +868,6 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasName("pk_unidades");
 
                     b.ToTable("unidades", (string)null);
-                });
-
-            modelBuilder.Entity("Zimat.Inventarios.Core.UsuarioAggregate.Usuario", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("Clave")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("clave");
-
-                    b.Property<decimal>("Comision")
-                        .HasColumnType("numeric")
-                        .HasColumnName("comision");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("email");
-
-                    b.Property<bool>("EsVendedor")
-                        .HasColumnType("boolean")
-                        .HasColumnName("es_vendedor");
-
-                    b.Property<int>("ListaPrecio")
-                        .HasColumnType("integer")
-                        .HasColumnName("lista_precio");
-
-                    b.Property<string>("Nivel")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("nivel");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("nombre");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("User")
-                        .HasColumnType("text")
-                        .HasColumnName("user");
-
-                    b.HasKey("Id")
-                        .HasName("pk_usuarios");
-
-                    b.ToTable("usuarios", (string)null);
                 });
 
             modelBuilder.Entity("Zimat.Inventarios.Core.ArticuloAggregate.Articulo", b =>

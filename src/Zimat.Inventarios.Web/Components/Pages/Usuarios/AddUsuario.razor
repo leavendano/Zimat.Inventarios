@@ -1,0 +1,162 @@
+@page "/add-usuario"
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject ILogger<AddUsuario> logger
+@using MediatR
+@using Zimat.Inventarios.UseCases.Usuarios.Create
+@using Ardalis.Result
+@inject IMediator  _mediator
+@attribute [Authorize]
+
+<PageTitle>Nuevo Usuario</PageTitle>
+    <RadzenColumn SizeMD=12>
+        <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">@mensajeAlerta</RadzenAlert>
+        <RadzenTemplateForm TItem="UsuarioForm" Data="@item" Visible="@(item != null)" Submit="@FormSubmit">
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Clave" Component="clave" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@item!.Clave" Name="clave" />
+                    <RadzenRequiredValidator Component="clave" Text="La Clave es requerida" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Nombre" Component="nombre" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@item!.Nombre" Name="nombre" />
+                    <RadzenRequiredValidator Component="nombre" Text="El Nombre es requerido" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Email" Component="email" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox Name="email" @bind-Value="@item!.Email" Style="width: 100%;" aria-label="email" />
+                    <RadzenRequiredValidator Component="email" Text="El Email es requerido" />
+                    <RadzenEmailValidator Component="email" Text="Email no válido" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Nivel" Component="nivel" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox Name="nivel" @bind-Value="@item!.Nivel" Style="width: 100%;" aria-label="nivel" />
+                    <RadzenRequiredValidator Component="nivel" Text="El Nivel es requerido" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Es Vendedor" Component="esVendedor" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenCheckBox @bind-Value="@item!.EsVendedor" Name="esVendedor" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Comisión" Component="comision" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenNumeric @bind-Value="@item!.Comision" Name="comision" Style="width: 100%;" ShowUpDown="false" Format="C" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Lista de Precio" Component="listaPrecio" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenNumeric @bind-Value="@item!.ListaPrecio" Name="listaPrecio" Style="width: 100%;" ShowUpDown="false" />
+                    <RadzenRequiredValidator Component="listaPrecio" Text="La Lista de Precio es requerida" />
+                </RadzenColumn>
+            </RadzenRow>
+          <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                    <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Guardar" Variant="Variant.Flat" />
+                    <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancelar" Variant="Variant.Flat" Click="@CancelButtonClick"  />
+          </RadzenStack>
+        </RadzenTemplateForm>
+    </RadzenColumn>
+
+@code {
+
+    protected class UsuarioForm
+    {
+        public string Clave {get; set;} = string.Empty;
+        public string Nombre {get; set;} = string.Empty;
+        public string Email {get; set;} = string.Empty;
+        public string Nivel {get; set;} = string.Empty;
+        public bool EsVendedor {get; set;} = false;
+        public decimal Comision {get; set;} = 0m;
+        public int ListaPrecio {get; set;} = 1;
+    }
+
+    protected bool errorVisible;
+    protected string mensajeAlerta = "No se guardó el registro";
+    [SupplyParameterFromForm]
+    protected UsuarioForm item {get; set;} = new();
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+    private string? NombreUsuario {get; set;}
+
+    protected override async Task OnInitializedAsync()
+    {
+        item ??= new();
+        if (authenticationState is not null)
+        {
+            var authState = await authenticationState;
+
+             if (authState.User?.Identity is not null && authState.User.Identity.IsAuthenticated)
+             {
+                NombreUsuario = authState.User.Identity.Name;
+             }
+        }
+    }
+
+    protected async Task FormSubmit()
+    {
+        try
+        {
+            var result = await _mediator.Send(new CreateUsuarioCommand(item.Clave, item.Nombre, item.Email, item.Nivel, item.EsVendedor, item.Comision, item.ListaPrecio, NombreUsuario!));
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Usuario creado",
+                Detail = "El usuario se ha creado correctamente",
+                Duration = 4000
+            });
+            errorVisible = false;
+            DialogService.Close(item);
+        }
+        catch (Exception e)
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error al crear el usuario",
+                Detail = e.Message,
+                Duration = 4000
+            });
+            mensajeAlerta = $"Error: {e.Message}";
+            errorVisible = true;
+            logger.LogError(e, "Error al crear el usuario");
+        }
+    }
+
+    void OnChange(string value, string name)
+    {
+        logger.LogInformation($"{name} se cambió a  {value}");
+    }
+
+    protected async Task CancelButtonClick(MouseEventArgs args)
+    {
+        await Task.Run(() => DialogService.Close(null));
+    }
+}
