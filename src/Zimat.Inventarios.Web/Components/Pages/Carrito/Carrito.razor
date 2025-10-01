@@ -1,8 +1,13 @@
 @page "/carrito"
 @using Zimat.Inventarios.Web.Services
+@using Zimat.Inventarios.UseCases.Clientes.List
+@using Zimat.Inventarios.UseCases.Clientes
+@using MediatR
+@using Ardalis.Result
 @inject CartService CartService
 @inject NotificationService NotificationService
 @inject NavigationManager Navigation
+@inject IMediator _mediator
 @attribute [Authorize]
 @implements IDisposable
 <PageTitle>Carrito de Compras</PageTitle>
@@ -17,6 +22,33 @@
             <RadzenText TextStyle="TextStyle.H4" Text="Carrito de Compras" />
             <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="@($"{CartService.TotalItems} artículos")" />
         </RadzenStack>
+    </RadzenColumn>
+</RadzenRow>
+
+<RadzenRow>
+    <RadzenColumn Size="12">
+        <RadzenCard class="rz-mb-4">
+            <RadzenStack Gap="1rem">
+                <RadzenText TextStyle="TextStyle.H6" Text="Seleccionar Cliente" />
+                <RadzenRow AlignItems="AlignItems.Center">
+                    <RadzenColumn Size="8">
+                        <RadzenDropDown @bind-Value="selectedClienteId"
+                                       Data="@clientes"
+                                       TextProperty="Nombre"
+                                       ValueProperty="Id"
+                                       Placeholder="Seleccione un cliente..."
+                                       Style="width: 100%;"
+                                       Change="@OnClienteSelected" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="4">
+                        @if (selectedCliente != null)
+                        {
+                            <RadzenText TextStyle="TextStyle.Body2" Text="@($"RFC: {selectedCliente.Rfc}")" />
+                        }
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenStack>
+        </RadzenCard>
     </RadzenColumn>
 </RadzenRow>
 
@@ -138,9 +170,14 @@
 </RadzenRow>
 
 @code {
-    protected override void OnInitialized()
+    private IEnumerable<ClienteDTO>? clientes;
+    private Guid? selectedClienteId;
+    private ClienteDTO? selectedCliente;
+
+    protected override async Task OnInitializedAsync()
     {
         CartService.OnCartChanged += StateHasChanged;
+        await LoadClientes();
     }
     
     public void Dispose()
@@ -198,5 +235,42 @@
     private void GoToPointOfSale()
     {
         Navigation.NavigateTo("/punto_venta");
+    }
+
+    private async Task LoadClientes()
+    {
+        try
+        {
+            var result = await _mediator.Send(new ListClientesQuery(null, null, null));
+            if (result.IsSuccess)
+            {
+                clientes = result.Value;
+            }
+        }
+        catch (Exception)
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Error al cargar los clientes"
+            });
+        }
+    }
+
+    private void OnClienteSelected(object value)
+    {
+        if (value != null && Guid.TryParse(value.ToString(), out var clienteId))
+        {
+            selectedClienteId = clienteId;
+            selectedCliente = clientes?.FirstOrDefault(c => c.Id == clienteId);
+
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Info,
+                Summary = "Cliente seleccionado",
+                Detail = $"Cliente: {selectedCliente?.Nombre}"
+            });
+        }
     }
 }
