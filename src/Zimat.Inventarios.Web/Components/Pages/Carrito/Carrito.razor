@@ -1,4 +1,6 @@
 @page "/carrito"
+@using Zimat.Inventarios.UseCases.Documentos
+@using Zimat.Inventarios.UseCases.Documentos.Create
 @using Zimat.Inventarios.Web.Services
 @using Zimat.Inventarios.UseCases.Clientes.List
 @using Zimat.Inventarios.UseCases.Clientes
@@ -40,11 +42,19 @@
                                        Style="width: 100%;"
                                        Change="@OnClienteSelected" />
                     </RadzenColumn>
-                    <RadzenColumn Size="4">
+                    <RadzenColumn Size="2">
+                        
                         @if (selectedCliente != null)
                         {
                             <RadzenText TextStyle="TextStyle.Body2" Text="@($"RFC: {selectedCliente.Rfc}")" />
                         }
+
+                    </RadzenColumn>
+                    <RadzenColumn Size="2">
+                        <RadzenDropDown @bind-Value="selectedTipoDePago"
+                                        Data="@tiposDePago"
+                                        Placeholder="Tipo de Pago"
+                                        Style="width: 100%;" />
                     </RadzenColumn>
                 </RadzenRow>
             </RadzenStack>
@@ -173,6 +183,10 @@
     private IEnumerable<ClienteDTO>? clientes;
     private Guid? selectedClienteId;
     private ClienteDTO? selectedCliente;
+    List<DocumentoConceptoDTO> conceptosToSave = [];
+    private string[] tiposDePago = new[] { "Contado", "Crédito" };
+    private int idTipoDePago = 0; // 0: Contado, 1: Crédito
+    private string selectedTipoDePago = "Contado";
 
     protected override async Task OnInitializedAsync()
     {
@@ -217,14 +231,55 @@
         });
     }
     
-    private void ProcessSale()
+    private async Task ProcessSale()
     {
-        NotificationService.Notify(new NotificationMessage 
-        { 
-            Severity = NotificationSeverity.Info, 
-            Summary = "Venta", 
-            Detail = $"Procesando venta por {String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", CartService.Total)}" 
-        });
+        if (!CartService.Items.Any())
+        {
+            NotificationService.Notify(new NotificationMessage 
+            { 
+                Severity = NotificationSeverity.Warning, 
+                Summary = "Carrito vacío", 
+                Detail = "No hay artículos en el carrito para procesar la venta" 
+            });
+            return;
+        }
+        
+        conceptosToSave = CartService.Items.Select(item => new DocumentoConceptoDTO
+        {
+            ArticuloId = item.ArticuloId,
+            Cantidad = item.Cantidad,
+            Precio = item.PrecioUnitario,
+           // UltimoCosto = item.UltimoCosto,
+            Impuesto1 = item.Impuesto1,
+            Descripcion = item.Descripcion,
+            Importe = item.Total
+        }).ToList();
+        idTipoDePago = selectedTipoDePago == "Contado" ? 51 : 52;
+        decimal total = CartService.Total;
+        string folio = $"FV-{DateTime.UtcNow:MMddHHmmss}";
+        var result = await _mediator.Send(new CreateDocumentoCommand(folio, DateTime.UtcNow, idTipoDePago, selectedClienteId,
+                null, total, null, conceptosToSave));
+       
+       if (result.IsSuccess)
+        {
+            NotificationService.Notify(new NotificationMessage 
+            { 
+                Severity = NotificationSeverity.Success, 
+                Summary = "Venta procesada", 
+                Detail = $"Venta procesada con folio {folio}" 
+            });
+            ClearCart();
+            GoToPointOfSale();
+        }
+        else
+        {
+            NotificationService.Notify(new NotificationMessage 
+            { 
+                Severity = NotificationSeverity.Error, 
+                Summary = "Error", 
+                Detail = "Error al procesar la venta" 
+            });
+        }
     }
 
     private void GoBack()

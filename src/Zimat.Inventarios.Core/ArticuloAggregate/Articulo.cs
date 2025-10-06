@@ -70,4 +70,15 @@ public class Articulo : EntityBase<Guid>, IAggregateRoot, IRegisterBase
 		PrecioPublico = Guard.Against.NegativeOrZero(nuevoPrecio,nameof(nuevoPrecio));
 	}
 
+  public void UpdateStock(decimal cantidad)
+  {
+    StockActual += cantidad;
+    if(StockActual < StockMinimo)
+      StockStatus = 1; // Bajo
+    else if(StockActual > StockMaximo && StockMaximo > 0)
+      StockStatus = 2; // Alto
+    else
+      StockStatus = 0; // Normal
+  }
+
 }
