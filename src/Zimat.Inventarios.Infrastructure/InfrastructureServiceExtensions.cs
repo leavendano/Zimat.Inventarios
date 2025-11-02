@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Zimat.Inventarios.UseCases.Articulos.List;
-using Zimat.Inventarios.UseCases.Documentos.List;
+using Zimat.Inventarios.UseCases.Compras.List;
 using Zimat.Inventarios.UseCases.Proveedores.List;
 using Zimat.Inventarios.UseCases.Unidades.List;
 using Zimat.Inventarios.UseCases.Lineas.List;
@@ -20,6 +20,7 @@ using Zimat.Inventarios.UseCases.Categorias.List;
 using Zimat.Inventarios.UseCases.Departamentos.List;
 using Zimat.Inventarios.UseCases.Clientes;
 using Zimat.Inventarios.UseCases.Usuarios.List;
+using Zimat.Inventarios.UseCases.Ventas.List;
 
 namespace Zimat.Inventarios.Infrastructure;
 public static class InfrastructureServiceExtensions
@@ -40,7 +41,7 @@ public static class InfrastructureServiceExtensions
     services.AddScoped<IDeleteContributorService, DeleteContributorService>();
     services.AddScoped<IListArticulosQueryService, ListArticulosQueryService>();
     services.AddScoped<IDeleteArticuloService, DeleteArticuloService>();
-    services.AddScoped<IListDocumentosQueryService, ListDocumentosQueryService>();
+    services.AddScoped<IListComprasQueryService, ListComprasQueryService>();
     services.AddScoped<IListProveedoresQueryService, ListProveedoresQueryService>();
     services.AddScoped<IListUnidadesQueryService, ListUnidadesQueryService>();
     services.AddScoped<IListLineasQueryService, ListLineasQueryService>();
@@ -49,6 +50,7 @@ public static class InfrastructureServiceExtensions
     services.AddScoped<IListDepartamentosQueryService, ListDepartamentosQueryService>();
     services.AddScoped<IListClientesQueryService, ListClientesQueryService>();
     services.AddScoped<IListUsuariosQueryService, ListUsuariosQueryService>();
+    services.AddScoped<IListVentasQueryService, ListVentasQueryService>();
     services.Configure<MailserverConfiguration>(config.GetSection("Mailserver"));
 
     logger.LogInformation("{Project} services registered", "Infrastructure");

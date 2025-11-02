@@ -3,7 +3,7 @@ using Ardalis.SharedKernel;
 using Microsoft.EntityFrameworkCore;
 using Zimat.Inventarios.Core.ProveedorAggregate;
 using Zimat.Inventarios.Core.ArticuloAggregate;
-using Zimat.Inventarios.Core.DocumentoAggregate;
+using Zimat.Inventarios.Core.CompraAggregate;
 using Zimat.Inventarios.Core.UnidadAggregate;
 using Zimat.Inventarios.Core.CategoriaAggregate;
 using Zimat.Inventarios.Core.DepartamentoAggregate;
@@ -11,6 +11,7 @@ using Zimat.Inventarios.Core.FamiliaAggregate;
 using Zimat.Inventarios.Core.LineaAggregate;
 using Zimat.Inventarios.Core.ClienteAggregate;
 using Zimat.Inventarios.Core.UsuarioAggregate;
+using Zimat.Inventarios.Core.VentaAggregate;
 
 namespace Zimat.Inventarios.Infrastructure.Data;
 public class AppDbContext : DbContext
@@ -35,8 +36,10 @@ public class AppDbContext : DbContext
   public DbSet<Unidad> Unidades => Set<Unidad>();
   public DbSet<Proveedor> Proveedores => Set<Proveedor>();
   public DbSet<Cliente> Clientes => Set<Cliente>();
-  public DbSet<Documento> Documentos => Set<Documento>();
-  public DbSet<DocumentoConcepto> DocumentoConceptos => Set<DocumentoConcepto>();
+  public DbSet<Compra> Compras => Set<Compra>();
+  public DbSet<CompraConcepto> CompraConceptos => Set<CompraConcepto>();
+  public DbSet<Venta> Ventas => Set<Venta>();
+  public DbSet<VentaConcepto> VentaConceptos => Set<VentaConcepto>();
   public DbSet<Usuario> Usuarios => Set<Usuario>();
 
 

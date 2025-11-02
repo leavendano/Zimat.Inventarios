@@ -1,12 +1,12 @@
 ﻿using System.Reflection;
 using Ardalis.ListStartupServices;
 using Ardalis.SharedKernel;
-using Zimat.Inventarios.Core.DocumentoAggregate;
+using Zimat.Inventarios.Core.CompraAggregate;
 using Zimat.Inventarios.Core.Interfaces;
 using Zimat.Inventarios.Infrastructure;
 using Zimat.Inventarios.Infrastructure.Data;
 using Zimat.Inventarios.Infrastructure.Email;
-using Zimat.Inventarios.UseCases.Documentos.Create;
+using Zimat.Inventarios.UseCases.Compras.Create;
 using Zimat.Inventarios.Web.Components;
 using Zimat.Inventarios.Web.Services;
 using FastEndpoints;
@@ -178,8 +178,8 @@ void ConfigureMediatR()
 {
   var mediatRAssemblies = new[]
 {
-  Assembly.GetAssembly(typeof(Documento)), // Core
-  Assembly.GetAssembly(typeof(CreateDocumentoCommand)) // UseCases
+  Assembly.GetAssembly(typeof(Compra)), // Core
+  Assembly.GetAssembly(typeof(CreateCompraCommand)) // UseCases
 };
   builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(mediatRAssemblies!));
   builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));

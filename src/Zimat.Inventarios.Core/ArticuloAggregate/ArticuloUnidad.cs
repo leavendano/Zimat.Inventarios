@@ -2,7 +2,7 @@
 using Ardalis.SharedKernel;
 using Zimat.Inventarios.Core.ArticuloAggregate.Events;
 using Zimat.Inventarios.Core.Base;
-using Zimat.Inventarios.Core.DocumentoAggregate;
+using Zimat.Inventarios.Core.CompraAggregate;
 
 namespace Zimat.Inventarios.Core.ArticuloAggregate;
 

@@ -1,0 +1,417 @@
+﻿@page "/add-compra"
+
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject ILogger<AddCompra> logger
+@using Zimat.Inventarios.UseCases.Articulos
+@using Zimat.Inventarios.UseCases.Articulos.List
+@using Zimat.Inventarios.UseCases.Compras
+@using Zimat.Inventarios.UseCases.Compras.Create
+@using Zimat.Inventarios.UseCases.Proveedores
+@using Zimat.Inventarios.UseCases.Proveedores.List
+@using MediatR
+@inject IMediator _mediator
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
+@attribute [Authorize]
+
+<style>
+    .rz-grid-table {
+        width: unset;
+    }
+</style>
+
+<PageTitle>Nuevo Compra</PageTitle>
+
+<RadzenColumn SizeMD=12>
+    <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">No se pudo guardar el compra</RadzenAlert>
+    
+    <RadzenTemplateForm TItem="CompraViewModel" Data="@compra" Visible="@(compra != null)" Submit="@FormSubmit">
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="2">
+                <RadzenLabel Text="Proveedor" Component="DropDownProveedor" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="5">
+                <RadzenDropDown @bind-Value="@compra!.ProveedorId" Data=@listadoProveedores TextProperty="@nameof(ProveedorDTO.Nombre)" ValueProperty="@nameof(ProveedorDTO.Id)"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
+                                AllowClear=false Placeholder="Seleccione un proveedor" style="display: block; width: 100%" Name="DropDownProveedor" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="1">
+                <RadzenLabel Text="Fecha" Component="fecha" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="4">
+                <RadzenDatePicker @bind-Value="@compra!.Fecha" Name="fecha" ShowCalendarWeek />
+                <RadzenRequiredValidator Component="fecha" Text="La fecha es requerida" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="2">
+                <RadzenLabel Text="Tipo" Component="DropDownTipo" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="4">
+                <RadzenDropDown @bind-Value="@compra!.TipoCompraId" Data=@tiposCompra TextProperty="@nameof(TipoCompra.Descripcion)" ValueProperty="Id"
+                                    AllowClear=false Placeholder="Seleccione un Tipo" style="display: block; width: 100%" Name="DropDownTipo"  />
+                <RadzenRequiredValidator Component="DropDownTipo" Text="El tipo es requerido" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="2">
+                <RadzenLabel Text="Referencia" Component="refencia" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="4">
+                <RadzenDropDown @bind-Value="@compra!.CompraRelacionadoId" Data=@comprasProveedor TextProperty="@nameof(CompraDTO.Folio)" ValueProperty="@nameof(CompraDTO.Id)"
+                                    AllowClear=false Placeholder="Seleccione un Compra" style="display: block; width: 100%" Name="DropDownTipo"  />
+                
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn SizeMD=12>
+                <RadzenDataGrid @ref="grid0" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="DataGridEditMode.Single"
+                ShowPagingSummary="true" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="160px"  Data="@conceptos" TItem="CompraConceptoDTO">
+                    <HeaderTemplate>
+                        <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle" Text="Agregar fila" Click="@InsertRow" />
+                        
+                    </HeaderTemplate>
+                    <Columns>
+                        <RadzenDataGridColumn TItem="CompraConceptoDTO" Property="Clave" Title="Clave" Width="100px">
+                            <EditTemplate Context="concepto">
+
+                                <RadzenDropDown @bind-Value="concepto.ArticuloId" Data="@articulos" TextProperty="@nameof(ArticuloDTO.Clave)" ValueProperty="Id"
+                                                AllowClear=false Placeholder="" style="display: block; width: 150px" Name="DropDownArticulo" TValue="Guid"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
+                                    Change="@(args => { var item = articulos!.Where(x => x.Id == (Guid)args).First();concepto!.Descripcion=item.Descripcion;concepto.Unidad = item.Unidad;concepto.UltimoCosto = item.UltimoCosto?? 0m;concepto.Impuesto1=item.Impuesto1;concepto.Clave=item.Clave;})" />
+                                
+                            </EditTemplate>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="CompraConceptoDTO" Property="Descripcion" Title="Descripcion">
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="CompraConceptoDTO" Property="Cantidad" Title="Cantidad">
+                            <EditTemplate Context="concepto">
+                                <RadzenNumeric @bind-Value="concepto.Cantidad" Style="width:100px; display: block" Name="cantidad" aria-label="cantidad"
+                                               TextAlign="TextAlign.Right" ShowUpDown="false" Format="0.00"
+                                               Change="@(args => concepto.Importe = args * concepto.UltimoCosto)" TValue="decimal" />
+                                <RadzenRequiredValidator Text="cantidad es requerido" Component="cantidad" Popup="true" />
+                            </EditTemplate>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="CompraConceptoDTO" Property="Unidad" Title="Unidad">
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="CompraConceptoDTO" Property="UltimoCosto" Title="Costo">
+                            <EditTemplate Context="concepto">
+                                <RadzenNumeric @bind-Value="concepto.UltimoCosto" Style="width:100px; display: block" Name="costo" aria-label="costo"
+                                               TextAlign="TextAlign.Right" ShowUpDown="false" Format="0.00"
+                                               Change="@(args => concepto.Importe = concepto.Cantidad * args)" TValue="decimal" />
+                                <RadzenRequiredValidator Text="precio es requerido" Component="costo" Popup="true" />
+                            </EditTemplate>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="CompraConceptoDTO" Property="Descuento" Title="%Descuento">
+                            <EditTemplate Context="concepto">
+                                <RadzenNumeric @bind-Value="concepto.Descuento" Style="width:100px; display: block" Name="descuento" aria-label="descuento"
+                                               TextAlign="TextAlign.Right" ShowUpDown="false" Format="0.00"
+                                               Change="@(args => concepto.DescuentoImporte = concepto.Cantidad * concepto.UltimoCosto * (100 - args)/100)" TValue="decimal" />
+                               
+                            </EditTemplate>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="CompraConceptoDTO" Property="Importe" Title="Importe">
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Context="concepto" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true"  FrozenPosition="FrozenColumnPosition.Right">
+                            <Template Context="concepto">
+                                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(concepto))" @onclick:stopPropagation="true">
+                                </RadzenButton>
+                                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" Click="@(args => DeleteRow(concepto))" @onclick:stopPropagation="true">
+                                </RadzenButton>
+                            </Template>
+                            <EditTemplate Context="concepto">
+                                <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(concepto))" aria-label="Save">
+                                </RadzenButton>
+                                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" Click="@((args) => CancelEdit(concepto))" aria-label="Cancel">
+                                </RadzenButton>
+                            </EditTemplate>
+                        </RadzenDataGridColumn>
+                        
+                    </Columns>
+
+                </RadzenDataGrid>
+
+            </RadzenColumn>
+        </RadzenRow>
+       <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.End" JustifyContent="JustifyContent.Normal" >
+            <RadzenRow AlignItems="AlignItems.Normal"> 
+                <RadzenColumn >
+                    <RadzenText Text="SubTotal" style="margin: 0" />
+                </RadzenColumn>
+                <RadzenColumn >
+                    <RadzenNumeric @bind-Value="@compra!.Subtotal" Style="width:200px; display: block" Name="subtotal" aria-label="subtotal"
+                                   TextAlign="TextAlign.Right" Disabled="true" ShowUpDown="false" Format="0.00" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Normal">
+                <RadzenColumn>
+                    <RadzenText Text="Desc Global" style="margin: 0" />
+                </RadzenColumn>
+                <RadzenColumn>
+                    <RadzenNumeric @bind-Value="@compra!.DescuentoCompra" Style="width:200px; display: block" Name="descuento_compra" aria-label="descuento"
+                                   TextAlign="TextAlign.Right" Disabled="true" ShowUpDown="false" Format="0.00" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Normal">
+                <RadzenColumn>
+                    <RadzenText Text="Desc Par" style="margin: 0" />
+                </RadzenColumn>
+                <RadzenColumn>
+                    <RadzenNumeric @bind-Value="@compra!.DescuentoCompra" Style="width:200px; display: block" Name="descuento_compra" aria-label="descuento"
+                                   TextAlign="TextAlign.Right" Disabled="true" ShowUpDown="false" Format="0.00" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Normal">
+                <RadzenColumn>
+                    <RadzenText Text="Impuesto" style="margin: 0" />
+                </RadzenColumn>
+                <RadzenColumn>
+                    <RadzenNumeric @bind-Value="@compra!.Impuestos" Style="width:200px; display: block" Name="sumaimpuesto" aria-label="impuesto"
+                                   TextAlign="TextAlign.Right" Disabled="true" ShowUpDown="false" Format="0.00" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Normal">
+                <RadzenColumn >
+                    <RadzenText Text="Total" style="margin: 0" />
+                </RadzenColumn>
+                <RadzenColumn>
+                    <RadzenNumeric @bind-Value="@compra!.Total" Style="width:200px; display: block" Name="total" aria-label="total"
+                                   TextAlign="TextAlign.Right" Disabled="true" ShowUpDown="false" Format="0.00" />
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Guardar" Variant="Variant.Flat" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancelar" Variant="Variant.Flat" Click="@CancelButtonClick" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenColumn>
+
+@code {
+
+    protected class CompraViewModel
+    {
+        public string Folio { get; set; } = "";
+        public int TipoCompraId { get; set; } = 1;
+        public DateTime Fecha { get; set; } = DateTime.Now;
+        public Guid? ClienteId { get; set; }
+        public Guid? ProveedorId { get; set; }
+        public int? FormaPagoId { get; set; }
+        public string Divisa { get; set; } = "MXN";
+        public decimal TipoCambio { get; set; } = 1m;
+        public decimal PDescuento { get; set; } = 0m;
+        public decimal Descuento { get; set; } = 0m;
+        public DateTime? FechaPago { get; set; }
+        public string? Referencia { get; set; }
+        public decimal Subtotal { get; set; } = 0;
+        public decimal DescuentoCompra { get; set; } = 0;
+        public decimal DescuentoConceptos { get; set; } = 0;
+        public decimal Impuestos { get; set; } = 0;
+        public decimal Total { get; set; } = 0;
+        public Guid? CompraRelacionadoId {get; set;}
+    }
+
+   @*  protected class ConceptoGridModel
+    {
+        public Guid ArticuloId { get; set; }
+        public string Clave { get; set; } = "";
+        public string Descripcion { get; set; } = "";
+        public decimal Precio { get; set; } = 0m;
+        public decimal Cantidad {get; set;} = 0m;
+        public string Unidad { get; set; } = "";
+        public decimal Impuesto1 { get; set; } = 16m;
+        public decimal Impuesto2 { get; set; } = 0;
+        public decimal UltimoCosto { get; set; }
+        public decimal Descuento { get; set; } = 0m;
+        public decimal DescuentoImporte { get; set; } = 0m;
+        public decimal Importe { get; set; }
+
+    } *@
+    
+    protected record TipoCompra(int Id, string Descripcion);
+
+    protected bool errorVisible;
+    [SupplyParameterFromForm]
+    protected CompraViewModel compra { get; set; } = new();
+
+    protected IEnumerable<CompraDTO> comprasProveedor {get;set;} = [];
+
+    protected IEnumerable<CompraConceptoDTO> conceptos { get; set; } = [];
+    protected IEnumerable<ArticuloListarDTO>? articulos = [];
+
+    protected IEnumerable<TipoCompra> tiposCompra {get;set;} = [];
+
+    List<CompraConceptoDTO> conceptosToInsert = [];
+    List<CompraConceptoDTO> conceptosToUpdate = [];
+
+    List<CompraConceptoDTO> conceptosToSave = [];
+
+    RadzenDataGrid<CompraConceptoDTO> grid0 = new();
+
+    string? UserName = null;
+    IEnumerable<ProveedorDTO>? listadoProveedores { get; set; }
+
+    protected decimal ImporteInicial = 0;
+    protected decimal Impuesto = 0;
+    protected decimal Total = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        UserName = user?.Identity?.Name;
+
+        var resultProveedores = await _mediator.Send(new ListProveedoresQuery(null, null,null));
+        if (resultProveedores.IsSuccess)
+        {
+            listadoProveedores = resultProveedores.Value;
+        }
+
+        var result = await _mediator.Send(new ListArticulosQuery(null,null, null));
+        if (result.IsSuccess)
+        {
+            articulos = result.Value;
+        }
+
+        tiposCompra = new List<TipoCompra> 
+            {
+                new TipoCompra(1,"Orden de Compra"),
+                new TipoCompra(2,"Compra"),
+                new TipoCompra(3,"Contrato")
+            };
+
+    }
+
+
+
+    protected async Task FormSubmit()
+    {
+
+        try
+        {
+            //await zimatService.CreateProduct(product);
+            var result = await _mediator.Send(new CreateCompraCommand(compra.Folio!, DateTime.UtcNow,compra.TipoCompraId,
+                compra.ProveedorId, compra.Total,compra.CompraRelacionadoId,conceptosToSave));
+            DialogService.Close(compra);
+        }
+        catch (Exception e)
+        {
+            errorVisible = true;
+            logger.LogError(e,"{Message}",e.Message);
+        }
+
+    }
+
+    void OnChange(decimal value)
+    {
+
+        decimal valor = (decimal)value;
+        logger.LogInformation($"value changed to {valor}");
+
+
+    }
+
+    protected async Task CancelButtonClick(MouseEventArgs args)
+    {
+        await Task.Run(() => DialogService.Close(null));
+    }
+
+    async Task InsertRow()
+    {
+
+        Reset();
+        var concepto = new CompraConceptoDTO();
+        conceptosToInsert.Add(concepto);
+
+        await grid0.InsertRow(concepto);
+
+    }
+
+    void Reset()
+    {
+        conceptosToInsert.Clear();
+        conceptosToUpdate.Clear();
+    }
+
+    void OnCreateRow(CompraConceptoDTO item)
+    {
+        conceptosToInsert.Remove(item);
+    }
+
+    void OnUpdateRow(CompraConceptoDTO item)
+    {
+        Reset(item);
+
+
+    }
+
+    void Reset(CompraConceptoDTO item)
+    {
+        conceptosToInsert.Remove(item);
+        conceptosToUpdate.Remove(item);
+    }
+
+    async Task SaveRow(CompraConceptoDTO item)
+    {
+        item.DescuentoImporte = (item.Importe  * item.Descuento / 100);
+        compra.Subtotal += (item.Importe - ImporteInicial);
+        compra.DescuentoConceptos += ((item.Importe - ImporteInicial) - item.DescuentoImporte);
+        compra.Impuestos += ((item.Importe-item.DescuentoImporte - ImporteInicial) * item.Impuesto1/100);
+        compra.Total = compra.Subtotal + compra.Impuestos - compra.DescuentoCompra; 
+        await grid0.UpdateRow(item);
+        var precio = articulos?.First(x => x.Id == item.ArticuloId).PrecioPublico;
+        item.Precio= precio ?? 1m;
+        conceptosToSave.Add(item);
+        ImporteInicial = 0;
+    }
+
+    async Task EditRow(CompraConceptoDTO item)
+    {
+        if (conceptosToInsert.Count() > 0)
+        {
+            Reset();
+        }
+        ImporteInicial = item.Importe;
+        conceptosToUpdate.Add(item);
+        await grid0.EditRow(item);
+    }
+
+    async Task DeleteRow(CompraConceptoDTO item)
+    {
+        Reset(item);
+
+        if (conceptos.Contains(item))
+        {
+
+
+            await grid0.Reload();
+        }
+        else
+        {
+            compra.Subtotal -= item.Importe;
+            compra.Total = compra.Subtotal + compra.Impuestos - compra.DescuentoCompra;
+            grid0.CancelEditRow(item);
+            await grid0.Reload();
+        }
+    }
+
+    void CancelEdit(CompraConceptoDTO order)
+    {
+        Reset(order);
+
+        grid0.CancelEditRow(order);
+        ImporteInicial = 0;
+
+        // var orderEntry = dbContext.Entry(order);
+        // if (orderEntry.State == EntityState.Modified)
+        // {
+        //     orderEntry.CurrentValues.SetValues(orderEntry.OriginalValues);
+        //     orderEntry.State = EntityState.Unchanged;
+        // }
+    }
+    
+}

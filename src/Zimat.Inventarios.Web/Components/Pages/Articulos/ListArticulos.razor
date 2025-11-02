@@ -89,7 +89,8 @@
 
     protected async Task EditRow(ArticuloListarDTO args)
     {
-        await DialogService.OpenAsync<EditArticulo>("Edit Articulo", new Dictionary<string, object> { { "Id",args.Id} });
+        await DialogService.OpenAsync<EditArticulo>("Editar Articulo", new Dictionary<string, object> { { "Id",args.Id} },
+        new DialogOptions() { Width = $"{900}px", Height = $"{600}px" });
         Result<IEnumerable<ArticuloListarDTO>> result = await _mediator.Send(new ListArticulosQuery(null,null, null));
         if (result.IsSuccess)
         {
