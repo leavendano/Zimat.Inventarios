@@ -1,0 +1,121 @@
+@page "/edit-familia"
+@using MediatR
+@using Zimat.Inventarios.UseCases.Familias.Get
+@using Zimat.Inventarios.UseCases.Familias.Update
+@inject IMediator _mediator
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+@inject ILogger<EditFamilia> logger
+
+<PageTitle>Editar Familia</PageTitle>
+<RadzenColumn SizeMD=12>
+    <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">@mensajeAlerta</RadzenAlert>
+    <RadzenTemplateForm TItem="FamiliaDTO" Data="@familia" Visible="@(familia != null)" Submit="@FormSubmit">
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Descripción" Component="descripcion" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@familia!.Descripcion" Name="descripcion" />
+                <RadzenRequiredValidator Component="descripcion" Text="La descripción es requerida" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Margen %" Component="margen" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenNumeric style="display: block; width: 100%" @bind-Value="@familia!.Margen" Name="margen" Min="0" Max="100" Step="0.01" />
+                <RadzenRequiredValidator Component="margen" Text="El margen es requerido" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Guardar" Variant="Variant.Flat" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancelar" Variant="Variant.Flat" Click="@CancelButtonClick" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenColumn>
+
+@code{
+    protected class FamiliaDTO
+    {
+        public Guid Id { get; set; }
+        public string Descripcion { get; set; } = string.Empty;
+        public decimal Margen { get; set; } = 0;
+    }
+
+    [Parameter]
+    public Guid Id { get; set; }
+
+    [Parameter] public EventCallback OnFamiliaUpdated { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await _mediator.Send(new GetFamiliaQuery(Id));
+        if (result.IsSuccess)
+        {
+            familia.Id = result.Value.Id;
+            familia.Descripcion = result.Value.Descripcion;
+            familia.Margen = result.Value.Margen;
+        }
+        else
+        {
+            mensajeAlerta = "No se pudo cargar la familia";
+            errorVisible = true;
+        }
+    }
+
+    protected bool errorVisible;
+    protected string mensajeAlerta = "No se pudo guardar el registro";
+
+    protected FamiliaDTO familia { get; set; } = new();
+
+    protected async Task FormSubmit()
+    {
+        try
+        {
+            var result = await _mediator.Send(new UpdateFamiliaCommand(familia.Id, familia.Descripcion, familia.Margen));
+
+            if (result.IsSuccess)
+            {
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Familia actualizada",
+                    Detail = "La familia se ha actualizado correctamente",
+                    Duration = 4000
+                });
+
+                if (OnFamiliaUpdated.HasDelegate)
+                {
+                    await OnFamiliaUpdated.InvokeAsync();
+                }
+
+                DialogService.Close(familia);
+            }
+            else
+            {
+                mensajeAlerta = "No se pudo actualizar la familia";
+                errorVisible = true;
+            }
+        }
+        catch (Exception e)
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error al actualizar la familia",
+                Detail = e.Message,
+                Duration = 4000
+            });
+            mensajeAlerta = $"Error: {e.Message}";
+            errorVisible = true;
+            logger.LogError(e, "Error al actualizar la familia");
+        }
+    }
+
+    protected async Task CancelButtonClick(MouseEventArgs args)
+    {
+        await Task.Run(() => DialogService.Close(null));
+    }
+}

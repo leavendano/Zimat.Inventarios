@@ -12,6 +12,7 @@ using Zimat.Inventarios.Core.LineaAggregate;
 using Zimat.Inventarios.Core.ClienteAggregate;
 using Zimat.Inventarios.Core.UsuarioAggregate;
 using Zimat.Inventarios.Core.VentaAggregate;
+using Zimat.Inventarios.Core.TipoDocumentoAggregate;
 
 namespace Zimat.Inventarios.Infrastructure.Data;
 public class AppDbContext : DbContext
@@ -41,6 +42,7 @@ public class AppDbContext : DbContext
   public DbSet<Venta> Ventas => Set<Venta>();
   public DbSet<VentaConcepto> VentaConceptos => Set<VentaConcepto>();
   public DbSet<Usuario> Usuarios => Set<Usuario>();
+  public DbSet<TipoDocumento> TipoDocumentos => Set<TipoDocumento>();
 
 
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 

@@ -1,0 +1,184 @@
+@page "/familias"
+@using Ardalis.Result
+@using Zimat.Inventarios.Core.Base
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject ILogger<ListFamilias> logger
+@using MediatR
+@inject IMediator _mediator
+@using Zimat.Inventarios.UseCases.Familias
+@using Zimat.Inventarios.UseCases.Familias.List
+@using Zimat.Inventarios.UseCases.Familias.Create
+@using Zimat.Inventarios.UseCases.Familias.Delete
+@using Zimat.Inventarios.UseCases.Familias.Update
+@attribute [Authorize]
+
+
+<PageTitle>Familias</PageTitle>
+<RadzenStack>
+    <RadzenRow AlignItems="AlignItems.Center">
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenText Text="Familias" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton Icon="add_circle_outline" Text="Nueva" Click="@AddButtonClick" Variant="Variant.Flat" />
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn SizeMD=12>
+            <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
+                            Data="@familias" TItem="FamiliaDTO" RowSelect="@EditRow">
+                <Columns>
+                    <RadzenDataGridColumn TItem="FamiliaDTO" Property="Descripcion" Title="Descripción">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="FamiliaDTO" Property="Margen" Title="Margen">
+                        <Template Context="familia">
+                            @($"{familia.Margen:P2}")
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="FamiliaDTO" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
+                        <Template Context="familia">
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
+                                          Shade="Shade.Lighter" Variant="Variant.Flat"
+                                          Click=@(args => GridDeleteButtonClick(args, familia)) @onclick:stopPropagation="true" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+@code {
+
+    protected IEnumerable<FamiliaDTO>? familias;
+
+    protected RadzenDataGrid<FamiliaDTO> grid0 = new();
+    protected override async Task OnInitializedAsync()
+    {
+
+        await base.OnInitializedAsync();
+        Result<IEnumerable<FamiliaDTO>> result = await _mediator.Send(new ListFamiliasQuery(null, null));
+
+        if (result.IsSuccess)
+        {
+            familias = result.Value;
+        }
+
+    }
+
+    protected async Task AddButtonClick(MouseEventArgs args)
+    {
+        try
+        {
+            var dialogParams = new Dictionary<string, object>
+            {
+                ["OnFamiliaCreated"] = EventCallback.Factory.Create(this, RefreshGrid)
+            };
+
+            await DialogService.OpenAsync<AddFamilia>("Nueva Familia", dialogParams, new DialogOptions()
+            {
+                Width = "600px",
+                Height = "400px",
+                Resizable = true,
+                Draggable = true
+            });
+        }
+        catch (Exception e)
+        {
+            logger.LogError(0, e, "Error al abrir diálogo de nueva familia");
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "No se pudo abrir el diálogo para crear nueva familia"
+            });
+        }
+    }
+
+    protected async Task EditRow(FamiliaDTO args)
+    {
+        try
+        {
+            var dialogParams = new Dictionary<string, object>
+            {
+                ["Id"] = args.Id,
+                ["OnFamiliaUpdated"] = EventCallback.Factory.Create(this, RefreshGrid)
+            };
+
+            await DialogService.OpenAsync<EditFamilia>("Editar Familia", dialogParams, new DialogOptions()
+            {
+                Width = "600px",
+                Height = "400px",
+                Resizable = true,
+                Draggable = true
+            });
+        }
+        catch (Exception e)
+        {
+            logger.LogError(0, e, "Error al abrir diálogo de edición de familia");
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "No se pudo abrir el diálogo para editar la familia"
+            });
+        }
+    }
+
+    protected async Task GridDeleteButtonClick(MouseEventArgs args, FamiliaDTO familia)
+    {
+        try
+        {
+            if (await DialogService.Confirm("¿Está seguro de borrar este elemento?") == true)
+            {
+                var result = await _mediator.Send(new DeleteFamiliaCommand(familia.Id));
+
+                if (result.IsSuccess)
+                {
+                    await RefreshGrid();
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Éxito",
+                        Detail = "Familia eliminada correctamente"
+                    });
+                }
+                else
+                {
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error",
+                        Detail = "No se pudo eliminar la familia"
+                    });
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            logger.LogError(0, e, "Error al eliminar un elemento");
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = $"Error",
+                    Detail = $"Unable to delete Familia"
+                });
+        }
+    }
+
+    protected async Task RefreshGrid()
+    {
+        Result<IEnumerable<FamiliaDTO>> result = await _mediator.Send(new ListFamiliasQuery(null, null));
+        if (result.IsSuccess)
+        {
+            familias = result.Value;
+            await grid0.Reload();
+        }
+    }
+}

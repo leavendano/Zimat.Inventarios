@@ -17,10 +17,22 @@ public class Familia : EntityBase<Guid>, IAggregateRoot, IRegisterBase
     CreatedAt = DateTime.UtcNow;
     UpdatedAt = DateTime.UtcNow;
   }
-  public string Descripcion { get; set; } 
-  public decimal Margen { get; set; } 
-  public string? User { get; set; } 
+  public string Descripcion { get; set; }
+  public decimal Margen { get; set; }
+  public string? User { get; set; }
   public int Status { get; set; }
   public DateTime CreatedAt { get; set; }
   public DateTime UpdatedAt { get; set; }
+
+  public void UpdateDescripcion(string newDescripcion)
+  {
+    Descripcion = Guard.Against.NullOrEmpty(newDescripcion, nameof(newDescripcion));
+    UpdatedAt = DateTime.UtcNow;
+  }
+
+  public void UpdateMargen(decimal newMargen)
+  {
+    Margen = Guard.Against.Negative(newMargen, nameof(newMargen));
+    UpdatedAt = DateTime.UtcNow;
+  }
 }

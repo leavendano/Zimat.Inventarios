@@ -294,7 +294,7 @@
         try
         {
             //await zimatService.CreateProduct(product);
-            var result = await _mediator.Send(new CreateCompraCommand(compra.Folio!, DateTime.UtcNow,compra.TipoCompraId,
+            var result = await _mediator.Send(new CreateCompraCommand(compra.Folio, DateTime.UtcNow,compra.TipoCompraId,
                 compra.ProveedorId, compra.Total,compra.CompraRelacionadoId,conceptosToSave));
             DialogService.Close(compra);
         }

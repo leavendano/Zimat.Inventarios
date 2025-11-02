@@ -20,10 +20,16 @@ public class Departamento : EntityBase<Guid>, IAggregateRoot, IRegisterBase
     UpdatedAt = DateTime.UtcNow;
   }
   
-  public string Nombre { get; set; } 
-  public string? User { get; set; } 
-  public int Status { get; set; } 
+  public string Nombre { get; set; }
+  public string? User { get; set; }
+  public int Status { get; set; }
   public DateTime CreatedAt { get; set; }
   public DateTime UpdatedAt { get; set; }
+
+  public void UpdateNombre(string newNombre)
+  {
+    Nombre = Guard.Against.NullOrEmpty(newNombre, nameof(newNombre));
+    UpdatedAt = DateTime.UtcNow;
+  }
 
 }

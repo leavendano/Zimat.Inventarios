@@ -21,6 +21,7 @@ using Zimat.Inventarios.UseCases.Departamentos.List;
 using Zimat.Inventarios.UseCases.Clientes;
 using Zimat.Inventarios.UseCases.Usuarios.List;
 using Zimat.Inventarios.UseCases.Ventas.List;
+using Zimat.Inventarios.UseCases.TipoDocumentos.List;
 
 namespace Zimat.Inventarios.Infrastructure;
 public static class InfrastructureServiceExtensions
@@ -48,6 +49,7 @@ public static class InfrastructureServiceExtensions
     services.AddScoped<IListFamiliasQueryService, ListFamiliasQueryService>();
     services.AddScoped<IListCategoriasQueryService, ListCategoriasQueryService>();
     services.AddScoped<IListDepartamentosQueryService, ListDepartamentosQueryService>();
+    services.AddScoped<IListTipoDocumentosQueryService, ListTipoDocumentosQueryService>();
     services.AddScoped<IListClientesQueryService, ListClientesQueryService>();
     services.AddScoped<IListUsuariosQueryService, ListUsuariosQueryService>();
     services.AddScoped<IListVentasQueryService, ListVentasQueryService>();
