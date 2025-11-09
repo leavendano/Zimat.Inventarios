@@ -14,6 +14,10 @@
 @using Zimat.Inventarios.UseCases.Proveedores
 @using Zimat.Inventarios.UseCases.Proveedores.List
 @using MediatR
+@using Zimat.Inventarios.UseCases.TipoDocumentos
+@using Zimat.Inventarios.UseCases.TipoDocumentos.Get
+@using Zimat.Inventarios.UseCases.TipoDocumentos.List
+@using Zimat.Inventarios.UseCases.TipoDocumentos.Update
 @inject IMediator _mediator
 @inject AuthenticationStateProvider GetAuthenticationStateAsync
 @attribute [Authorize]
@@ -52,7 +56,7 @@
                 <RadzenLabel Text="Tipo" Component="DropDownTipo" style="width: 100%" />
             </RadzenColumn>
             <RadzenColumn SizeMD="4">
-                <RadzenDropDown @bind-Value="@compra!.TipoCompraId" Data=@tiposCompra TextProperty="@nameof(TipoCompra.Descripcion)" ValueProperty="Id"
+                <RadzenDropDown @bind-Value="@compra!.TipoCompraId" Data=@tiposCompra TextProperty="@nameof(TipoDocumentoDTO.Nombre)" ValueProperty="@nameof(TipoDocumentoDTO.Id)"
                                     AllowClear=false Placeholder="Seleccione un Tipo" style="display: block; width: 100%" Name="DropDownTipo"  />
                 <RadzenRequiredValidator Component="DropDownTipo" Text="El tipo es requerido" />
             </RadzenColumn>
@@ -61,7 +65,7 @@
             </RadzenColumn>
             <RadzenColumn SizeMD="4">
                 <RadzenDropDown @bind-Value="@compra!.CompraRelacionadoId" Data=@comprasProveedor TextProperty="@nameof(CompraDTO.Folio)" ValueProperty="@nameof(CompraDTO.Id)"
-                                    AllowClear=false Placeholder="Seleccione un Compra" style="display: block; width: 100%" Name="DropDownTipo"  />
+                                    AllowClear=false Placeholder="Seleccione un Documento" style="display: block; width: 100%" Name="DropDownTipo"  />
                 
             </RadzenColumn>
         </RadzenRow>
@@ -108,7 +112,7 @@
                             <EditTemplate Context="concepto">
                                 <RadzenNumeric @bind-Value="concepto.Descuento" Style="width:100px; display: block" Name="descuento" aria-label="descuento"
                                                TextAlign="TextAlign.Right" ShowUpDown="false" Format="0.00"
-                                               Change="@(args => concepto.DescuentoImporte = concepto.Cantidad * concepto.UltimoCosto * (100 - args)/100)" TValue="decimal" />
+                                               Change="@(args => concepto.DescuentoImporte = concepto.Cantidad * concepto.UltimoCosto * args/100)" TValue="decimal" />
                                
                             </EditTemplate>
                         </RadzenDataGridColumn>
@@ -159,7 +163,7 @@
                     <RadzenText Text="Desc Par" style="margin: 0" />
                 </RadzenColumn>
                 <RadzenColumn>
-                    <RadzenNumeric @bind-Value="@compra!.DescuentoCompra" Style="width:200px; display: block" Name="descuento_compra" aria-label="descuento"
+                    <RadzenNumeric @bind-Value="@compra!.DescuentoConceptos" Style="width:200px; display: block" Name="descuento_conceptos" aria-label="descuento"
                                    TextAlign="TextAlign.Right" Disabled="true" ShowUpDown="false" Format="0.00" />
                 </RadzenColumn>
             </RadzenRow>
@@ -230,8 +234,8 @@
         public decimal Importe { get; set; }
 
     } *@
-    
-    protected record TipoCompra(int Id, string Descripcion);
+
+
 
     protected bool errorVisible;
     [SupplyParameterFromForm]
@@ -242,7 +246,7 @@
     protected IEnumerable<CompraConceptoDTO> conceptos { get; set; } = [];
     protected IEnumerable<ArticuloListarDTO>? articulos = [];
 
-    protected IEnumerable<TipoCompra> tiposCompra {get;set;} = [];
+    protected IEnumerable<TipoDocumentoDTO> tiposCompra {get;set;} = [];
 
     List<CompraConceptoDTO> conceptosToInsert = [];
     List<CompraConceptoDTO> conceptosToUpdate = [];
@@ -255,6 +259,8 @@
     IEnumerable<ProveedorDTO>? listadoProveedores { get; set; }
 
     protected decimal ImporteInicial = 0;
+    protected decimal DescuentoInicial = 0;
+    protected decimal ImpuestoInicial = 0;
     protected decimal Impuesto = 0;
     protected decimal Total = 0;
 
@@ -264,7 +270,12 @@
         var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
         var user = authstate.User;
         UserName = user?.Identity?.Name;
+        var resultTipoDocumento = await _mediator.Send(new ListTipoDocumentosQuery(null, null));
+        if(resultTipoDocumento.IsSuccess)
+        {
+            tiposCompra = resultTipoDocumento.Value.Where(x => x.EsEntrada).ToList();
 
+        }
         var resultProveedores = await _mediator.Send(new ListProveedoresQuery(null, null,null));
         if (resultProveedores.IsSuccess)
         {
@@ -277,12 +288,7 @@
             articulos = result.Value;
         }
 
-        tiposCompra = new List<TipoCompra> 
-            {
-                new TipoCompra(1,"Orden de Compra"),
-                new TipoCompra(2,"Compra"),
-                new TipoCompra(3,"Contrato")
-            };
+
 
     }
 
@@ -294,6 +300,14 @@
         try
         {
             //await zimatService.CreateProduct(product);
+            var resultFolio = await _mediator.Send(new IncrementaFolioCommand(compra.TipoCompraId));
+            if (resultFolio.IsSuccess)
+            {
+                var tipoDoc = resultFolio.Value;
+                var ultimoFolio = tipoDoc.UltimoFolio;
+                compra.Folio = $"{tipoDoc.Prefijo}{ultimoFolio:D5}";
+            }
+            //var resultFolioUpdate = await _mediator.Send(new IncrementaFolioCommand(compra.TipoCompraId));
             var result = await _mediator.Send(new CreateCompraCommand(compra.Folio, DateTime.UtcNow,compra.TipoCompraId,
                 compra.ProveedorId, compra.Total,compra.CompraRelacionadoId,conceptosToSave));
             DialogService.Close(compra);
@@ -359,9 +373,9 @@
     {
         item.DescuentoImporte = (item.Importe  * item.Descuento / 100);
         compra.Subtotal += (item.Importe - ImporteInicial);
-        compra.DescuentoConceptos += ((item.Importe - ImporteInicial) - item.DescuentoImporte);
-        compra.Impuestos += ((item.Importe-item.DescuentoImporte - ImporteInicial) * item.Impuesto1/100);
-        compra.Total = compra.Subtotal + compra.Impuestos - compra.DescuentoCompra; 
+        compra.DescuentoConceptos += ( item.DescuentoImporte - DescuentoInicial);
+        compra.Impuestos += (((item.Importe-ImporteInicial) -(item.DescuentoImporte - DescuentoInicial)) * item.Impuesto1/100) - ImpuestoInicial;
+        compra.Total = compra.Subtotal + compra.Impuestos - compra.DescuentoConceptos; 
         await grid0.UpdateRow(item);
         var precio = articulos?.First(x => x.Id == item.ArticuloId).PrecioPublico;
         item.Precio= precio ?? 1m;
@@ -376,6 +390,8 @@
             Reset();
         }
         ImporteInicial = item.Importe;
+        DescuentoInicial = item.DescuentoImporte;
+        ImpuestoInicial = (item.Importe - item.DescuentoImporte) * item.Impuesto1 / 100;
         conceptosToUpdate.Add(item);
         await grid0.EditRow(item);
     }

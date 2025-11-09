@@ -1,4 +1,4 @@
-using Ardalis.GuardClauses;
+﻿using Ardalis.GuardClauses;
 using Ardalis.SharedKernel;
 using Zimat.Inventarios.Core.Base;
 using Zimat.Inventarios.Core.CompraAggregate.Events;
@@ -37,7 +37,7 @@ public class Compra : EntityBase<Guid>, IAggregateRoot, IRegisterBase
   	public DateTime CreatedAt { get; set;}
   	public DateTime UpdatedAt { get; set;}
 
-  public Compra(string folio, DateTime fecha,Guid? proveedorId, decimal importe) : base()
+  public Compra(string folio, DateTime fecha,Guid? proveedorId, decimal importe,int tipoDocumentoId) : base()
   {
     Folio = Guard.Against.NullOrEmpty(folio, nameof(folio));
     Fecha = Guard.Against.OutOfSQLDateRange(fecha, nameof(fecha));
@@ -46,8 +46,14 @@ public class Compra : EntityBase<Guid>, IAggregateRoot, IRegisterBase
     Id = UuidV7.NewGuid();
     _conceptos = [];
     CreatedAt = DateTime.UtcNow;
-    Status = RegisterStatus.Activo;; // Activo por defecto
-    }
+    Status = RegisterStatus.Activo; // Activo por defecto
+    TipoDocumentoId = Guard.Against.NegativeOrZero(tipoDocumentoId,nameof(tipoDocumentoId));
+  }
+
+  public void UpdateFolio(string newFolio)
+  {
+    Folio = Guard.Against.NullOrEmpty(newFolio, nameof(newFolio));
+  }
 
     public void AddConcepto(CompraConcepto newItem)
   {

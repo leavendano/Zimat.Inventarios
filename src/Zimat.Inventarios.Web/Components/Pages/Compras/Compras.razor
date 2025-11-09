@@ -31,15 +31,17 @@
     <RadzenRow>
         <RadzenColumn SizeMD=12>
             <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
-                            Data="@compras" TItem="CompraDTO" RowSelect="@EditRow">
+                            Data="@compras" TItem="CompraListarDTO" RowSelect="@EditRow">
                 <Columns>
-                    <RadzenDataGridColumn TItem="CompraDTO" Property="Folio" Title="Folio">
+                    <RadzenDataGridColumn TItem="CompraListarDTO" Property="Folio" Title="Folio">
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="CompraDTO" Property="TipoDocumentoId" Title="Tipo">
+                    <RadzenDataGridColumn TItem="CompraListarDTO" Property="TipoDocumentoNombre" Title="Tipo">
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="CompraDTO" Property="Fecha" Title="Fecha">
+                    <RadzenDataGridColumn TItem="CompraListarDTO" Property="Fecha" Title="Fecha">
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="CompraDTO" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
+                    <RadzenDataGridColumn TItem="CompraListarDTO" Property="ProveedorNombre" Title="Proveedor">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="CompraListarDTO" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
                         <Template Context="compra">
 
                             <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
@@ -56,14 +58,14 @@
 </RadzenStack>
 @code {
 
-    protected IEnumerable<CompraDTO>? compras;
+    protected IEnumerable<CompraListarDTO>? compras;
 
-    protected RadzenDataGrid<CompraDTO> grid0 = new();
+    protected RadzenDataGrid<CompraListarDTO> grid0 = new();
     protected override async Task OnInitializedAsync()
     {
 
         await base.OnInitializedAsync();
-        Result<IEnumerable<CompraDTO>> result = await _mediator.Send(new ListComprasQuery(null, null, null, null));
+        Result<IEnumerable<CompraListarDTO>> result = await _mediator.Send(new ListComprasQuery(null, null, null, null));
 
         if (result.IsSuccess)
         {
@@ -79,7 +81,7 @@
         string additionalStyle = "min-width:fit-content;min-height:fit-content;height:fit-content;width:fit-content;border: 1px solid black;";
         options.Style = additionalStyle;
         await DialogService.OpenAsync<AddCompra>("Nueva Compra", null, options);
-        Result<IEnumerable<CompraDTO>> result = await _mediator.Send(new ListComprasQuery(null, null, null, null));
+        Result<IEnumerable<CompraListarDTO>> result = await _mediator.Send(new ListComprasQuery(null, null, null, null));
 
         if (result.IsSuccess)
         {
@@ -90,10 +92,10 @@
 
     }
 
-    protected async Task EditRow(CompraDTO args)
+    protected async Task EditRow(CompraListarDTO args)
     {
         //await DialogService.OpenAsync<EditArticulo>("Edit Articulo", new Dictionary<string, object> { { "Id", args.Id } });
-        Result<IEnumerable<CompraDTO>> result = await _mediator.Send(new ListComprasQuery(null, null, null, null));
+        Result<IEnumerable<CompraListarDTO>> result = await _mediator.Send(new ListComprasQuery(null, null, null, null));
         if (result.IsSuccess)
         {
 
@@ -102,7 +104,7 @@
         }
     }
 
-    protected async Task GridDeleteButtonClick(MouseEventArgs args, CompraDTO compra)
+    protected async Task GridDeleteButtonClick(MouseEventArgs args, CompraListarDTO compra)
     {
         try
         {
@@ -113,7 +115,7 @@
 
                 if (result.IsSuccess)
                 {
-                    Result<IEnumerable<CompraDTO>> result2 = await _mediator.Send(new ListComprasQuery(null, null, null, null));
+                    Result<IEnumerable<CompraListarDTO>> result2 = await _mediator.Send(new ListComprasQuery(null, null, null, null));
                     if (result2.IsSuccess)
                     {
                         compras = result2.Value;
