@@ -101,7 +101,7 @@
     protected bool errorVisible;
     protected string mensajeAlerta = "No se guardó el registro";
     [SupplyParameterFromForm]
-    protected UsuarioForm item {get; set;} = new();
+    protected UsuarioForm item {get; set;} = default!;
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
     private string? NombreUsuario {get; set;}

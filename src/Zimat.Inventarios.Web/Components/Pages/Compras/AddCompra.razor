@@ -239,7 +239,7 @@
 
     protected bool errorVisible;
     [SupplyParameterFromForm]
-    protected CompraViewModel compra { get; set; } = new();
+    protected CompraViewModel compra { get; set; } = default!;
 
     protected IEnumerable<CompraDTO> comprasProveedor {get;set;} = [];
 

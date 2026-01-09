@@ -3,8 +3,8 @@ namespace Zimat.Inventarios.UseCases.Articulos;
 public class ArticuloEditarDTO
 {
   public Guid Id { get; set; }
-  public string? Clave {get; private set;}
-  public string? Descripcion { get; private set;} 
+  public required string Clave {get;  set;}
+  public required string Descripcion { get;  set;} 
   public string? Observaciones { get; set;}
   public string? CodigoBarras { get; set; }
   public Guid UnidadId  { get; set;} 
@@ -26,7 +26,7 @@ public class ArticuloEditarDTO
   public decimal StockMaximo { get; set; } 
   public int StockStatus { get; set; } = 0; // 0: Normal, 1: Bajo, 2: Alto
   
-  public decimal PrecioPublico { get; set; } 
+
   public decimal DescuentoMaximo { get; set;}
   public decimal? CostoUnitario { get; set;}
   public decimal? CostoPromedio { get; set;}

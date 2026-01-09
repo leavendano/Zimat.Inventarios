@@ -52,7 +52,7 @@
     protected bool errorVisible;
     protected string mensajeAlerta = "No se guardo el registro";
     [SupplyParameterFromForm]
-    protected FamiliaDTO item {get; set;} = new();
+    protected FamiliaDTO item {get; set;} = default!;
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
     private string? NombreUsuario {get; set;}

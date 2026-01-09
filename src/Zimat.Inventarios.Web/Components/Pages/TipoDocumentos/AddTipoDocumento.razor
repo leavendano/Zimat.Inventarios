@@ -103,7 +103,7 @@
     protected bool errorVisible;
     protected string mensajeAlerta = "No se guardo el registro";
     [SupplyParameterFromForm]
-    protected TipoDocumentoFormDTO item { get; set; } = new();
+    protected TipoDocumentoFormDTO item { get; set; } = default!;
 
     [Parameter] public EventCallback OnTipoDocumentoCreated { get; set; }
 

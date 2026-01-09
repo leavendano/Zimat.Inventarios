@@ -235,7 +235,7 @@
 
     protected bool errorVisible;
     [SupplyParameterFromForm]
-    protected ArticuloDTO product { get; set; } = new();
+    protected ArticuloDTO product { get; set; } = default!;
 
     int selectedIndex = 0;
     string? UserName = null;

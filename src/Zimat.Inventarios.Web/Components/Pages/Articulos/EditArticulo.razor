@@ -118,69 +118,7 @@
                         </RadzenColumn>
                     </RadzenRow>
                  </RadzenTabsItem>
-                <RadzenTabsItem Text="Precios">
-                    <RadzenRow style="margin-bottom: 1rem">
-                        <RadzenColumn SizeMD="2">
-                            <RadzenLabel Text="%Imp 1" Component="impuesto1" />
-                        </RadzenColumn>
-                        <RadzenColumn SizeMD="2">
-                            <RadzenDropDown @bind-Value="@product!.Impuesto1" Data=@listadoImpuestos 
-                                            AllowClear=false Placeholder="Seleccione una Departamento" style="display: block; width: 100%" Name="DropDownImpuestos" />
-                        </RadzenColumn>
-                        <RadzenColumn SizeMD="2">
-                            <RadzenLabel Text="Precio 1" Component="precio1" />
-                        </RadzenColumn>
-                        <RadzenColumn SizeMD="2">
-                            <RadzenNumeric  TValue="decimal" style="display: block;" Name="precio1" @bind-Value="@product!.Precio1"/>
-                            <RadzenRequiredValidator Component="precio1" Text="El precio es requerido" />
-                        </RadzenColumn>
-                    </RadzenRow>
-                    <RadzenRow style="margin-bottom: 1rem">
-                        <RadzenColumn SizeMD="2">
-                            <RadzenLabel Text="%Imp 2" Component="impuesto2" />
-                        </RadzenColumn>
-                        <RadzenColumn SizeMD="2">
-                            <RadzenNumeric TValue="decimal" style="display: block;" Name="impuesto2" @bind-Value="@product!.Impuesto2" />
-                        </RadzenColumn>
-                        <RadzenColumn SizeMD="2">
-                            <RadzenLabel Text="Precio 2" Component="precio1" />
-                        </RadzenColumn>
-                        <RadzenColumn SizeMD="2">
-                            <RadzenNumeric TValue="decimal" style="display: block;" Name="precio2" @bind-Value="@product!.Precio2" />
-                          
-                        </RadzenColumn>
-                    </RadzenRow>
-                    <RadzenRow style="margin-bottom: 1rem">
-                        <RadzenColumn SizeMD="2">
-                           
-                        </RadzenColumn>
-                        <RadzenColumn SizeMD="2">
-                            
-                        </RadzenColumn>
-                        <RadzenColumn SizeMD="2">
-                            <RadzenLabel Text="Precio 3" Component="precio3" />
-                        </RadzenColumn>
-                        <RadzenColumn SizeMD="2">
-                            <RadzenNumeric TValue="decimal" style="display: block;" Name="precio3" @bind-Value="@product!.Precio3" />
-
-                        </RadzenColumn>
-                    </RadzenRow>
-                    <RadzenRow style="margin-bottom: 1rem">
-                        <RadzenColumn SizeMD="2">
-
-                        </RadzenColumn>
-                        <RadzenColumn SizeMD="2">
-
-                        </RadzenColumn>
-                        <RadzenColumn SizeMD="2">
-                            <RadzenLabel Text="Precio 4" Component="precio4" />
-                        </RadzenColumn>
-                        <RadzenColumn SizeMD="2">
-                            <RadzenNumeric TValue="decimal" style="display: block;" Name="precio4" @bind-Value="@product!.Precio4" />
-
-                        </RadzenColumn>
-                    </RadzenRow>
-                </RadzenTabsItem>
+                
                 <RadzenTabsItem Text="Observaciones">
                     <RadzenColumn Size="12" SizeMD="4">
                     <RadzenCard>
@@ -207,6 +145,7 @@
         public string Clave { get; set; } = "";
         public string Descripcion { get; set; } = "";
         public string? Codigo { get; set; }
+        public string? Observaciones { get; set; }
         public Guid UnidadId { get; set; }
         public string? Marca { get; set; }
         public string? Modelo { get; set; }
@@ -219,15 +158,13 @@
         public bool Series { get; set; }
         public decimal Impuesto1 { get; set; } = 0;
         public decimal Impuesto2 { get; set; } = 0;
-        public decimal Precio1 { get; set; } = 0;
-        public decimal Precio2 { get; set; } = 0;
-        public decimal Precio3 { get; set; } = 0;
-        public decimal Precio4 { get; set; } = 0;
+        public string? ClaveSat { get; set; }
         public DateTime Ultcomp { get; set; }
         public DateTime Ultvent { get; set; }
         public decimal Existencia { get; set; }
-        public decimal Minimo { get; set; }
-        public decimal Maximo { get; set; }
+        public decimal StockMinimo { get; set; }
+        public decimal StockMaximo { get; set; }
+        public decimal DescuentoMaximo { get; set; }
         public decimal Reorden { get; set; }
         public string? RutaImagen { get; set; }
         public decimal UltimoCosto { get; set; }
@@ -254,8 +191,18 @@
             product.Id = result.Value.Id;
             product.Clave = result.Value.Clave;
             product.Descripcion = result.Value.Descripcion;
-            product.Precio1 = result.Value.PrecioPublico;
             product.RutaImagen = result.Value.RutaImagen;
+            product.Codigo = result.Value.CodigoBarras;
+            product.UnidadId = result.Value.UnidadId;
+            product.Marca = result.Value.Marca;
+            product.Modelo = result.Value.Modelo;
+            product.LineaId = result.Value.LineaId;
+            product.FamiliaId = result.Value.FamiliaId;
+            product.CategoriaId = result.Value.CategoriaId;
+            product.DepartamentoId = result.Value.DepartamentoId;
+            product.Impuesto1 = result.Value.Impuesto1;
+            product.Impuesto2 = result.Value.Impuesto2;
+            
         }
 
         var resultUnidades = await _mediator.Send(new ListUnidadesQuery(null, null, null));
@@ -298,7 +245,29 @@
         try
         {
 
-            var result = await _mediator.Send(new UpdateArticuloCommand(product.Id, product.Descripcion, product.Precio1,product.RutaImagen));
+            var result = await _mediator.Send(new UpdateArticuloCommand(
+                product.Id,
+                product.Descripcion,
+                product.Clave,
+                product.Observaciones,
+                product.Codigo,
+                product.UnidadId,
+                product.Marca,
+                product.Modelo,
+                product.LineaId,
+                product.FamiliaId,
+                product.CategoriaId,
+                product.DepartamentoId,
+                product.Ubicacion,
+                product.Series,
+                product.Impuesto1,
+                product.Impuesto2,
+                product.ClaveSat,
+                product.StockMinimo,
+                product.StockMaximo,
+                product.DescuentoMaximo,
+                product.RutaImagen
+                ));
 
             DialogService.Close(product);
         }

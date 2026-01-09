@@ -65,7 +65,7 @@
     }
     protected bool errorVisible;
     [SupplyParameterFromForm]
-    protected ContributorDTO product {get; set;} = new();
+    protected ContributorDTO product {get; set;} = default!;
 
     protected async Task FormSubmit()
     {

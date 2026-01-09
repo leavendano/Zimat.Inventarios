@@ -25,7 +25,14 @@ public static class SeedData
   }
   public static void PopulateTestData(AppDbContext dbContext)
   {
-    Unidad unidadBTO = new Unidad("BTO", "H87");
+    Unidad unidadBTO = new Unidad("BTO", "H87")
+    {
+      Id = new Guid("0198dd1a-c902-7830-486d-f133b0c37137")
+    };
+    Unidad pzaUnidad = new Unidad("PZA", "H87")
+    {
+      Id = new Guid("0198dd1a-ca20-7fea-ff18-35d1e9ac2b59")
+    };
     if (!dbContext.Unidades.Any())
     {
 
@@ -33,7 +40,7 @@ public static class SeedData
       dbContext.Unidades.Add(new Unidad("Servicio", "E48", "Administrador"));
       dbContext.Unidades.Add(new Unidad("Actividad", "ACT", "Administrador"));
       dbContext.Unidades.Add(new Unidad("KGS", "KGM", "Administrador"));
-      dbContext.Unidades.Add(new Unidad("PZA", "H87", "Administrador"));
+      dbContext.Unidades.Add(pzaUnidad);
       GuardaCambios = true;
     }
 
@@ -123,13 +130,28 @@ public static class SeedData
     if (!dbContext.Articulos.Any())
     {
       
-      var IdUnidad = dbContext.Unidades.FirstOrDefault(u => u.Descripcion == "BTO")?.Id ?? unidadBTO.Id;
-      var art1 = new Articulo("10-001", "CEMENTO GRIS TOLTECA BTO 50 / KGS", 211, IdUnidad,"Administrador");
+      var IdUnidad = unidadBTO.Id;
+      var art1 = new Articulo("10-001", "CEMENTO GRIS TOLTECA BTO 50 / KGS", 211, IdUnidad, "Administrador")
+      {
+        Id = new Guid("0198dd1a-caf0-76f7-e84e-cfb02293c70b")
+      };
       dbContext.Articulos.Add(art1);
-      var art2 = new Articulo("10-004", "CEMENTO BLANCO TOLTECA BTO/25 KGS", 201,IdUnidad,"Administrador");
+      var art2 = new Articulo("10-004", "CEMENTO BLANCO TOLTECA BTO/25 KGS", 201, IdUnidad, "Administrador")
+      {
+        Id = new Guid("0198dd1a-cb36-7a59-d595-1d1e7baa94aa")
+      };
       dbContext.Articulos.Add(art2);
-      dbContext.Articulos.Add(new Articulo("10-005", "MORTERO TOLTECA BTO/50 KG.", 195,IdUnidad,"Administrador"));
-      dbContext.Articulos.Add(new Articulo("10-101", "CAL HIDRATADA BTO 25 / KGS", 82,IdUnidad,"Administrador"));
+      var art3 = new Articulo("10-005", "MORTERO TOLTECA BTO/50 KG.", 195, IdUnidad, "Administrador")
+      {
+        Id = new Guid("0198dd1a-cb37-72b5-0919-202100c35a57")
+      };
+      dbContext.Articulos.Add(art3);
+      var art4 = new Articulo("10-101", "CAL HIDRATADA BTO 25 / KGS", 82,IdUnidad,"Administrador")
+      {
+        Id = new Guid("0198dd1a-cb37-71f6-83d1-3b538c661dcd")
+      };
+      dbContext.Articulos.Add(art4);
+      
 
       GuardaCambios = true;
     }
