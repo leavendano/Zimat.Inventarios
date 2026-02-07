@@ -8,8 +8,7 @@ public class ArticuloListarDTO
   public decimal PrecioPublico { get; set; }
   public decimal? UltimoCosto { get; set; }
   public decimal Impuesto1 { get; set; }
-  public Guid UnidadId { get; set; }
-  public string Unidad { get; set; } = string.Empty;
+  
   public decimal StockActual { get; set; } = 0;
   public string? RutaImagen { get; set; }
   public decimal Cantidad { get; set; } = 1;

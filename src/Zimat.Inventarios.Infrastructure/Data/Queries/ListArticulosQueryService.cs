@@ -14,8 +14,8 @@ public class ListArticulosQueryService(AppDbContext _db) : IListArticulosQuerySe
   public async Task<IEnumerable<ArticuloListarDTO>> ListAsync(string? filtro, int? skip, int? take)
   {
     // NOTE: This will fail if testing with EF InMemory provider!
-    var stringBuilder = new StringBuilder(@"SELECT a.id,clave , a.descripcion, a.precio_publico, a.costo_unitario as ultimo_costo, impuesto1, a.unidad_id,
-          u.descripcion as unidad, stock_actual, ruta_imagen, 1 as cantidad  FROM articulos a LEFT JOIN public.unidades u ON u.id = a.unidad_id ");
+    var stringBuilder = new StringBuilder(@"SELECT a.id,clave , a.descripcion, a.precio_publico, a.costo_unitario as ultimo_costo, impuesto1,
+           stock_actual, ruta_imagen, 1 as cantidad  FROM articulos a ");
 
 
     if (!String.IsNullOrEmpty(filtro))

@@ -17,7 +17,7 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "10.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -148,10 +148,6 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("ultima_venta");
 
-                    b.Property<Guid>("UnidadId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("unidad_id");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
@@ -163,16 +159,12 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_articulos");
 
-                    b.HasIndex("UnidadId")
-                        .HasDatabaseName("ix_articulos_unidad_id");
-
                     b.ToTable("articulos", (string)null);
                 });
 
             modelBuilder.Entity("Zimat.Inventarios.Core.ArticuloAggregate.ArticuloUnidad", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
@@ -193,10 +185,6 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("status");
 
-                    b.Property<string>("Unidad")
-                        .HasColumnType("text")
-                        .HasColumnName("unidad");
-
                     b.Property<Guid>("UnidadId")
                         .HasColumnType("uuid")
                         .HasColumnName("unidad_id");
@@ -210,16 +198,16 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnName("user");
 
                     b.HasKey("Id")
-                        .HasName("pk_articulo_unidades");
+                        .HasName("pk_articulo_unidad");
 
                     b.HasIndex("UnidadId")
-                        .HasDatabaseName("ix_articulo_unidades_unidad_id");
+                        .HasDatabaseName("ix_articulo_unidad_unidad_id");
 
                     b.HasIndex("ArticuloId", "UnidadId")
                         .IsUnique()
-                        .HasDatabaseName("ix_articulo_unidades_articulo_id_unidad_id");
+                        .HasDatabaseName("ix_articulo_unidad_articulo_id_unidad_id");
 
-                    b.ToTable("articulo_unidades", (string)null);
+                    b.ToTable("articulo_unidad", (string)null);
                 });
 
             modelBuilder.Entity("Zimat.Inventarios.Core.ArticuloAggregate.Precio", b =>
@@ -264,13 +252,13 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnName("user");
 
                     b.HasKey("Id")
-                        .HasName("pk_precios");
+                        .HasName("pk_precio");
 
                     b.HasIndex("ArticuloUnidadId", "NumeroLista")
                         .IsUnique()
-                        .HasDatabaseName("ix_precios_articulo_unidad_id_numero_lista");
+                        .HasDatabaseName("ix_precio_articulo_unidad_id_numero_lista");
 
-                    b.ToTable("precios", (string)null);
+                    b.ToTable("precio", (string)null);
                 });
 
             modelBuilder.Entity("Zimat.Inventarios.Core.CategoriaAggregate.Categoria", b =>
@@ -606,12 +594,12 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnName("user");
 
                     b.HasKey("Id")
-                        .HasName("pk_compra_conceptos");
+                        .HasName("pk_compra_concepto");
 
                     b.HasIndex("CompraId")
-                        .HasDatabaseName("ix_compra_conceptos_compra_id");
+                        .HasDatabaseName("ix_compra_concepto_compra_id");
 
-                    b.ToTable("compra_conceptos", (string)null);
+                    b.ToTable("compra_concepto", (string)null);
                 });
 
             modelBuilder.Entity("Zimat.Inventarios.Core.DepartamentoAggregate.Departamento", b =>
@@ -1156,49 +1144,41 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnName("venta_id");
 
                     b.HasKey("Id")
-                        .HasName("pk_venta_conceptos");
+                        .HasName("pk_venta_concepto");
 
                     b.HasIndex("VentaId")
-                        .HasDatabaseName("ix_venta_conceptos_venta_id");
+                        .HasDatabaseName("ix_venta_concepto_venta_id");
 
-                    b.ToTable("venta_conceptos", (string)null);
-                });
-
-            modelBuilder.Entity("Zimat.Inventarios.Core.ArticuloAggregate.Articulo", b =>
-                {
-                    b.HasOne("Zimat.Inventarios.Core.UnidadAggregate.Unidad", null)
-                        .WithMany()
-                        .HasForeignKey("UnidadId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_articulos_unidades_unidad_id");
+                    b.ToTable("venta_concepto", (string)null);
                 });
 
             modelBuilder.Entity("Zimat.Inventarios.Core.ArticuloAggregate.ArticuloUnidad", b =>
                 {
                     b.HasOne("Zimat.Inventarios.Core.ArticuloAggregate.Articulo", null)
-                        .WithMany()
+                        .WithMany("ArticuloUnidades")
                         .HasForeignKey("ArticuloId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_articulo_unidades_articulos_articulo_id");
+                        .HasConstraintName("fk_articulo_unidad_articulos_articulo_id");
 
-                    b.HasOne("Zimat.Inventarios.Core.UnidadAggregate.Unidad", null)
+                    b.HasOne("Zimat.Inventarios.Core.UnidadAggregate.Unidad", "Unidad")
                         .WithMany()
                         .HasForeignKey("UnidadId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_articulo_unidades_unidades_unidad_id");
+                        .HasConstraintName("fk_articulo_unidad_unidades_unidad_id");
+
+                    b.Navigation("Unidad");
                 });
 
             modelBuilder.Entity("Zimat.Inventarios.Core.ArticuloAggregate.Precio", b =>
                 {
                     b.HasOne("Zimat.Inventarios.Core.ArticuloAggregate.ArticuloUnidad", null)
-                        .WithMany("Conceptos")
+                        .WithMany("Precios")
                         .HasForeignKey("ArticuloUnidadId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_precios_articulo_unidades_articulo_unidad_id");
+                        .HasConstraintName("fk_precio_articulo_unidad_articulo_unidad_id");
                 });
 
             modelBuilder.Entity("Zimat.Inventarios.Core.CompraAggregate.Compra", b =>
@@ -1217,7 +1197,7 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasForeignKey("CompraId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_compra_conceptos_compras_compra_id");
+                        .HasConstraintName("fk_compra_concepto_compras_compra_id");
                 });
 
             modelBuilder.Entity("Zimat.Inventarios.Core.VentaAggregate.Venta", b =>
@@ -1236,12 +1216,17 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasForeignKey("VentaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_venta_conceptos_ventas_venta_id");
+                        .HasConstraintName("fk_venta_concepto_ventas_venta_id");
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.ArticuloAggregate.Articulo", b =>
+                {
+                    b.Navigation("ArticuloUnidades");
                 });
 
             modelBuilder.Entity("Zimat.Inventarios.Core.ArticuloAggregate.ArticuloUnidad", b =>
                 {
-                    b.Navigation("Conceptos");
+                    b.Navigation("Precios");
                 });
 
             modelBuilder.Entity("Zimat.Inventarios.Core.CompraAggregate.Compra", b =>

@@ -6,15 +6,18 @@ namespace Zimat.Inventarios.Core.ArticuloAggregate;
 
 public class Articulo : EntityBase<Guid>, IAggregateRoot, IRegisterBase
 {
+  private readonly List<ArticuloUnidad> _articuloUnidades = [];
 
+  public IReadOnlyCollection<ArticuloUnidad> ArticuloUnidades => _articuloUnidades.AsReadOnly();
 
-  public Articulo(string clave, string descripcion, decimal precioPublico, Guid unidadId, string? user) : base()
+  public Articulo(string clave, string descripcion, decimal precioPublico, string? user) : base()
   {
     Clave = Guard.Against.NullOrEmpty(clave, nameof(clave));
     Descripcion = Guard.Against.NullOrEmpty(descripcion, nameof(descripcion));
     PrecioPublico = Guard.Against.NegativeOrZero(precioPublico, nameof(precioPublico));
     Id = UuidV7.NewGuid();
-    UnidadId = Guard.Against.NullOrEmpty(unidadId, nameof(unidadId));
+    //AddArticuloUnidad(new ArticuloUnidad(Id, unidadId, 1)); // Agregar la unidad base con factor de conversión 1
+    
     User = user;
     Status = RegisterStatus.Activo; // Activo por defecto
     StockActual = 0;
@@ -27,7 +30,7 @@ public class Articulo : EntityBase<Guid>, IAggregateRoot, IRegisterBase
   public string Descripcion { get; private set;} 
   public string? Observaciones { get; set;}
   public string? CodigoBarras { get; set; }
-  public Guid UnidadId  { get; set;} 
+  
   public string? Marca  { get; set;}
   public string? Modelo  { get; set;}
   public Guid? LineaId  { get; set;} 
@@ -79,6 +82,43 @@ public class Articulo : EntityBase<Guid>, IAggregateRoot, IRegisterBase
       StockStatus = 2; // Alto
     else
       StockStatus = 0; // Normal
+  }
+
+  public void AddArticuloUnidad(ArticuloUnidad newItem)
+  {
+    Guard.Against.Null(newItem, nameof(newItem));
+
+    // Validar que no exista ya una unidad con el mismo UnidadId
+    var existente = _articuloUnidades.FirstOrDefault(x => x.UnidadId == newItem.UnidadId);
+    if (existente != null)
+    {
+      throw new InvalidOperationException($"Ya existe una unidad registrada con el UnidadId {newItem.UnidadId}");
+    }
+
+    _articuloUnidades.Add(newItem);
+  }
+
+  public void UpdateArticuloUnidad(Guid articuloUnidadId, decimal nuevoFactorConversion)
+  {
+    var articuloUnidad = _articuloUnidades.FirstOrDefault(x => x.Id == articuloUnidadId);
+    if (articuloUnidad == null)
+    {
+      throw new InvalidOperationException($"No se encontró ArticuloUnidad con Id {articuloUnidadId}");
+    }
+
+    articuloUnidad.FactorConversion = Guard.Against.NegativeOrZero(nuevoFactorConversion, nameof(nuevoFactorConversion));
+    articuloUnidad.UpdatedAt = DateTime.UtcNow;
+  }
+
+  public void RemoveArticuloUnidad(Guid articuloUnidadId)
+  {
+    var articuloUnidad = _articuloUnidades.FirstOrDefault(x => x.Id == articuloUnidadId);
+    if (articuloUnidad == null)
+    {
+      throw new InvalidOperationException($"No se encontró ArticuloUnidad con Id {articuloUnidadId}");
+    }
+
+    _articuloUnidades.Remove(articuloUnidad);
   }
 
 }

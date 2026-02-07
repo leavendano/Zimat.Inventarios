@@ -84,7 +84,7 @@
                                 <RadzenDropDown @bind-Value="concepto.ArticuloId" Data="@articulos" TextProperty="@nameof(ArticuloDTO.Clave)" ValueProperty="Id"
                                                 AllowClear=false Placeholder="" style="display: block; width: 150px" Name="DropDownArticulo" TValue="Guid"
                                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
-                                    Change="@(args => { var item = articulos!.Where(x => x.Id == (Guid)args).First();concepto!.Descripcion=item.Descripcion;concepto.Unidad = item.Unidad;concepto.UltimoCosto = item.UltimoCosto?? 0m;concepto.Impuesto1=item.Impuesto1;concepto.Clave=item.Clave;})" />
+                                    Change="@(args => { var item = articulos!.Where(x => x.Id == (Guid)args).First();concepto!.Descripcion=item.Descripcion;concepto.UltimoCosto = item.UltimoCosto?? 0m;concepto.Impuesto1=item.Impuesto1;concepto.Clave=item.Clave;})" />
                                 
                             </EditTemplate>
                         </RadzenDataGridColumn>

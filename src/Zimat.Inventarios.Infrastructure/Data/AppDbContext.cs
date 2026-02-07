@@ -28,8 +28,8 @@ public class AppDbContext : DbContext
 
  
   public DbSet<Articulo> Articulos => Set<Articulo>();
-  public DbSet<ArticuloUnidad> ArticuloUnidades => Set<ArticuloUnidad>();
-  public DbSet<Precio> Precios => Set<Precio>();
+  //public DbSet<ArticuloUnidad> ArticuloUnidades => Set<ArticuloUnidad>();
+  //public DbSet<Precio> Precios => Set<Precio>();
   public DbSet<Categoria> Categorias => Set<Categoria>();
   public DbSet<Departamento> Departamentos => Set<Departamento>();
   public DbSet<Familia> Familias => Set<Familia>();
@@ -38,9 +38,9 @@ public class AppDbContext : DbContext
   public DbSet<Proveedor> Proveedores => Set<Proveedor>();
   public DbSet<Cliente> Clientes => Set<Cliente>();
   public DbSet<Compra> Compras => Set<Compra>();
-  public DbSet<CompraConcepto> CompraConceptos => Set<CompraConcepto>();
+  //public DbSet<CompraConcepto> CompraConceptos => Set<CompraConcepto>();
   public DbSet<Venta> Ventas => Set<Venta>();
-  public DbSet<VentaConcepto> VentaConceptos => Set<VentaConcepto>();
+  //public DbSet<VentaConcepto> VentaConceptos => Set<VentaConcepto>();
   public DbSet<Usuario> Usuarios => Set<Usuario>();
   public DbSet<TipoDocumento> TipoDocumentos => Set<TipoDocumento>();
 

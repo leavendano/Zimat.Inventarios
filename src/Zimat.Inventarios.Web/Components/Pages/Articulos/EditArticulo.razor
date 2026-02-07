@@ -71,9 +71,7 @@
                 <RadzenLabel Text="Unidad" Component="unidad" style="width: 100%" />
             </RadzenColumn>
             <RadzenColumn SizeMD="4">
-                <RadzenDropDown @bind-Value="@product!.UnidadId" Data=@listadoUnidades TextProperty="@nameof(UnidadDTO.Descripcion)" ValueProperty="Id"
-                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
-                                AllowClear=false Placeholder="Seleccione una unidad" style="display: block; width: 100%" Name="DropDownUnidad"/>
+                
             </RadzenColumn>
         </RadzenRow>
         
@@ -146,7 +144,6 @@
         public string Descripcion { get; set; } = "";
         public string? Codigo { get; set; }
         public string? Observaciones { get; set; }
-        public Guid UnidadId { get; set; }
         public string? Marca { get; set; }
         public string? Modelo { get; set; }
         public Guid? LineaId { get; set; }
@@ -171,7 +168,7 @@
         public bool Activo { get; set; }
     }
 
-    IEnumerable<UnidadDTO>? listadoUnidades { get; set; }
+    //IEnumerable<UnidadDTO>? listadoUnidades { get; set; }
     IEnumerable<LineaDTO>? listadoLineas { get; set; }
     IEnumerable<FamiliaDTO>? listadoFamilias { get; set; }
     IEnumerable<CategoriaDTO>? listadoCategorias { get; set; }
@@ -193,7 +190,6 @@
             product.Descripcion = result.Value.Descripcion;
             product.RutaImagen = result.Value.RutaImagen;
             product.Codigo = result.Value.CodigoBarras;
-            product.UnidadId = result.Value.UnidadId;
             product.Marca = result.Value.Marca;
             product.Modelo = result.Value.Modelo;
             product.LineaId = result.Value.LineaId;
@@ -205,11 +201,11 @@
             
         }
 
-        var resultUnidades = await _mediator.Send(new ListUnidadesQuery(null, null, null));
+       @*  var resultUnidades = await _mediator.Send(new ListUnidadesQuery(null, null, null));
         if (resultUnidades.IsSuccess)
         {
             listadoUnidades = resultUnidades.Value;
-        }
+        } *@
         var resultLineas = await _mediator.Send(new ListLineasQuery(null, null));
         if (resultLineas.IsSuccess)
         {
@@ -251,7 +247,6 @@
                 product.Clave,
                 product.Observaciones,
                 product.Codigo,
-                product.UnidadId,
                 product.Marca,
                 product.Modelo,
                 product.LineaId,

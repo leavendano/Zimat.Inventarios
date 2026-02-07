@@ -25,7 +25,6 @@ public class GetArticuloHandler(IReadRepository<Articulo> _repository)
           Descripcion = entity.Descripcion,
           Observaciones = entity.Observaciones,
           CodigoBarras = entity.CodigoBarras,
-          UnidadId = entity.UnidadId,
           Marca = entity.Marca,
           Modelo = entity.Modelo,
           LineaId = entity.LineaId,

@@ -3,6 +3,7 @@ using Ardalis.SharedKernel;
 using Zimat.Inventarios.Core.ArticuloAggregate.Events;
 using Zimat.Inventarios.Core.Base;
 using Zimat.Inventarios.Core.CompraAggregate;
+using Zimat.Inventarios.Core.UnidadAggregate;
 
 namespace Zimat.Inventarios.Core.ArticuloAggregate;
 
@@ -10,13 +11,12 @@ public class ArticuloUnidad : EntityBase<Guid>, IRegisterBase
 {
   private readonly List<Precio> _precios;
 
-  public IEnumerable<Precio> Conceptos
-  {
-    get { return _precios; }
-  }
-  public Guid ArticuloId { get; set; }
+  public IReadOnlyCollection<Precio> Precios => _precios.AsReadOnly();
+ 
+    public Guid ArticuloId { get; set; }
     public Guid UnidadId { get; set; }
-    public string? Unidad { get; set; }
+    
+    public virtual Unidad Unidad { get; private set; } = null!;
     public decimal FactorConversion { get; set; }
     public string? User { get; set; }
     public int Status { get; set; }
@@ -36,11 +36,25 @@ public class ArticuloUnidad : EntityBase<Guid>, IRegisterBase
         _precios = [];
      }
 
+    
     public void AddPrecio(Precio newItem)
     {
       Guard.Against.Null(newItem, nameof(newItem));
-      _precios.Add(newItem);
-      var newItemAddedEvent = new NewPrecioAddedEvent(this, newItem);
-      base.RegisterDomainEvent(newItemAddedEvent);
+      var existente = _precios.FirstOrDefault(x => x.NumeroLista == newItem.NumeroLista);
+      if (existente != null)
+      {
+        existente.ImportePrecio = newItem.ImportePrecio;
+        existente.FactorCosto = newItem.FactorCosto;
+        existente.UpdatedAt = DateTime.UtcNow;
+        var precioUpdatedEvent = new PrecioUpdatedEvent(this, existente);
+        base.RegisterDomainEvent(precioUpdatedEvent);
+        return;
+      }
+      else 
+      {
+        _precios.Add(newItem);
+        var newItemAddedEvent = new NewPrecioAddedEvent(this, newItem);
+        base.RegisterDomainEvent(newItemAddedEvent);
+      }
     }
 }

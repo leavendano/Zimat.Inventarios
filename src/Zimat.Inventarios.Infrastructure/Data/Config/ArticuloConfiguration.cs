@@ -14,12 +14,14 @@ public class ArticuloConfiguration : IEntityTypeConfiguration<Articulo>
 
     builder.Property(x => x.Id).HasColumnType("uuid");
 
-    builder.HasOne<Unidad>()
-        .WithMany()
-        .HasForeignKey(x => x.UnidadId)
-        .OnDelete(DeleteBehavior.Restrict)
-        .IsRequired();
-      
+    builder.HasMany(a => a.ArticuloUnidades)
+        .WithOne()
+        .HasForeignKey(au => au.ArticuloId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    builder.Navigation(a => a.ArticuloUnidades)
+        .UsePropertyAccessMode(PropertyAccessMode.Field);
+
   }
 }
 

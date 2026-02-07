@@ -131,22 +131,22 @@ public static class SeedData
     {
       
       var IdUnidad = unidadBTO.Id;
-      var art1 = new Articulo("10-001", "CEMENTO GRIS TOLTECA BTO 50 / KGS", 211, IdUnidad, "Administrador")
+      var art1 = new Articulo("10-001", "CEMENTO GRIS TOLTECA BTO 50 / KGS", 211, "Administrador")
       {
         Id = new Guid("0198dd1a-caf0-76f7-e84e-cfb02293c70b")
       };
       dbContext.Articulos.Add(art1);
-      var art2 = new Articulo("10-004", "CEMENTO BLANCO TOLTECA BTO/25 KGS", 201, IdUnidad, "Administrador")
+      var art2 = new Articulo("10-004", "CEMENTO BLANCO TOLTECA BTO/25 KGS", 201, "Administrador")
       {
         Id = new Guid("0198dd1a-cb36-7a59-d595-1d1e7baa94aa")
       };
       dbContext.Articulos.Add(art2);
-      var art3 = new Articulo("10-005", "MORTERO TOLTECA BTO/50 KG.", 195, IdUnidad, "Administrador")
+      var art3 = new Articulo("10-005", "MORTERO TOLTECA BTO/50 KG.", 195, "Administrador")
       {
         Id = new Guid("0198dd1a-cb37-72b5-0919-202100c35a57")
       };
       dbContext.Articulos.Add(art3);
-      var art4 = new Articulo("10-101", "CAL HIDRATADA BTO 25 / KGS", 82,IdUnidad,"Administrador")
+      var art4 = new Articulo("10-101", "CAL HIDRATADA BTO 25 / KGS", 82,"Administrador")
       {
         Id = new Guid("0198dd1a-cb37-71f6-83d1-3b538c661dcd")
       };

@@ -59,7 +59,11 @@ namespace Zimat.Inventarios.Core.Base;
 
   public static Guid NewGuid()
   {
-    return new UuidV7().Value;
+    #if NET9_0_OR_GREATER
+      return Guid.CreateVersion7();
+    #else
+      return new UuidV7().Value;
+    #endif
   }
 
   public override string ToString() => Value.ToString();

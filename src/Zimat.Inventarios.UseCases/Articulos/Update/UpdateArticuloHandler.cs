@@ -27,7 +27,6 @@ public class UpdateArticuloHandler(IRepository<Articulo> _repository, IEmailSend
     existingArticulo.Impuesto2 = request.Impuesto2;
     existingArticulo.Observaciones = request.Observaciones;
     existingArticulo.CodigoBarras = request.CodigoBarras;
-    existingArticulo.UnidadId = request.UnidadId;
     existingArticulo.Marca = request.Marca;
     existingArticulo.Modelo = request.Modelo;
     existingArticulo.Ubicacion = request.Ubicacion;
@@ -48,6 +47,6 @@ public class UpdateArticuloHandler(IRepository<Articulo> _repository, IEmailSend
 
     return Result.Success(new ArticuloDTO(existingArticulo.Id,
       existingArticulo.Clave, existingArticulo.Descripcion,existingArticulo.PrecioPublico,existingArticulo.CostoUnitario,
-      existingArticulo.Impuesto1,existingArticulo.UnidadId,existingArticulo.RutaImagen));
+      existingArticulo.Impuesto1,existingArticulo.RutaImagen));
   }
 }

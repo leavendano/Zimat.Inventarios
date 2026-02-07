@@ -7,7 +7,6 @@ public class ArticuloEditarDTO
   public required string Descripcion { get;  set;} 
   public string? Observaciones { get; set;}
   public string? CodigoBarras { get; set; }
-  public Guid UnidadId  { get; set;} 
   public string? Marca  { get; set;}
   public string? Modelo  { get; set;}
   public Guid? LineaId  { get; set;} 

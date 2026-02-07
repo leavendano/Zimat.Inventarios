@@ -14,20 +14,23 @@ public class ArticuloUnidadConfiguration : IEntityTypeConfiguration<ArticuloUnid
             .HasPrecision(18, 4) // Precision and scale for decimal
             .IsRequired();
 
-        builder.Property(x => x.Id).HasColumnType("uuid");
+        builder.Property(x => x.Id)
+        .HasColumnType("uuid")
+        .ValueGeneratedNever();
 
-        builder.HasOne<Articulo>()
-            .WithMany()
+         builder.HasOne<Articulo>()
+            .WithMany(a => a.ArticuloUnidades)
             .HasForeignKey(x => x.ArticuloId)
             .OnDelete(DeleteBehavior.Restrict)
-            .IsRequired();
+            .IsRequired(); 
 
-        builder.HasOne<Unidad>()
+       /*  builder.HasOne<Unidad>()
             .WithMany()
             .HasForeignKey(x => x.UnidadId)
+            .HasPrincipalKey(u => u.Id)
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired();
-
+ */
         builder.HasIndex(c => new { c.ArticuloId,c.UnidadId}).IsUnique();
     }
 }

@@ -40,9 +40,12 @@
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="ArticuloListarDTO" Property="PrecioPublico" Title="Precio">
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="ArticuloListarDTO" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
+                    <RadzenDataGridColumn TItem="ArticuloListarDTO" Filterable="false" Sortable="false" Width="140px" TextAlign="TextAlign.Center">
                         <Template Context="articulo">
-
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="assignment" Size="ButtonSize.Medium"
+                                          Shade="Shade.Lighter" Variant="Variant.Flat"
+                                          Click=@(args => UnidadesButtonClick(args, articulo)) @onclick:stopPropagation="true"
+                                          title="Unidades" />
                             <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
                                           Shade="Shade.Lighter" Variant="Variant.Flat"
                                           Click=@(args => GridDeleteButtonClick(args, articulo)) @onclick:stopPropagation="true" />
@@ -98,6 +101,13 @@
             articulos = result.Value;
             await grid0.Reload();
         }
+    }
+
+    protected async Task UnidadesButtonClick(MouseEventArgs args, ArticuloListarDTO articulo)
+    {
+        await DialogService.OpenAsync<ArticuloUnidades>("Unidades del Artículo",
+            new Dictionary<string, object> { { "Id", articulo.Id } },
+            new DialogOptions() { Width = "900px", Height = "600px" });
     }
 
     protected async Task GridDeleteButtonClick(MouseEventArgs args, ArticuloListarDTO articulo)

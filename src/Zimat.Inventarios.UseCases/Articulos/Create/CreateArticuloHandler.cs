@@ -11,7 +11,7 @@ public class CreateArticuloHandler(IRepository<Articulo> _repository)
   public async Task<Result<Guid>> Handle(CreateArticuloCommand request,
     CancellationToken cancellationToken)
   {
-    var newArticulo = new Articulo(request.Clave,request.Descripcion, request.PrecioPublico,request.UnidadId,request.UserName);
+    var newArticulo = new Articulo(request.Clave,request.Descripcion, request.PrecioPublico,request.UserName);
 
     newArticulo.CategoriaId = request.CategoriaId;
     newArticulo.LineaId = request.LineaId;

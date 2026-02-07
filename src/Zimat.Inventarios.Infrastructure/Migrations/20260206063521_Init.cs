@@ -1,16 +1,59 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace Zimat.Inventarios.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Inicial : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "articulos",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    clave = table.Column<string>(type: "text", nullable: false),
+                    descripcion = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    observaciones = table.Column<string>(type: "text", nullable: true),
+                    codigo_barras = table.Column<string>(type: "text", nullable: true),
+                    marca = table.Column<string>(type: "text", nullable: true),
+                    modelo = table.Column<string>(type: "text", nullable: true),
+                    linea_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    familia_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    categoria_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    departamento_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    ubicacion = table.Column<string>(type: "text", nullable: true),
+                    series = table.Column<bool>(type: "boolean", nullable: false),
+                    impuesto1 = table.Column<decimal>(type: "numeric", nullable: false),
+                    impuesto2 = table.Column<decimal>(type: "numeric", nullable: false),
+                    clave_sat = table.Column<string>(type: "text", nullable: true),
+                    ultima_compra = table.Column<Guid>(type: "uuid", nullable: true),
+                    ultima_venta = table.Column<Guid>(type: "uuid", nullable: true),
+                    stock_actual = table.Column<decimal>(type: "numeric", nullable: false),
+                    stock_minimo = table.Column<decimal>(type: "numeric", nullable: false),
+                    stock_maximo = table.Column<decimal>(type: "numeric", nullable: false),
+                    stock_status = table.Column<int>(type: "integer", nullable: false),
+                    precio_publico = table.Column<decimal>(type: "numeric", nullable: false),
+                    descuento_maximo = table.Column<decimal>(type: "numeric", nullable: false),
+                    costo_unitario = table.Column<decimal>(type: "numeric", nullable: true),
+                    costo_promedio = table.Column<decimal>(type: "numeric", nullable: true),
+                    ruta_imagen = table.Column<string>(type: "text", nullable: true),
+                    peso_neto = table.Column<decimal>(type: "numeric", nullable: false),
+                    user = table.Column<string>(type: "text", nullable: true),
+                    status = table.Column<int>(type: "integer", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_articulos", x => x.id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "categorias",
                 columns: table => new
@@ -145,6 +188,28 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "tipo_documentos",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    nombre = table.Column<string>(type: "text", nullable: false),
+                    es_entrada = table.Column<bool>(type: "boolean", nullable: false),
+                    es_salida = table.Column<bool>(type: "boolean", nullable: false),
+                    afecta_inventario = table.Column<bool>(type: "boolean", nullable: false),
+                    afecta_cuentas_por_pagar = table.Column<bool>(type: "boolean", nullable: false),
+                    afecta_cuentas_por_cobrar = table.Column<bool>(type: "boolean", nullable: false),
+                    requiere_proveedor = table.Column<bool>(type: "boolean", nullable: false),
+                    requiere_cliente = table.Column<bool>(type: "boolean", nullable: false),
+                    prefijo = table.Column<string>(type: "text", nullable: false),
+                    ultimo_folio = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_tipo_documentos", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "unidades",
                 columns: table => new
                 {
@@ -261,38 +326,13 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "articulos",
+                name: "articulo_unidad",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    clave = table.Column<string>(type: "text", nullable: false),
-                    descripcion = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    observaciones = table.Column<string>(type: "text", nullable: true),
-                    codigo_barras = table.Column<string>(type: "text", nullable: true),
+                    articulo_id = table.Column<Guid>(type: "uuid", nullable: false),
                     unidad_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    marca = table.Column<string>(type: "text", nullable: true),
-                    modelo = table.Column<string>(type: "text", nullable: true),
-                    linea_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    familia_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    categoria_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    departamento_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    ubicacion = table.Column<string>(type: "text", nullable: true),
-                    series = table.Column<bool>(type: "boolean", nullable: false),
-                    impuesto1 = table.Column<decimal>(type: "numeric", nullable: false),
-                    impuesto2 = table.Column<decimal>(type: "numeric", nullable: false),
-                    clave_sat = table.Column<string>(type: "text", nullable: true),
-                    ultima_compra = table.Column<Guid>(type: "uuid", nullable: true),
-                    ultima_venta = table.Column<Guid>(type: "uuid", nullable: true),
-                    stock_actual = table.Column<decimal>(type: "numeric", nullable: false),
-                    stock_minimo = table.Column<decimal>(type: "numeric", nullable: false),
-                    stock_maximo = table.Column<decimal>(type: "numeric", nullable: false),
-                    stock_status = table.Column<int>(type: "integer", nullable: false),
-                    precio_publico = table.Column<decimal>(type: "numeric", nullable: false),
-                    descuento_maximo = table.Column<decimal>(type: "numeric", nullable: false),
-                    costo_unitario = table.Column<decimal>(type: "numeric", nullable: true),
-                    costo_promedio = table.Column<decimal>(type: "numeric", nullable: true),
-                    ruta_imagen = table.Column<string>(type: "text", nullable: true),
-                    peso_neto = table.Column<decimal>(type: "numeric", nullable: false),
+                    factor_conversion = table.Column<decimal>(type: "numeric(18,4)", precision: 18, scale: 4, nullable: false),
                     user = table.Column<string>(type: "text", nullable: true),
                     status = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -300,17 +340,23 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_articulos", x => x.id);
+                    table.PrimaryKey("pk_articulo_unidad", x => x.id);
                     table.ForeignKey(
-                        name: "fk_articulos_unidades_unidad_id",
+                        name: "fk_articulo_unidad_articulos_articulo_id",
+                        column: x => x.articulo_id,
+                        principalTable: "articulos",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "fk_articulo_unidad_unidades_unidad_id",
                         column: x => x.unidad_id,
                         principalTable: "unidades",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "venta_conceptos",
+                name: "venta_concepto",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -334,9 +380,9 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_venta_conceptos", x => x.id);
+                    table.PrimaryKey("pk_venta_concepto", x => x.id);
                     table.ForeignKey(
-                        name: "fk_venta_conceptos_ventas_venta_id",
+                        name: "fk_venta_concepto_ventas_venta_id",
                         column: x => x.venta_id,
                         principalTable: "ventas",
                         principalColumn: "id",
@@ -344,7 +390,7 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "compra_conceptos",
+                name: "compra_concepto",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -368,9 +414,9 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_compra_conceptos", x => x.id);
+                    table.PrimaryKey("pk_compra_concepto", x => x.id);
                     table.ForeignKey(
-                        name: "fk_compra_conceptos_compras_compra_id",
+                        name: "fk_compra_concepto_compras_compra_id",
                         column: x => x.compra_id,
                         principalTable: "compras",
                         principalColumn: "id",
@@ -378,38 +424,7 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "articulo_unidades",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
-                    articulo_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    unidad_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    unidad = table.Column<string>(type: "text", nullable: true),
-                    factor_conversion = table.Column<decimal>(type: "numeric(18,4)", precision: 18, scale: 4, nullable: false),
-                    user = table.Column<string>(type: "text", nullable: true),
-                    status = table.Column<int>(type: "integer", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_articulo_unidades", x => x.id);
-                    table.ForeignKey(
-                        name: "fk_articulo_unidades_articulos_articulo_id",
-                        column: x => x.articulo_id,
-                        principalTable: "articulos",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "fk_articulo_unidades_unidades_unidad_id",
-                        column: x => x.unidad_id,
-                        principalTable: "unidades",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "precios",
+                name: "precio",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -424,34 +439,29 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_precios", x => x.id);
+                    table.PrimaryKey("pk_precio", x => x.id);
                     table.ForeignKey(
-                        name: "fk_precios_articulo_unidades_articulo_unidad_id",
+                        name: "fk_precio_articulo_unidad_articulo_unidad_id",
                         column: x => x.articulo_unidad_id,
-                        principalTable: "articulo_unidades",
+                        principalTable: "articulo_unidad",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "ix_articulo_unidades_articulo_id_unidad_id",
-                table: "articulo_unidades",
+                name: "ix_articulo_unidad_articulo_id_unidad_id",
+                table: "articulo_unidad",
                 columns: new[] { "articulo_id", "unidad_id" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "ix_articulo_unidades_unidad_id",
-                table: "articulo_unidades",
+                name: "ix_articulo_unidad_unidad_id",
+                table: "articulo_unidad",
                 column: "unidad_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_articulos_unidad_id",
-                table: "articulos",
-                column: "unidad_id");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_compra_conceptos_compra_id",
-                table: "compra_conceptos",
+                name: "ix_compra_concepto_compra_id",
+                table: "compra_concepto",
                 column: "compra_id");
 
             migrationBuilder.CreateIndex(
@@ -460,14 +470,14 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 column: "proveedor_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_precios_articulo_unidad_id_numero_lista",
-                table: "precios",
+                name: "ix_precio_articulo_unidad_id_numero_lista",
+                table: "precio",
                 columns: new[] { "articulo_unidad_id", "numero_lista" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "ix_venta_conceptos_venta_id",
-                table: "venta_conceptos",
+                name: "ix_venta_concepto_venta_id",
+                table: "venta_concepto",
                 column: "venta_id");
 
             migrationBuilder.CreateIndex(
@@ -483,7 +493,7 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 name: "categorias");
 
             migrationBuilder.DropTable(
-                name: "compra_conceptos");
+                name: "compra_concepto");
 
             migrationBuilder.DropTable(
                 name: "departamentos");
@@ -495,19 +505,22 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 name: "lineas");
 
             migrationBuilder.DropTable(
-                name: "precios");
+                name: "precio");
+
+            migrationBuilder.DropTable(
+                name: "tipo_documentos");
 
             migrationBuilder.DropTable(
                 name: "usuarios");
 
             migrationBuilder.DropTable(
-                name: "venta_conceptos");
+                name: "venta_concepto");
 
             migrationBuilder.DropTable(
                 name: "compras");
 
             migrationBuilder.DropTable(
-                name: "articulo_unidades");
+                name: "articulo_unidad");
 
             migrationBuilder.DropTable(
                 name: "ventas");
@@ -519,10 +532,10 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 name: "articulos");
 
             migrationBuilder.DropTable(
-                name: "clientes");
+                name: "unidades");
 
             migrationBuilder.DropTable(
-                name: "unidades");
+                name: "clientes");
         }
     }
 }

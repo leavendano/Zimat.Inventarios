@@ -71,9 +71,9 @@
                 <RadzenLabel Text="Unidad" Component="unidad" style="width: 100%" />
             </RadzenColumn>
             <RadzenColumn SizeMD="4">
-                <RadzenDropDown @bind-Value="@product!.UnidadId" Data=@listadoUnidades TextProperty="@nameof(UnidadDTO.Descripcion)" ValueProperty="Id"
+                @* <RadzenDropDown @bind-Value="@product!.UnidadId" Data=@listadoUnidades TextProperty="@nameof(UnidadDTO.Descripcion)" ValueProperty="Id"
                                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
-                                AllowClear=false Placeholder="Seleccione una unidad" style="display: block; width: 100%" Name="DropDownUnidad"/>
+                                AllowClear=false Placeholder="Seleccione una unidad" style="display: block; width: 100%" Name="DropDownUnidad"/> *@
             </RadzenColumn>
         </RadzenRow>
         
@@ -205,7 +205,7 @@
         public string Clave { get; set; } = "";
         public string? Descripcion { get; set; } 
         public string? Codigo { get; set; }
-        public Guid UnidadId { get; set; }
+       // public Guid UnidadId { get; set; }
         public string? Marca { get; set; }
         public string? Modelo { get; set; }
         public Guid? LineaId { get; set; }
@@ -240,7 +240,7 @@
     int selectedIndex = 0;
     string? UserName = null;
 
-    IEnumerable<UnidadDTO>? listadoUnidades { get; set; }
+    //IEnumerable<UnidadDTO>? listadoUnidades { get; set; }
     IEnumerable<LineaDTO>? listadoLineas { get; set; }
     IEnumerable<FamiliaDTO>? listadoFamilias { get; set; }
     IEnumerable<CategoriaDTO>? listadoCategorias { get; set; }
@@ -254,11 +254,11 @@
         var user = authstate.User;
         UserName = user?.Identity?.Name;
 
-        var resultUnidades = await _mediator.Send(new ListUnidadesQuery(null, null, null));
+        @* var resultUnidades = await _mediator.Send(new ListUnidadesQuery(null, null, null));
         if (resultUnidades.IsSuccess)
         {
             listadoUnidades = resultUnidades.Value;
-        }
+        } *@
         var resultLineas = await _mediator.Send(new ListLineasQuery(null, null));
         if (resultLineas.IsSuccess)
         {
@@ -292,7 +292,7 @@
         try
         {
             //await zimatService.CreateProduct(product);
-            var result = await _mediator.Send(new CreateArticuloCommand(product.Clave!,product.Descripcion!, product.Precio1,product.UnidadId,
+            var result = await _mediator.Send(new CreateArticuloCommand(product.Clave!,product.Descripcion!, product.Precio1,
                    product.CategoriaId,product.LineaId,product.FamiliaId,product.DepartamentoId,UserName));
             DialogService.Close(product);
         }
