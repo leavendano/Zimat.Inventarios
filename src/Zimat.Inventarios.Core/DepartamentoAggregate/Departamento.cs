@@ -4,12 +4,32 @@ using Zimat.Inventarios.Core.Base;
 
 namespace Zimat.Inventarios.Core.DepartamentoAggregate;
 
-public class Departamento(string nombre, string usuario = "ADMINISTRADOR") : EntityBase, IAggregateRoot, IRegisterBase
+public class Departamento : EntityBase<Guid>, IAggregateRoot, IRegisterBase
 {
-  public string Nombre { get; set; } = Guard.Against.NullOrEmpty(nombre, nameof(nombre));
-  public string? Usuario { get; set; } = Guard.Against.NullOrEmpty(usuario, nameof(usuario));
-  public int Estatus { get; set; } = 1;
+
+  public Departamento(string nombre,string user = "Administrador") : base()
+  
+    
+    // Generar un nuevo ID si no se proporciona uno
+  {
+    Nombre = Guard.Against.NullOrEmpty(nombre, nameof(nombre));
+    User = Guard.Against.NullOrEmpty(user, nameof(user));
+    Id = UuidV7.NewGuid();
+    Status = RegisterStatus.Activo; // Activo por defecto
+    CreatedAt = DateTime.UtcNow;
+    UpdatedAt = DateTime.UtcNow;
+  }
+  
+  public string Nombre { get; set; }
+  public string? User { get; set; }
+  public int Status { get; set; }
   public DateTime CreatedAt { get; set; }
   public DateTime UpdatedAt { get; set; }
+
+  public void UpdateNombre(string newNombre)
+  {
+    Nombre = Guard.Against.NullOrEmpty(newNombre, nameof(newNombre));
+    UpdatedAt = DateTime.UtcNow;
+  }
 
 }

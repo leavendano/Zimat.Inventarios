@@ -1,0 +1,125 @@
+@using Zimat.Inventarios.UseCases.Articulos.ArticuloUnidades.Create
+@using Zimat.Inventarios.UseCases.Unidades
+@using Zimat.Inventarios.UseCases.Unidades.List
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+@inject ILogger<AddArticuloUnidad> logger
+@using MediatR
+@inject IMediator _mediator
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
+@attribute [Authorize]
+
+<PageTitle>Agregar Unidad</PageTitle>
+
+<RadzenColumn SizeMD=12>
+    <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">
+        No se puede guardar la unidad
+    </RadzenAlert>
+    <RadzenTemplateForm TItem="ArticuloUnidadCrearDTO" Data="@articuloUnidad" Visible="@(articuloUnidad != null)" Submit="@FormSubmit">
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="4">
+                <RadzenLabel Text="Unidad" Component="unidad" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="8">
+                <RadzenDropDown @bind-Value="@articuloUnidad!.UnidadId" Data=@listadoUnidades TextProperty="@nameof(UnidadDTO.Descripcion)" ValueProperty="Id"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
+                                AllowClear=false Placeholder="Seleccione una unidad" style="display: block; width: 100%" Name="DropDownUnidad" />
+                <RadzenRequiredValidator Component="DropDownUnidad" Text="La unidad es requerida" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="4">
+                <RadzenLabel Text="Factor Conversión" Component="factorConversion" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="8">
+                <RadzenNumeric TValue="decimal" @bind-Value="@articuloUnidad!.FactorConversion" Name="factorConversion"
+                               style="display: block; width: 100%" Min="0" />
+                <RadzenRequiredValidator Component="factorConversion" Text="El factor de conversión es requerido" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Guardar" Variant="Variant.Flat" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancelar" Variant="Variant.Flat" Click="@CancelButtonClick" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenColumn>
+
+@code {
+    [Parameter]
+    public Guid ArticuloId { get; set; }
+
+    protected class ArticuloUnidadCrearDTO
+    {
+        public Guid UnidadId { get; set; }
+        public decimal FactorConversion { get; set; } = 1;
+    }
+
+    protected bool errorVisible;
+    protected ArticuloUnidadCrearDTO articuloUnidad = new();
+    protected string? UserName = null;
+    protected IEnumerable<UnidadDTO>? listadoUnidades { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        UserName = user?.Identity?.Name;
+
+        var resultUnidades = await _mediator.Send(new ListUnidadesQuery(null, null, null));
+        if (resultUnidades.IsSuccess)
+        {
+            listadoUnidades = resultUnidades.Value;
+        }
+    }
+
+    protected async Task FormSubmit()
+    {
+        try
+        {
+            var result = await _mediator.Send(new CreateArticuloUnidadCommand(
+                ArticuloId,
+                articuloUnidad.UnidadId,
+                articuloUnidad.FactorConversion,
+                UserName));
+
+            if (result.IsSuccess)
+            {
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Éxito",
+                    Detail = "Unidad agregada correctamente"
+                });
+                DialogService.Close(articuloUnidad);
+            }
+            else
+            {
+                errorVisible = true;
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = result.Errors.FirstOrDefault() ?? "No se pudo agregar la unidad"
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error al agregar unidad");
+            errorVisible = true;
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Error al agregar la unidad"
+            });
+        }
+    }
+
+    protected async Task CancelButtonClick(MouseEventArgs args)
+    {
+        await Task.Run(() => DialogService.Close(null));
+    }
+}

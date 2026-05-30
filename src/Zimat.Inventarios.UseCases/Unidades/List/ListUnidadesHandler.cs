@@ -6,7 +6,7 @@ public class ListUnidadesHandler(IListUnidadesQueryService _query)  : IQueryHand
 {
   public async Task<Result<IEnumerable<UnidadDTO>>> Handle(ListUnidadesQuery request, CancellationToken cancellationToken)
   {
-    var result = await _query.ListAsync();
+    var result = await _query.ListAsync(request.articuloId, request.Skip, request.Take);
 
     return Result.Success(result);
   }

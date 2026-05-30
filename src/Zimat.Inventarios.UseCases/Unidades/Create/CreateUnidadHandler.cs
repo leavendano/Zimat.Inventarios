@@ -5,9 +5,9 @@ using Zimat.Inventarios.Core.UnidadAggregate;
 
 namespace Zimat.Inventarios.UseCases.Unidades.Create;
 public class CreateUnidadHandler(IRepository<Unidad> _repository)
-  : ICommandHandler<CreateUnidadCommand, Result<int>>
+  : ICommandHandler<CreateUnidadCommand, Result<Guid>>
 {
-  public async Task<Result<int>> Handle(CreateUnidadCommand request,
+  public async Task<Result<Guid>> Handle(CreateUnidadCommand request,
     CancellationToken cancellationToken)
   {
     var newItem = new Unidad(request.Descripcion, request.ClaveSat,request.UserName);

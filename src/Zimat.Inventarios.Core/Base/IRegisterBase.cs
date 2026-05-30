@@ -2,8 +2,8 @@
 
 public interface IRegisterBase
 {
-   public string? Usuario { get; set; }
-  public int Estatus { get; set; }
+   public string? User { get; set; }
+  public int Status { get; set; }
         
   public DateTime CreatedAt { get; set; }
         

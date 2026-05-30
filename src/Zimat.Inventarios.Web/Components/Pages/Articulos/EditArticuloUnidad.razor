@@ -1,0 +1,106 @@
+@using Zimat.Inventarios.UseCases.Articulos.ArticuloUnidades.Update
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+@inject ILogger<EditArticuloUnidad> logger
+@using MediatR
+@inject IMediator _mediator
+@attribute [Authorize]
+
+<PageTitle>Editar Unidad</PageTitle>
+
+<RadzenColumn SizeMD=12>
+    <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">
+        No se puede actualizar la unidad
+    </RadzenAlert>
+    <RadzenTemplateForm TItem="ArticuloUnidadEditarDTO" Data="@articuloUnidad" Visible="@(articuloUnidad != null)" Submit="@FormSubmit">
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="4">
+                <RadzenLabel Text="Factor Conversión" Component="factorConversion" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="8">
+                <RadzenNumeric TValue="decimal" @bind-Value="@articuloUnidad!.FactorConversion" Name="factorConversion"
+                               style="display: block; width: 100%" Min="0" />
+                <RadzenRequiredValidator Component="factorConversion" Text="El factor de conversión es requerido" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Guardar" Variant="Variant.Flat" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancelar" Variant="Variant.Flat" Click="@CancelButtonClick" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenColumn>
+
+@code {
+    [Parameter]
+    public Guid ArticuloId { get; set; }
+
+    [Parameter]
+    public Guid ArticuloUnidadId { get; set; }
+
+    [Parameter]
+    public decimal FactorConversion { get; set; }
+
+    protected class ArticuloUnidadEditarDTO
+    {
+        public decimal FactorConversion { get; set; }
+    }
+
+    protected bool errorVisible;
+    protected ArticuloUnidadEditarDTO articuloUnidad = new();
+
+    protected override Task OnInitializedAsync()
+    {
+        articuloUnidad.FactorConversion = FactorConversion;
+        return base.OnInitializedAsync();
+    }
+
+    protected async Task FormSubmit()
+    {
+        try
+        {
+            var result = await _mediator.Send(new UpdateArticuloUnidadCommand(
+                ArticuloId,
+                ArticuloUnidadId,
+                articuloUnidad.FactorConversion));
+
+            if (result.IsSuccess)
+            {
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Éxito",
+                    Detail = "Unidad actualizada correctamente"
+                });
+                DialogService.Close(articuloUnidad);
+            }
+            else
+            {
+                errorVisible = true;
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = result.Errors.FirstOrDefault() ?? "No se pudo actualizar la unidad"
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error al actualizar unidad");
+            errorVisible = true;
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Error al actualizar la unidad"
+            });
+        }
+    }
+
+    protected async Task CancelButtonClick(MouseEventArgs args)
+    {
+        await Task.Run(() => DialogService.Close(null));
+    }
+}

@@ -1,0 +1,174 @@
+@using Ardalis.Result
+@using Zimat.Inventarios.UseCases.Articulos.Precios
+@using Zimat.Inventarios.UseCases.Articulos.Precios.List
+@using Zimat.Inventarios.UseCases.Articulos.Precios.Delete
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject ILogger<ArticuloPrecios> logger
+@using MediatR
+@inject IMediator _mediator
+@attribute [Authorize]
+
+<PageTitle>Precios de la Unidad</PageTitle>
+<RadzenStack>
+    <RadzenRow AlignItems="AlignItems.Center">
+        <RadzenColumn Size="12" SizeMD="8">
+            @* <RadzenText Text="Precios de la Unidad" TextStyle="TextStyle.H4" TagName="TagName.H2" style="margin: 0" /> *@
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="4">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton Icon="add_circle_outline" Text="Agregar Precio" Click="@AddButtonClick" Variant="Variant.Flat" />
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn SizeMD=12>
+            <RadzenDataGrid @ref="grid0" AllowFiltering="false" FilterMode="FilterMode.Simple" AllowPaging="true" AllowSorting="true"
+                            ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
+                            Data="@precios" TItem="PrecioListarDTO">
+                <Columns>
+                    <RadzenDataGridColumn TItem="PrecioListarDTO" Property="NumeroLista" Title="No. Lista" Width="100px">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="PrecioListarDTO" Property="ImportePrecio" Title="Importe Precio">
+                        <Template Context="precio">
+                            @precio.ImportePrecio.ToString("N2")
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="PrecioListarDTO" Property="FactorCosto" Title="Factor Costo">
+                        <Template Context="precio">
+                            @precio.FactorCosto.ToString("N4")
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="PrecioListarDTO" Property="User" Title="Usuario">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="PrecioListarDTO" Property="UpdatedAt" Title="Última Actualización">
+                        <Template Context="precio">
+                            @precio.UpdatedAt.ToString("dd/MM/yyyy HH:mm")
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="PrecioListarDTO" Filterable="false" Sortable="false" Width="140px" TextAlign="TextAlign.Center">
+                        <Template Context="precio">
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="edit" Size="ButtonSize.Small"
+                                          Shade="Shade.Lighter" Variant="Variant.Flat"
+                                          Click=@(args => EditButtonClick(args, precio)) @onclick:stopPropagation="true" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Small"
+                                          Shade="Shade.Lighter" Variant="Variant.Flat"
+                                          Click=@(args => DeleteButtonClick(args, precio)) @onclick:stopPropagation="true" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public Guid ArticuloId { get; set; }
+
+    [Parameter]
+    public Guid ArticuloUnidadId { get; set; }
+
+    protected IEnumerable<PrecioListarDTO>? precios;
+    protected RadzenDataGrid<PrecioListarDTO> grid0 = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        Result<IEnumerable<PrecioListarDTO>> result = await _mediator.Send(new ListPreciosQuery(ArticuloId, ArticuloUnidadId));
+
+        if (result.IsSuccess)
+        {
+            precios = result.Value;
+        }
+        else
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "No se pudieron cargar los precios"
+            });
+        }
+    }
+
+    protected async Task AddButtonClick(MouseEventArgs args)
+    {
+        await DialogService.OpenAsync<AddArticuloPrecio>("Agregar Precio",
+            new Dictionary<string, object> { { "ArticuloId", ArticuloId }, { "ArticuloUnidadId", ArticuloUnidadId },{"NumeroPrecio", precios?.Count() ?? 0} },
+            new DialogOptions() { Width = "500px", Height = "400px" });
+
+        await LoadData();
+        await grid0.Reload();
+    }
+
+    protected async Task EditButtonClick(MouseEventArgs args, PrecioListarDTO precio)
+    {
+        await DialogService.OpenAsync<EditArticuloPrecio>("Editar Precio",
+            new Dictionary<string, object>
+            {
+                { "ArticuloId", ArticuloId },
+                { "ArticuloUnidadId", ArticuloUnidadId },
+                { "PrecioId", precio.Id },
+                { "ImportePrecio", precio.ImportePrecio },
+                { "FactorCosto", precio.FactorCosto },
+                { "NumeroLista", precio.NumeroLista }
+            },
+            new DialogOptions() { Width = "500px", Height = "400px" });
+
+        await LoadData();
+        await grid0.Reload();
+    }
+
+    protected async Task DeleteButtonClick(MouseEventArgs args, PrecioListarDTO precio)
+    {
+        try
+        {
+            if (await DialogService.Confirm("¿Está seguro de eliminar este precio?") == true)
+            {
+                var result = await _mediator.Send(new DeletePrecioCommand(ArticuloId, ArticuloUnidadId, precio.Id));
+
+                if (result.IsSuccess)
+                {
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Éxito",
+                        Detail = "Precio eliminado correctamente"
+                    });
+
+                    await LoadData();
+                    await grid0.Reload();
+                }
+                else
+                {
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error",
+                        Detail = result.Errors.FirstOrDefault() ?? "No se pudo eliminar el precio"
+                    });
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            logger.LogError(0, e, "Error al eliminar precio");
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Error al eliminar el precio"
+            });
+        }
+    }
+}

@@ -1,0 +1,163 @@
+@page "/add-tipo-documento"
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject ILogger<AddTipoDocumento> logger
+@using MediatR
+@using Zimat.Inventarios.UseCases.TipoDocumentos.Create
+@using Ardalis.Result
+@inject IMediator  _mediator
+@attribute [Authorize]
+
+<PageTitle>Nuevo Tipo de Documento</PageTitle>
+    <RadzenColumn SizeMD=12>
+        <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">@mensajeAlerta</RadzenAlert>
+        <RadzenTemplateForm TItem="TipoDocumentoFormDTO" Data="@item" Visible="@(item != null)" Submit="@FormSubmit">
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Nombre" Component="nombre" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@item!.Nombre" Name="nombre" />
+                    <RadzenRequiredValidator Component="nombre" Text="El Nombre es requerido" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Prefijo" Component="prefijo" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@item!.Prefijo" Name="prefijo" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Último Folio" Component="ultimoFolio" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenNumeric Name="ultimoFolio" @bind-Value="@item!.UltimoFolio" Style="width: 100%;" Min="0" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="6">
+                    <RadzenCheckBox @bind-Value="@item!.EsEntrada" Name="esEntrada" />
+                    <RadzenLabel Text="Es Entrada" Component="esEntrada" style="margin-left: 0.5rem" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="6">
+                    <RadzenCheckBox @bind-Value="@item!.EsSalida" Name="esSalida" />
+                    <RadzenLabel Text="Es Salida" Component="esSalida" style="margin-left: 0.5rem" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="6">
+                    <RadzenCheckBox @bind-Value="@item!.AfectaInventario" Name="afectaInventario" />
+                    <RadzenLabel Text="Afecta Inventario" Component="afectaInventario" style="margin-left: 0.5rem" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="6">
+                    <RadzenCheckBox @bind-Value="@item!.AfectaCuentasPorPagar" Name="afectaCuentasPorPagar" />
+                    <RadzenLabel Text="Afecta Cuentas por Pagar" Component="afectaCuentasPorPagar" style="margin-left: 0.5rem" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="6">
+                    <RadzenCheckBox @bind-Value="@item!.AfectaCuentasPorCobrar" Name="afectaCuentasPorCobrar" />
+                    <RadzenLabel Text="Afecta Cuentas por Cobrar" Component="afectaCuentasPorCobrar" style="margin-left: 0.5rem" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="6">
+                    <RadzenCheckBox @bind-Value="@item!.RequiereProveedor" Name="requiereProveedor" />
+                    <RadzenLabel Text="Requiere Proveedor" Component="requiereProveedor" style="margin-left: 0.5rem" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="6">
+                    <RadzenCheckBox @bind-Value="@item!.RequiereCliente" Name="requiereCliente" />
+                    <RadzenLabel Text="Requiere Cliente" Component="requiereCliente" style="margin-left: 0.5rem" />
+                </RadzenColumn>
+            </RadzenRow>
+          <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                    <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Guardar" Variant="Variant.Flat" />
+                    <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancelar" Variant="Variant.Flat" Click="@CancelButtonClick"  />
+          </RadzenStack>
+        </RadzenTemplateForm>
+    </RadzenColumn>
+
+@code {
+
+    protected class TipoDocumentoFormDTO
+    {
+        public string Nombre { get; set; } = string.Empty;
+        public string Prefijo { get; set; } = string.Empty;
+        public int UltimoFolio { get; set; } = 0;
+        public bool EsEntrada { get; set; } = false;
+        public bool EsSalida { get; set; } = false;
+        public bool AfectaInventario { get; set; } = false;
+        public bool AfectaCuentasPorPagar { get; set; } = false;
+        public bool AfectaCuentasPorCobrar { get; set; } = false;
+        public bool RequiereProveedor { get; set; } = false;
+        public bool RequiereCliente { get; set; } = false;
+    }
+
+    protected bool errorVisible;
+    protected string mensajeAlerta = "No se guardo el registro";
+    [SupplyParameterFromForm]
+    protected TipoDocumentoFormDTO item { get; set; } = default!;
+
+    [Parameter] public EventCallback OnTipoDocumentoCreated { get; set; }
+
+    
+
+    protected async Task FormSubmit()
+    {
+        try
+        {
+            var result = await _mediator.Send(new CreateTipoDocumentoCommand(
+                item.Nombre,
+                item.EsEntrada,
+                item.EsSalida,
+                item.AfectaInventario,
+                item.AfectaCuentasPorPagar,
+                item.AfectaCuentasPorCobrar,
+                item.RequiereProveedor,
+                item.RequiereCliente,
+                item.UltimoFolio,
+                item.Prefijo
+            ));
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Tipo de documento creado",
+                Detail = "El tipo de documento se ha creado correctamente",
+                Duration = 4000
+            });
+            errorVisible = false;
+
+            if (OnTipoDocumentoCreated.HasDelegate)
+            {
+                await OnTipoDocumentoCreated.InvokeAsync();
+            }
+
+            DialogService.Close(item);
+        }
+        catch (Exception e)
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error al crear el tipo de documento",
+                Detail = e.Message,
+                Duration = 4000
+            });
+            mensajeAlerta = $"Error: {e.Message}";
+            errorVisible = true;
+            logger.LogError(e, "Error al crear el tipo de documento");
+        }
+    }
+
+    protected async Task CancelButtonClick(MouseEventArgs args)
+    {
+        await Task.Run(() => DialogService.Close(null));
+    }
+}

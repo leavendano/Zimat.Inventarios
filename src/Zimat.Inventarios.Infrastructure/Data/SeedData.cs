@@ -7,6 +7,8 @@ using Zimat.Inventarios.Core.LineaAggregate;
 using Zimat.Inventarios.Core.FamiliaAggregate;
 using Zimat.Inventarios.Core.CategoriaAggregate;
 using Zimat.Inventarios.Core.DepartamentoAggregate;
+using Zimat.Inventarios.Core.ClienteAggregate;
+using Zimat.Inventarios.Core.UsuarioAggregate;
 namespace Zimat.Inventarios.Infrastructure.Data;
 
 public static class SeedData
@@ -23,14 +25,22 @@ public static class SeedData
   }
   public static void PopulateTestData(AppDbContext dbContext)
   {
+    Unidad unidadBTO = new Unidad("BTO", "H87")
+    {
+      Id = new Guid("0198dd1a-c902-7830-486d-f133b0c37137")
+    };
+    Unidad pzaUnidad = new Unidad("PZA", "H87")
+    {
+      Id = new Guid("0198dd1a-ca20-7fea-ff18-35d1e9ac2b59")
+    };
     if (!dbContext.Unidades.Any())
     {
 
-      dbContext.Unidades.Add(new Unidad("BTO", "H87"));
-      dbContext.Unidades.Add(new Unidad("Servicio", "E48"));
-      dbContext.Unidades.Add(new Unidad("Actividad", "ACT"));
-      dbContext.Unidades.Add(new Unidad("KGS", "KGM"));
-      dbContext.Unidades.Add(new Unidad("PZA", "H87"));
+      dbContext.Unidades.Add(unidadBTO);
+      dbContext.Unidades.Add(new Unidad("Servicio", "E48", "Administrador"));
+      dbContext.Unidades.Add(new Unidad("Actividad", "ACT", "Administrador"));
+      dbContext.Unidades.Add(new Unidad("KGS", "KGM", "Administrador"));
+      dbContext.Unidades.Add(pzaUnidad);
       GuardaCambios = true;
     }
 
@@ -45,13 +55,36 @@ public static class SeedData
       GuardaCambios = true;
     }
 
+
+    if (!dbContext.Clientes.Any())
+    {
+
+      dbContext.Clientes.Add(new Cliente("0", "PUBLICO EN GENERAL", "XAXX010101000", "71980"));
+      dbContext.Clientes.Add(new Cliente("408", "RODOLFO LUJAN RUIZ", "LURR720417KNA", "70934"));
+      dbContext.Clientes.Add(new Cliente("15928", "EDILBERTO MENDOZA", "XAXX010101000", "71980"));
+      dbContext.Clientes.Add(new Cliente("18482", "SILVANO CORTES CRUZ", "XAXX010101000", "71980"));
+
+      GuardaCambios = true;
+    }
+
+    if (!dbContext.Clientes.Any())
+    {
+
+      dbContext.Usuarios.Add(new Usuario("HDH", "Hilda Díaz Hernández", "zimat.mostrador1@gmail.com", "2",true));
+      dbContext.Usuarios.Add(new Usuario("JJC", "Jose Luis Jimenez Carbajal", "zimat.mostrador1@gmail.com", "12",true));
+      dbContext.Usuarios.Add(new Usuario("HZG", "Homero Ziga Gopar", "gerencia.general@zimat-concretos.com", "1",false));
+      dbContext.Usuarios.Add(new Usuario("AOV", "Adriana Olivera Vásquez", "zimatfacturacion@gmail.com", "2",true));
+
+      GuardaCambios = true;
+    }
+
     if (!dbContext.Lineas.Any())
     {
 
-      dbContext.Lineas.Add(new Linea("POLVOS Y PRODUCTOS DE CONCRETO"));
-      dbContext.Lineas.Add(new Linea("ACEROS"));
-      dbContext.Lineas.Add(new Linea("LAMINA, TEJAS Y  ACCESORIOS"));
-      dbContext.Lineas.Add(new Linea("SANITARIOS"));
+      dbContext.Lineas.Add(new Linea("POLVOS Y PRODUCTOS DE CONCRETO",0,"Administrador"));
+      dbContext.Lineas.Add(new Linea("ACEROS",0,"Administrador"));
+      dbContext.Lineas.Add(new Linea("LAMINA, TEJAS Y  ACCESORIOS",0,"Administrador"));
+      dbContext.Lineas.Add(new Linea("SANITARIOS",0,"Administrador"));
 
 
       GuardaCambios = true;
@@ -60,10 +93,10 @@ public static class SeedData
     if (!dbContext.Familias.Any())
     {
 
-      dbContext.Familias.Add(new Familia("CEMEX"));
-      dbContext.Familias.Add(new Familia("MEXALIT"));
-      dbContext.Familias.Add(new Familia("DEACERO"));
-      dbContext.Familias.Add(new Familia("CERAMAT"));
+      dbContext.Familias.Add(new Familia("CEMEX",0,"Administrador"));
+      dbContext.Familias.Add(new Familia("MEXALIT",0,"Administrador"));
+      dbContext.Familias.Add(new Familia("DEACERO",0,"Administrador"));
+      dbContext.Familias.Add(new Familia("CERAMAT",0,"Administrador"));
 
 
       GuardaCambios = true;
@@ -73,10 +106,10 @@ public static class SeedData
     if (!dbContext.Categorias.Any())
     {
 
-      dbContext.Categorias.Add(new Categoria("POLVOS"));
-      dbContext.Categorias.Add(new Categoria("ACEROS"));
-      dbContext.Categorias.Add(new Categoria("RECUBRIMIENTOS"));
-      dbContext.Categorias.Add(new Categoria("TECHADOS"));
+      dbContext.Categorias.Add(new Categoria("POLVOS",0,"Administrador"));
+      dbContext.Categorias.Add(new Categoria("ACEROS",0,"Administrador"));
+      dbContext.Categorias.Add(new Categoria("RECUBRIMIENTOS",0,"Administrador"));
+      dbContext.Categorias.Add(new Categoria("TECHADOS",0,"Administrador"));
 
 
       GuardaCambios = true;
@@ -84,10 +117,10 @@ public static class SeedData
     if (!dbContext.Departamentos.Any())
     {
 
-      dbContext.Departamentos.Add(new Departamento("PINTURAS , SELLADOR Y DESOXIDA"));
-      dbContext.Departamentos.Add(new Departamento("PRODUCTOS AIRE Y EQUIPOS"));
-      dbContext.Departamentos.Add(new Departamento("PRODUCTOS ALAFLEX"));
-      dbContext.Departamentos.Add(new Departamento("PRODUCTOS ALLAPSA"));
+      dbContext.Departamentos.Add(new Departamento("PINTURAS , SELLADOR Y DESOXIDA","Administrador"));
+      dbContext.Departamentos.Add(new Departamento("PRODUCTOS AIRE Y EQUIPOS","Administrador"));
+      dbContext.Departamentos.Add(new Departamento("PRODUCTOS ALAFLEX","Administrador"));
+      dbContext.Departamentos.Add(new Departamento("PRODUCTOS ALLAPSA","Administrador"));
 
 
       GuardaCambios = true;
@@ -97,13 +130,28 @@ public static class SeedData
     if (!dbContext.Articulos.Any())
     {
       
-      
-      var art1 = new Articulo("10-001", "CEMENTO GRIS TOLTECA BTO 50 / KGS", 211,1,"Administrador");
+      var IdUnidad = unidadBTO.Id;
+      var art1 = new Articulo("10-001", "CEMENTO GRIS TOLTECA BTO 50 / KGS", 211, "Administrador")
+      {
+        Id = new Guid("0198dd1a-caf0-76f7-e84e-cfb02293c70b")
+      };
       dbContext.Articulos.Add(art1);
-      var art2 = new Articulo("10-004", "CEMENTO BLANCO TOLTECA BTO/25 KGS", 201,1,"Administrador");
+      var art2 = new Articulo("10-004", "CEMENTO BLANCO TOLTECA BTO/25 KGS", 201, "Administrador")
+      {
+        Id = new Guid("0198dd1a-cb36-7a59-d595-1d1e7baa94aa")
+      };
       dbContext.Articulos.Add(art2);
-      dbContext.Articulos.Add(new Articulo("10-005", "MORTERO TOLTECA BTO/50 KG.", 195,1,"Administrador"));
-      dbContext.Articulos.Add(new Articulo("10-101", "CAL HIDRATADA BTO 25 / KGS", 82,1,"Administrador"));
+      var art3 = new Articulo("10-005", "MORTERO TOLTECA BTO/50 KG.", 195, "Administrador")
+      {
+        Id = new Guid("0198dd1a-cb37-72b5-0919-202100c35a57")
+      };
+      dbContext.Articulos.Add(art3);
+      var art4 = new Articulo("10-101", "CAL HIDRATADA BTO 25 / KGS", 82,"Administrador")
+      {
+        Id = new Guid("0198dd1a-cb37-71f6-83d1-3b538c661dcd")
+      };
+      dbContext.Articulos.Add(art4);
+      
 
       GuardaCambios = true;
     }

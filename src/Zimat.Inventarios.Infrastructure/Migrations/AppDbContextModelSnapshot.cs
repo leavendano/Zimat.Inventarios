@@ -17,7 +17,7 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "10.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -29,12 +29,8 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<bool>("Activo")
-                        .HasColumnType("boolean")
-                        .HasColumnName("activo");
-
-                    b.Property<int?>("CategoriaId")
-                        .HasColumnType("integer")
+                    b.Property<Guid?>("CategoriaId")
+                        .HasColumnType("uuid")
                         .HasColumnName("categoria_id");
 
                     b.Property<string>("Clave")
@@ -42,16 +38,28 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("clave");
 
-                    b.Property<string>("Codigo")
+                    b.Property<string>("ClaveSat")
                         .HasColumnType("text")
-                        .HasColumnName("codigo");
+                        .HasColumnName("clave_sat");
+
+                    b.Property<string>("CodigoBarras")
+                        .HasColumnType("text")
+                        .HasColumnName("codigo_barras");
+
+                    b.Property<decimal?>("CostoPromedio")
+                        .HasColumnType("numeric")
+                        .HasColumnName("costo_promedio");
+
+                    b.Property<decimal?>("CostoUnitario")
+                        .HasColumnType("numeric")
+                        .HasColumnName("costo_unitario");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<int?>("DepartamentoId")
-                        .HasColumnType("integer")
+                    b.Property<Guid?>("DepartamentoId")
+                        .HasColumnType("uuid")
                         .HasColumnName("departamento_id");
 
                     b.Property<string>("Descripcion")
@@ -64,16 +72,8 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("descuento_maximo");
 
-                    b.Property<int>("Estatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("estatus");
-
-                    b.Property<decimal>("Existencia")
-                        .HasColumnType("numeric")
-                        .HasColumnName("existencia");
-
-                    b.Property<int?>("FamiliaId")
-                        .HasColumnType("integer")
+                    b.Property<Guid?>("FamiliaId")
+                        .HasColumnType("uuid")
                         .HasColumnName("familia_id");
 
                     b.Property<decimal>("Impuesto1")
@@ -84,65 +84,77 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("impuesto2");
 
-                    b.Property<int?>("LineaId")
-                        .HasColumnType("integer")
+                    b.Property<Guid?>("LineaId")
+                        .HasColumnType("uuid")
                         .HasColumnName("linea_id");
 
                     b.Property<string>("Marca")
                         .HasColumnType("text")
                         .HasColumnName("marca");
 
-                    b.Property<decimal>("Maximo")
-                        .HasColumnType("numeric")
-                        .HasColumnName("maximo");
-
-                    b.Property<decimal>("Minimo")
-                        .HasColumnType("numeric")
-                        .HasColumnName("minimo");
-
                     b.Property<string>("Modelo")
                         .HasColumnType("text")
                         .HasColumnName("modelo");
+
+                    b.Property<string>("Observaciones")
+                        .HasColumnType("text")
+                        .HasColumnName("observaciones");
+
+                    b.Property<decimal>("PesoNeto")
+                        .HasColumnType("numeric")
+                        .HasColumnName("peso_neto");
 
                     b.Property<decimal>("PrecioPublico")
                         .HasColumnType("numeric")
                         .HasColumnName("precio_publico");
 
-                    b.Property<decimal>("Reorden")
-                        .HasColumnType("numeric")
-                        .HasColumnName("reorden");
+                    b.Property<string>("RutaImagen")
+                        .HasColumnType("text")
+                        .HasColumnName("ruta_imagen");
 
                     b.Property<bool>("Series")
                         .HasColumnType("boolean")
                         .HasColumnName("series");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<decimal>("StockActual")
+                        .HasColumnType("numeric")
+                        .HasColumnName("stock_actual");
+
+                    b.Property<decimal>("StockMaximo")
+                        .HasColumnType("numeric")
+                        .HasColumnName("stock_maximo");
+
+                    b.Property<decimal>("StockMinimo")
+                        .HasColumnType("numeric")
+                        .HasColumnName("stock_minimo");
+
+                    b.Property<int>("StockStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("stock_status");
+
                     b.Property<string>("Ubicacion")
                         .HasColumnType("text")
                         .HasColumnName("ubicacion");
 
-                    b.Property<DateTime?>("UltimaCompra")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<Guid?>("UltimaCompra")
+                        .HasColumnType("uuid")
                         .HasColumnName("ultima_compra");
 
-                    b.Property<DateTime?>("UltimaVenta")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<Guid?>("UltimaVenta")
+                        .HasColumnType("uuid")
                         .HasColumnName("ultima_venta");
-
-                    b.Property<decimal?>("UltimoCosto")
-                        .HasColumnType("numeric")
-                        .HasColumnName("ultimo_costo");
-
-                    b.Property<int>("UnidadId")
-                        .HasColumnType("integer")
-                        .HasColumnName("unidad_id");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<string>("Usuario")
+                    b.Property<string>("User")
                         .HasColumnType("text")
-                        .HasColumnName("usuario");
+                        .HasColumnName("user");
 
                     b.HasKey("Id")
                         .HasName("pk_articulos");
@@ -150,14 +162,110 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     b.ToTable("articulos", (string)null);
                 });
 
-            modelBuilder.Entity("Zimat.Inventarios.Core.CategoriaAggregate.Categoria", b =>
+            modelBuilder.Entity("Zimat.Inventarios.Core.ArticuloAggregate.ArticuloUnidad", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<Guid>("ArticuloId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("articulo_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<decimal>("FactorConversion")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)")
+                        .HasColumnName("factor_conversion");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<Guid>("UnidadId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("unidad_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("User")
+                        .HasColumnType("text")
+                        .HasColumnName("user");
+
+                    b.HasKey("Id")
+                        .HasName("pk_articulo_unidades");
+
+                    b.HasIndex("UnidadId")
+                        .HasDatabaseName("ix_articulo_unidades_unidad_id");
+
+                    b.HasIndex("ArticuloId", "UnidadId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_articulo_unidades_articulo_id_unidad_id");
+
+                    b.ToTable("articulo_unidades", (string)null);
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.ArticuloAggregate.Precio", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("ArticuloUnidadId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("articulo_unidad_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<decimal>("FactorCosto")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("numeric(18,6)")
+                        .HasColumnName("factor_costo");
+
+                    b.Property<decimal>("ImportePrecio")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)")
+                        .HasColumnName("importe_precio");
+
+                    b.Property<int>("NumeroLista")
+                        .HasColumnType("integer")
+                        .HasColumnName("numero_lista");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("User")
+                        .HasColumnType("text")
+                        .HasColumnName("user");
+
+                    b.HasKey("Id")
+                        .HasName("pk_precios");
+
+                    b.HasIndex("ArticuloUnidadId", "NumeroLista")
+                        .IsUnique()
+                        .HasDatabaseName("ix_precios_articulo_unidad_id_numero_lista");
+
+                    b.ToTable("precios", (string)null);
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.CategoriaAggregate.Categoria", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -168,21 +276,21 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("descripcion");
 
-                    b.Property<int>("Estatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("estatus");
-
                     b.Property<decimal>("Margen")
                         .HasColumnType("numeric")
                         .HasColumnName("margen");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<string>("Usuario")
+                    b.Property<string>("User")
                         .HasColumnType("text")
-                        .HasColumnName("usuario");
+                        .HasColumnName("user");
 
                     b.HasKey("Id")
                         .HasName("pk_categorias");
@@ -190,43 +298,120 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     b.ToTable("categorias", (string)null);
                 });
 
-            modelBuilder.Entity("Zimat.Inventarios.Core.DepartamentoAggregate.Departamento", b =>
+            modelBuilder.Entity("Zimat.Inventarios.Core.ClienteAggregate.Cliente", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<string>("Calle")
+                        .HasColumnType("text")
+                        .HasColumnName("calle");
+
+                    b.Property<string>("Ciudad")
+                        .HasColumnType("text")
+                        .HasColumnName("ciudad");
+
+                    b.Property<string>("Clave")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("clave");
+
+                    b.Property<string>("CodigoPostal")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("codigo_postal");
+
+                    b.Property<string>("Colonia")
+                        .HasColumnType("text")
+                        .HasColumnName("colonia");
+
+                    b.Property<string>("ContactoPago")
+                        .HasColumnType("text")
+                        .HasColumnName("contacto_pago");
+
+                    b.Property<string>("ContactoVentas")
+                        .HasColumnType("text")
+                        .HasColumnName("contacto_ventas");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<int>("Estatus")
+                    b.Property<int>("DiasCredito")
                         .HasColumnType("integer")
-                        .HasColumnName("estatus");
+                        .HasColumnName("dias_credito");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text")
+                        .HasColumnName("email");
+
+                    b.Property<string>("Estado")
+                        .HasColumnType("text")
+                        .HasColumnName("estado");
+
+                    b.Property<decimal>("LimiteCredito")
+                        .HasColumnType("numeric")
+                        .HasColumnName("limite_credito");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("nombre");
 
+                    b.Property<string>("NumeroExterior")
+                        .HasColumnType("text")
+                        .HasColumnName("numero_exterior");
+
+                    b.Property<string>("Observaciones")
+                        .HasColumnType("text")
+                        .HasColumnName("observaciones");
+
+                    b.Property<string>("Pais")
+                        .HasColumnType("text")
+                        .HasColumnName("pais");
+
+                    b.Property<string>("RegimenFiscal")
+                        .HasColumnType("text")
+                        .HasColumnName("regimen_fiscal");
+
+                    b.Property<string>("Rfc")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("rfc");
+
+                    b.Property<decimal>("Saldo")
+                        .HasColumnType("numeric")
+                        .HasColumnName("saldo");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<string>("Telefono")
+                        .HasColumnType("text")
+                        .HasColumnName("telefono");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<string>("Usuario")
+                    b.Property<string>("User")
                         .HasColumnType("text")
-                        .HasColumnName("usuario");
+                        .HasColumnName("user");
+
+                    b.Property<string>("UsoCfdi")
+                        .HasColumnType("text")
+                        .HasColumnName("uso_cfdi");
 
                     b.HasKey("Id")
-                        .HasName("pk_departamentos");
+                        .HasName("pk_clientes");
 
-                    b.ToTable("departamentos", (string)null);
+                    b.ToTable("clientes", (string)null);
                 });
 
-            modelBuilder.Entity("Zimat.Inventarios.Core.DocumentoAggregate.Documento", b =>
+            modelBuilder.Entity("Zimat.Inventarios.Core.CompraAggregate.Compra", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -236,10 +421,6 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     b.Property<int?>("AlmacenId")
                         .HasColumnType("integer")
                         .HasColumnName("almacen_id");
-
-                    b.Property<int?>("ClienteId")
-                        .HasColumnType("integer")
-                        .HasColumnName("cliente_id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -257,10 +438,6 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     b.Property<Guid?>("DocumentoRelacionadoId")
                         .HasColumnType("uuid")
                         .HasColumnName("documento_relacionado_id");
-
-                    b.Property<int>("Estatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("estatus");
 
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("timestamp with time zone")
@@ -299,8 +476,8 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("pagado");
 
-                    b.Property<int?>("ProveedorId")
-                        .HasColumnType("integer")
+                    b.Property<Guid?>("ProveedorId")
+                        .HasColumnType("uuid")
                         .HasColumnName("proveedor_id");
 
                     b.Property<string>("Referencia")
@@ -310,6 +487,10 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     b.Property<decimal>("SaldoAnticipo")
                         .HasColumnType("numeric")
                         .HasColumnName("saldo_anticipo");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
 
                     b.Property<decimal>("TipoCambio")
                         .HasColumnType("numeric")
@@ -323,17 +504,20 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<string>("Usuario")
+                    b.Property<string>("User")
                         .HasColumnType("text")
-                        .HasColumnName("usuario");
+                        .HasColumnName("user");
 
                     b.HasKey("Id")
-                        .HasName("pk_documentos");
+                        .HasName("pk_compras");
 
-                    b.ToTable("documentos", (string)null);
+                    b.HasIndex("ProveedorId")
+                        .HasDatabaseName("ix_compras_proveedor_id");
+
+                    b.ToTable("compras", (string)null);
                 });
 
-            modelBuilder.Entity("Zimat.Inventarios.Core.DocumentoAggregate.DocumentoConcepto", b =>
+            modelBuilder.Entity("Zimat.Inventarios.Core.CompraAggregate.CompraConcepto", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -347,6 +531,10 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     b.Property<decimal>("Cantidad")
                         .HasColumnType("numeric")
                         .HasColumnName("cantidad");
+
+                    b.Property<Guid>("CompraId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("compra_id");
 
                     b.Property<decimal>("Costo")
                         .HasColumnType("numeric")
@@ -367,14 +555,6 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     b.Property<decimal>("Devueltos")
                         .HasColumnType("numeric")
                         .HasColumnName("devueltos");
-
-                    b.Property<Guid>("DocumentoId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("documento_id");
-
-                    b.Property<int>("Estatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("estatus");
 
                     b.Property<decimal>("Importe")
                         .HasColumnType("numeric")
@@ -400,31 +580,67 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("precio");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<string>("Usuario")
+                    b.Property<string>("User")
                         .HasColumnType("text")
-                        .HasColumnName("usuario");
+                        .HasColumnName("user");
 
                     b.HasKey("Id")
-                        .HasName("pk_documento_conceptos");
+                        .HasName("pk_compra_concepto");
 
-                    b.HasIndex("DocumentoId")
-                        .HasDatabaseName("ix_documento_conceptos_documento_id");
+                    b.HasIndex("CompraId")
+                        .HasDatabaseName("ix_compra_concepto_compra_id");
 
-                    b.ToTable("documento_conceptos", (string)null);
+                    b.ToTable("compra_concepto", (string)null);
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.DepartamentoAggregate.Departamento", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("nombre");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("User")
+                        .HasColumnType("text")
+                        .HasColumnName("user");
+
+                    b.HasKey("Id")
+                        .HasName("pk_departamentos");
+
+                    b.ToTable("departamentos", (string)null);
                 });
 
             modelBuilder.Entity("Zimat.Inventarios.Core.FamiliaAggregate.Familia", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -435,21 +651,21 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("descripcion");
 
-                    b.Property<int>("Estatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("estatus");
-
                     b.Property<decimal>("Margen")
                         .HasColumnType("numeric")
                         .HasColumnName("margen");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<string>("Usuario")
+                    b.Property<string>("User")
                         .HasColumnType("text")
-                        .HasColumnName("usuario");
+                        .HasColumnName("user");
 
                     b.HasKey("Id")
                         .HasName("pk_familias");
@@ -457,14 +673,78 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     b.ToTable("familias", (string)null);
                 });
 
-            modelBuilder.Entity("Zimat.Inventarios.Core.LineaAggregate.Linea", b =>
+            modelBuilder.Entity("Zimat.Inventarios.Core.KardexAggregate.Kardex", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<int>("AlmacenId")
+                        .HasColumnType("integer")
+                        .HasColumnName("almacen_id");
+
+                    b.Property<Guid>("ArticuloId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("articulo_id");
+
+                    b.Property<decimal>("Cantidad")
+                        .HasColumnType("numeric")
+                        .HasColumnName("cantidad");
+
+                    b.Property<decimal>("CostoTotal")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("numeric(18,6)")
+                        .HasColumnName("costo_total");
+
+                    b.Property<decimal>("CostoUnitario")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("numeric(18,6)")
+                        .HasColumnName("costo_unitario");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha");
+
+                    b.Property<Guid?>("ReferenciaId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("referencia_id");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<int>("TipoMovimiento")
+                        .HasColumnType("integer")
+                        .HasColumnName("tipo_movimiento");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("User")
+                        .HasColumnType("text")
+                        .HasColumnName("user");
+
+                    b.HasKey("Id")
+                        .HasName("pk_kardexes");
+
+                    b.HasIndex("ArticuloId")
+                        .HasDatabaseName("ix_kardexes_articulo_id");
+
+                    b.ToTable("kardexes", (string)null);
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.LineaAggregate.Linea", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -475,21 +755,21 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("descripcion");
 
-                    b.Property<int>("Estatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("estatus");
-
                     b.Property<decimal>("Margen")
                         .HasColumnType("numeric")
                         .HasColumnName("margen");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<string>("Usuario")
+                    b.Property<string>("User")
                         .HasColumnType("text")
-                        .HasColumnName("usuario");
+                        .HasColumnName("user");
 
                     b.HasKey("Id")
                         .HasName("pk_lineas");
@@ -497,14 +777,46 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     b.ToTable("lineas", (string)null);
                 });
 
-            modelBuilder.Entity("Zimat.Inventarios.Core.ProveedorAggregate.Proveedor", b =>
+            modelBuilder.Entity("Zimat.Inventarios.Core.MarcaAggregate.Marca", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("descripcion");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("User")
+                        .HasColumnType("text")
+                        .HasColumnName("user");
+
+                    b.HasKey("Id")
+                        .HasName("pk_marcas");
+
+                    b.ToTable("marcas", (string)null);
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.ProveedorAggregate.Proveedor", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("Calle")
                         .HasColumnType("text")
@@ -556,10 +868,6 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("estado");
 
-                    b.Property<int>("Estatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("estatus");
-
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("text")
@@ -574,6 +882,10 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("rfc");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
                     b.Property<string>("Telefono")
                         .HasColumnType("text")
                         .HasColumnName("telefono");
@@ -582,17 +894,13 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("tipo_proveedor");
 
-                    b.Property<DateTime?>("UltimaCompra")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("ultima_compra");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<string>("Usuario")
+                    b.Property<string>("User")
                         .HasColumnType("text")
-                        .HasColumnName("usuario");
+                        .HasColumnName("user");
 
                     b.HasKey("Id")
                         .HasName("pk_proveedores");
@@ -600,7 +908,7 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     b.ToTable("proveedores", (string)null);
                 });
 
-            modelBuilder.Entity("Zimat.Inventarios.Core.UnidadAggregate.Unidad", b =>
+            modelBuilder.Entity("Zimat.Inventarios.Core.TipoDocumentoAggregate.TipoDocumento", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -608,6 +916,61 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("AfectaCuentasPorCobrar")
+                        .HasColumnType("boolean")
+                        .HasColumnName("afecta_cuentas_por_cobrar");
+
+                    b.Property<bool>("AfectaCuentasPorPagar")
+                        .HasColumnType("boolean")
+                        .HasColumnName("afecta_cuentas_por_pagar");
+
+                    b.Property<bool>("AfectaInventario")
+                        .HasColumnType("boolean")
+                        .HasColumnName("afecta_inventario");
+
+                    b.Property<bool>("EsEntrada")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_entrada");
+
+                    b.Property<bool>("EsSalida")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_salida");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("nombre");
+
+                    b.Property<string>("Prefijo")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("prefijo");
+
+                    b.Property<bool>("RequiereCliente")
+                        .HasColumnType("boolean")
+                        .HasColumnName("requiere_cliente");
+
+                    b.Property<bool>("RequiereProveedor")
+                        .HasColumnType("boolean")
+                        .HasColumnName("requiere_proveedor");
+
+                    b.Property<int>("UltimoFolio")
+                        .HasColumnType("integer")
+                        .HasColumnName("ultimo_folio");
+
+                    b.HasKey("Id")
+                        .HasName("pk_tipo_documentos");
+
+                    b.ToTable("tipo_documentos", (string)null);
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.UnidadAggregate.Unidad", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("ClaveSat")
                         .IsRequired()
@@ -623,17 +986,17 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("descripcion");
 
-                    b.Property<int>("Estatus")
+                    b.Property<int>("Status")
                         .HasColumnType("integer")
-                        .HasColumnName("estatus");
+                        .HasColumnName("status");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<string>("Usuario")
+                    b.Property<string>("User")
                         .HasColumnType("text")
-                        .HasColumnName("usuario");
+                        .HasColumnName("user");
 
                     b.HasKey("Id")
                         .HasName("pk_unidades");
@@ -641,17 +1004,346 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                     b.ToTable("unidades", (string)null);
                 });
 
-            modelBuilder.Entity("Zimat.Inventarios.Core.DocumentoAggregate.DocumentoConcepto", b =>
+            modelBuilder.Entity("Zimat.Inventarios.Core.UsuarioAggregate.Usuario", b =>
                 {
-                    b.HasOne("Zimat.Inventarios.Core.DocumentoAggregate.Documento", null)
-                        .WithMany("Conceptos")
-                        .HasForeignKey("DocumentoId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Clave")
                         .IsRequired()
-                        .HasConstraintName("fk_documento_conceptos_documentos_documento_id");
+                        .HasColumnType("text")
+                        .HasColumnName("clave");
+
+                    b.Property<decimal>("Comision")
+                        .HasColumnType("numeric")
+                        .HasColumnName("comision");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("email");
+
+                    b.Property<bool>("EsVendedor")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_vendedor");
+
+                    b.Property<int>("ListaPrecio")
+                        .HasColumnType("integer")
+                        .HasColumnName("lista_precio");
+
+                    b.Property<string>("Nivel")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("nivel");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("nombre");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("User")
+                        .HasColumnType("text")
+                        .HasColumnName("user");
+
+                    b.HasKey("Id")
+                        .HasName("pk_usuarios");
+
+                    b.ToTable("usuarios", (string)null);
                 });
 
-            modelBuilder.Entity("Zimat.Inventarios.Core.DocumentoAggregate.Documento", b =>
+            modelBuilder.Entity("Zimat.Inventarios.Core.VentaAggregate.Venta", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int?>("AlmacenId")
+                        .HasColumnType("integer")
+                        .HasColumnName("almacen_id");
+
+                    b.Property<Guid?>("ClienteId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("cliente_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<decimal>("Descuento")
+                        .HasColumnType("numeric")
+                        .HasColumnName("descuento");
+
+                    b.Property<string>("Divisa")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("divisa");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha");
+
+                    b.Property<DateTime?>("FechaPago")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_pago");
+
+                    b.Property<string>("Folio")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("folio");
+
+                    b.Property<int?>("FormaPagoId")
+                        .HasColumnType("integer")
+                        .HasColumnName("forma_pago_id");
+
+                    b.Property<decimal>("Importe")
+                        .HasColumnType("numeric")
+                        .HasColumnName("importe");
+
+                    b.Property<decimal>("Impuesto1")
+                        .HasColumnType("numeric")
+                        .HasColumnName("impuesto1");
+
+                    b.Property<decimal>("Impuesto2")
+                        .HasColumnType("numeric")
+                        .HasColumnName("impuesto2");
+
+                    b.Property<decimal>("PDescuento")
+                        .HasColumnType("numeric")
+                        .HasColumnName("p_descuento");
+
+                    b.Property<bool>("Pagado")
+                        .HasColumnType("boolean")
+                        .HasColumnName("pagado");
+
+                    b.Property<string>("Referencia")
+                        .HasColumnType("text")
+                        .HasColumnName("referencia");
+
+                    b.Property<decimal>("SaldoAnticipo")
+                        .HasColumnType("numeric")
+                        .HasColumnName("saldo_anticipo");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<decimal>("TipoCambio")
+                        .HasColumnType("numeric")
+                        .HasColumnName("tipo_cambio");
+
+                    b.Property<int>("TipoDocumentoId")
+                        .HasColumnType("integer")
+                        .HasColumnName("tipo_documento_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("User")
+                        .HasColumnType("text")
+                        .HasColumnName("user");
+
+                    b.HasKey("Id")
+                        .HasName("pk_ventas");
+
+                    b.HasIndex("ClienteId")
+                        .HasDatabaseName("ix_ventas_cliente_id");
+
+                    b.ToTable("ventas", (string)null);
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.VentaAggregate.VentaConcepto", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("ArticuloId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("articulo_id");
+
+                    b.Property<decimal>("Cantidad")
+                        .HasColumnType("numeric")
+                        .HasColumnName("cantidad");
+
+                    b.Property<decimal>("Costo")
+                        .HasColumnType("numeric")
+                        .HasColumnName("costo");
+
+                    b.Property<decimal>("CostoPromedio")
+                        .HasColumnType("numeric")
+                        .HasColumnName("costo_promedio");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<decimal>("Descuento")
+                        .HasColumnType("numeric")
+                        .HasColumnName("descuento");
+
+                    b.Property<decimal>("Devueltos")
+                        .HasColumnType("numeric")
+                        .HasColumnName("devueltos");
+
+                    b.Property<decimal>("Importe")
+                        .HasColumnType("numeric")
+                        .HasColumnName("importe");
+
+                    b.Property<decimal>("Impuesto1")
+                        .HasColumnType("numeric")
+                        .HasColumnName("impuesto1");
+
+                    b.Property<decimal>("Impuesto2")
+                        .HasColumnType("numeric")
+                        .HasColumnName("impuesto2");
+
+                    b.Property<string>("NumeroSerie")
+                        .HasColumnType("text")
+                        .HasColumnName("numero_serie");
+
+                    b.Property<decimal>("Pendiente")
+                        .HasColumnType("numeric")
+                        .HasColumnName("pendiente");
+
+                    b.Property<decimal>("Precio")
+                        .HasColumnType("numeric")
+                        .HasColumnName("precio");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("User")
+                        .HasColumnType("text")
+                        .HasColumnName("user");
+
+                    b.Property<Guid>("VentaId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("venta_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_venta_concepto");
+
+                    b.HasIndex("VentaId")
+                        .HasDatabaseName("ix_venta_concepto_venta_id");
+
+                    b.ToTable("venta_concepto", (string)null);
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.ArticuloAggregate.ArticuloUnidad", b =>
+                {
+                    b.HasOne("Zimat.Inventarios.Core.ArticuloAggregate.Articulo", null)
+                        .WithMany("ArticuloUnidades")
+                        .HasForeignKey("ArticuloId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_articulo_unidades_articulos_articulo_id");
+
+                    b.HasOne("Zimat.Inventarios.Core.UnidadAggregate.Unidad", "Unidad")
+                        .WithMany()
+                        .HasForeignKey("UnidadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_articulo_unidades_unidades_unidad_id");
+
+                    b.Navigation("Unidad");
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.ArticuloAggregate.Precio", b =>
+                {
+                    b.HasOne("Zimat.Inventarios.Core.ArticuloAggregate.ArticuloUnidad", null)
+                        .WithMany("Precios")
+                        .HasForeignKey("ArticuloUnidadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_precios_articulo_unidades_articulo_unidad_id");
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.CompraAggregate.Compra", b =>
+                {
+                    b.HasOne("Zimat.Inventarios.Core.ProveedorAggregate.Proveedor", null)
+                        .WithMany()
+                        .HasForeignKey("ProveedorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_compras_proveedores_proveedor_id");
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.CompraAggregate.CompraConcepto", b =>
+                {
+                    b.HasOne("Zimat.Inventarios.Core.CompraAggregate.Compra", null)
+                        .WithMany("Conceptos")
+                        .HasForeignKey("CompraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_compra_concepto_compras_compra_id");
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.KardexAggregate.Kardex", b =>
+                {
+                    b.HasOne("Zimat.Inventarios.Core.ArticuloAggregate.Articulo", null)
+                        .WithMany()
+                        .HasForeignKey("ArticuloId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_kardexes_articulos_articulo_id");
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.VentaAggregate.Venta", b =>
+                {
+                    b.HasOne("Zimat.Inventarios.Core.ClienteAggregate.Cliente", null)
+                        .WithMany()
+                        .HasForeignKey("ClienteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_ventas_clientes_cliente_id");
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.VentaAggregate.VentaConcepto", b =>
+                {
+                    b.HasOne("Zimat.Inventarios.Core.VentaAggregate.Venta", null)
+                        .WithMany("Conceptos")
+                        .HasForeignKey("VentaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_venta_concepto_ventas_venta_id");
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.ArticuloAggregate.Articulo", b =>
+                {
+                    b.Navigation("ArticuloUnidades");
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.ArticuloAggregate.ArticuloUnidad", b =>
+                {
+                    b.Navigation("Precios");
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.CompraAggregate.Compra", b =>
+                {
+                    b.Navigation("Conceptos");
+                });
+
+            modelBuilder.Entity("Zimat.Inventarios.Core.VentaAggregate.Venta", b =>
                 {
                     b.Navigation("Conceptos");
                 });

@@ -1,0 +1,137 @@
+@using Zimat.Inventarios.UseCases.Articulos.Precios.Update
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+@inject ILogger<EditArticuloPrecio> logger
+@using MediatR
+@inject IMediator _mediator
+@attribute [Authorize]
+
+<PageTitle>Editar Precio</PageTitle>
+
+<RadzenColumn SizeMD=12>
+    <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">
+        No se puede actualizar el precio
+    </RadzenAlert>
+    <RadzenTemplateForm TItem="PrecioEditarDTO" Data="@precio" Visible="@(precio != null)" Submit="@FormSubmit">
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="4">
+                <RadzenLabel Text="No. Lista" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="8">
+                <RadzenNumeric TValue="int" Value="@NumeroLista" Disabled="true" style="display: block; width: 100%" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="4">
+                <RadzenLabel Text="Importe Precio" Component="importePrecio" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="8">
+                <RadzenNumeric TValue="decimal" @bind-Value="@precio!.ImportePrecio" Name="importePrecio"
+                               style="display: block; width: 100%" Min="0" />
+                <RadzenRequiredValidator Component="importePrecio" Text="El importe del precio es requerido" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="4">
+                <RadzenLabel Text="Factor Costo" Component="factorCosto" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="8">
+                <RadzenNumeric TValue="decimal" @bind-Value="@precio!.FactorCosto" Name="factorCosto"
+                               style="display: block; width: 100%" Min="0" />
+                <RadzenRequiredValidator Component="factorCosto" Text="El factor de costo es requerido" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Guardar" Variant="Variant.Flat" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancelar" Variant="Variant.Flat" Click="@CancelButtonClick" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenColumn>
+
+@code {
+    [Parameter]
+    public Guid ArticuloId { get; set; }
+
+    [Parameter]
+    public Guid ArticuloUnidadId { get; set; }
+
+    [Parameter]
+    public Guid PrecioId { get; set; }
+
+    [Parameter]
+    public decimal ImportePrecio { get; set; }
+
+    [Parameter]
+    public decimal FactorCosto { get; set; }
+
+    [Parameter]
+    public int NumeroLista { get; set; }
+
+    protected class PrecioEditarDTO
+    {
+        public decimal ImportePrecio { get; set; }
+        public decimal FactorCosto { get; set; }
+    }
+
+    protected bool errorVisible;
+    protected PrecioEditarDTO precio = new();
+
+    protected override Task OnInitializedAsync()
+    {
+        precio.ImportePrecio = ImportePrecio;
+        precio.FactorCosto = FactorCosto;
+        return base.OnInitializedAsync();
+    }
+
+    protected async Task FormSubmit()
+    {
+        try
+        {
+            var result = await _mediator.Send(new UpdatePrecioCommand(
+                ArticuloId,
+                ArticuloUnidadId,
+                PrecioId,
+                precio.ImportePrecio,
+                precio.FactorCosto));
+
+            if (result.IsSuccess)
+            {
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Éxito",
+                    Detail = "Precio actualizado correctamente"
+                });
+                DialogService.Close(precio);
+            }
+            else
+            {
+                errorVisible = true;
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = result.Errors.FirstOrDefault() ?? "No se pudo actualizar el precio"
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error al actualizar precio");
+            errorVisible = true;
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Error al actualizar el precio"
+            });
+        }
+    }
+
+    protected async Task CancelButtonClick(MouseEventArgs args)
+    {
+        await Task.Run(() => DialogService.Close(null));
+    }
+}

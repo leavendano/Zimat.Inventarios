@@ -6,7 +6,7 @@ public abstract class RegisterBase<TId> : EntityBase<TId> where TId : struct, IE
 {
   
   public string? Usuario { get; set; } = null;
-  public int Estatus { get; set; } = 1;
+  public bool Activo { get; set; } = true;
         
   public DateTime CreatedAt { get; set; }
         

@@ -3,12 +3,18 @@ using Ardalis.SharedKernel;
 using Microsoft.EntityFrameworkCore;
 using Zimat.Inventarios.Core.ProveedorAggregate;
 using Zimat.Inventarios.Core.ArticuloAggregate;
-using Zimat.Inventarios.Core.DocumentoAggregate;
+using Zimat.Inventarios.Core.CompraAggregate;
 using Zimat.Inventarios.Core.UnidadAggregate;
 using Zimat.Inventarios.Core.CategoriaAggregate;
 using Zimat.Inventarios.Core.DepartamentoAggregate;
 using Zimat.Inventarios.Core.FamiliaAggregate;
 using Zimat.Inventarios.Core.LineaAggregate;
+using Zimat.Inventarios.Core.ClienteAggregate;
+using Zimat.Inventarios.Core.UsuarioAggregate;
+using Zimat.Inventarios.Core.VentaAggregate;
+using Zimat.Inventarios.Core.TipoDocumentoAggregate;
+using Zimat.Inventarios.Core.KardexAggregate;
+using Zimat.Inventarios.Core.MarcaAggregate;
 
 namespace Zimat.Inventarios.Infrastructure.Data;
 public class AppDbContext : DbContext
@@ -24,14 +30,23 @@ public class AppDbContext : DbContext
 
  
   public DbSet<Articulo> Articulos => Set<Articulo>();
+  public DbSet<ArticuloUnidad> ArticuloUnidades => Set<ArticuloUnidad>();
+  public DbSet<Precio> Precios => Set<Precio>();
   public DbSet<Categoria> Categorias => Set<Categoria>();
   public DbSet<Departamento> Departamentos => Set<Departamento>();
   public DbSet<Familia> Familias => Set<Familia>();
   public DbSet<Linea> Lineas => Set<Linea>();
   public DbSet<Unidad> Unidades => Set<Unidad>();
   public DbSet<Proveedor> Proveedores => Set<Proveedor>();
-  public DbSet<Documento> Documentos => Set<Documento>();
-  public DbSet<DocumentoConcepto> DocumentoConceptos => Set<DocumentoConcepto>();
+  public DbSet<Cliente> Clientes => Set<Cliente>();
+  public DbSet<Compra> Compras => Set<Compra>();
+  //public DbSet<CompraConcepto> CompraConceptos => Set<CompraConcepto>();
+  public DbSet<Venta> Ventas => Set<Venta>();
+  //public DbSet<VentaConcepto> VentaConceptos => Set<VentaConcepto>();
+  public DbSet<Usuario> Usuarios => Set<Usuario>();
+  public DbSet<TipoDocumento> TipoDocumentos => Set<TipoDocumento>();
+  public DbSet<Kardex> Kardexes => Set<Kardex>();
+  public DbSet<Marca> Marcas => Set<Marca>();
 
 
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 
@@ -41,6 +56,7 @@ public class AppDbContext : DbContext
   {
     base.OnModelCreating(modelBuilder);
     modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+    //modelBuilder.Entity<IRegisterBase>().HasQueryFilter(p => !p.Activo);
   }
 
   public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())

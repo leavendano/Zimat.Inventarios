@@ -1,0 +1,137 @@
+@using Zimat.Inventarios.UseCases.Articulos.Precios.Create
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+@inject ILogger<AddArticuloPrecio> logger
+@using MediatR
+@inject IMediator _mediator
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
+@attribute [Authorize]
+
+<PageTitle>Agregar Precio</PageTitle>
+
+<RadzenColumn SizeMD=12>
+    <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">
+        No se puede guardar el precio
+    </RadzenAlert>
+    <RadzenTemplateForm TItem="PrecioCrearDTO" Data="@precio" Visible="@(precio != null)" Submit="@FormSubmit">
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="4">
+                <RadzenLabel Text="No. Lista" Component="numeroLista" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="8">
+                <RadzenDropDown @bind-Value="@precio!.NumeroLista" Data=@numerosLista 
+                                AllowClear=false Placeholder="Seleccione una lista" style="display: block; width: 100%" Name="DropDownNumeroLista" />
+                <RadzenRequiredValidator Component="DropDownNumeroLista" Text="El número de lista es requerido" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="4">
+                <RadzenLabel Text="Importe Precio" Component="importePrecio" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="8">
+                <RadzenNumeric TValue="decimal" @bind-Value="@precio!.ImportePrecio" Name="importePrecio"
+                               style="display: block; width: 100%" Min="0" />
+                <RadzenRequiredValidator Component="importePrecio" Text="El importe del precio es requerido" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="4">
+                <RadzenLabel Text="Factor Costo" Component="factorCosto" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="8">
+                <RadzenNumeric TValue="decimal" @bind-Value="@precio!.FactorCosto" Name="factorCosto"
+                               style="display: block; width: 100%" Min="0" />
+                <RadzenRequiredValidator Component="factorCosto" Text="El factor de costo es requerido" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Guardar" Variant="Variant.Flat" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancelar" Variant="Variant.Flat" Click="@CancelButtonClick" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenColumn>
+
+@code {
+    [Parameter]
+    public Guid ArticuloId { get; set; }
+
+    [Parameter]
+    public Guid ArticuloUnidadId { get; set; }
+
+    [Parameter]
+    public int NumeroPrecio { get; set; }
+
+
+    protected class PrecioCrearDTO
+    {
+        public int NumeroLista { get; set; } = 1;
+        public decimal ImportePrecio { get; set; } = 1;
+        public decimal FactorCosto { get; set; } = 1;
+    }
+
+    protected bool errorVisible;
+    protected PrecioCrearDTO precio = new();
+    protected string? UserName = null;
+    protected IEnumerable<int> numerosLista = new List<int> { 1, 2, 3, 4, 5 };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        UserName = user?.Identity?.Name;
+        precio.NumeroLista = NumeroPrecio + 1;
+    }
+
+    protected async Task FormSubmit()
+    {
+        try
+        {
+            var result = await _mediator.Send(new CreatePrecioCommand(
+                ArticuloId,
+                ArticuloUnidadId,
+                precio.NumeroLista,
+                precio.ImportePrecio,
+                precio.FactorCosto,
+                UserName));
+
+            if (result.IsSuccess)
+            {
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Éxito",
+                    Detail = "Precio agregado correctamente"
+                });
+                DialogService.Close(precio);
+            }
+            else
+            {
+                errorVisible = true;
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = result.Errors.FirstOrDefault() ?? "No se pudo agregar el precio"
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error al agregar precio");
+            errorVisible = true;
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Error al agregar el precio"
+            });
+        }
+    }
+
+    protected async Task CancelButtonClick(MouseEventArgs args)
+    {
+        await Task.Run(() => DialogService.Close(null));
+    }
+}

@@ -1,0 +1,122 @@
+@page "/add-familia"
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject ILogger<AddFamilia> logger
+@using MediatR
+@using Zimat.Inventarios.UseCases.Familias.Create
+@using Ardalis.Result
+@inject IMediator  _mediator
+@attribute [Authorize]
+
+<PageTitle>Nueva Familia</PageTitle>
+    <RadzenColumn SizeMD=12>
+        <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">@mensajeAlerta</RadzenAlert>
+        <RadzenTemplateForm TItem="FamiliaDTO" Data="@item" Visible="@(item != null)" Submit="@FormSubmit">
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Descripción" Component="descripcion" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@item!.Descripcion" Name="descripcion" />
+                    <RadzenRequiredValidator Component="descripcion" Text="La Descripción es requerida" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow style="margin-bottom: 1rem">
+                <RadzenColumn SizeMD="3">
+                    <RadzenLabel Text="Margen %" Component="margen" style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="9">
+                    <RadzenNumeric Name="margen" @bind-Value="@item!.Margen" Style="width: 100%;" aria-label="margen" Min="0" Max="100" Step="0.01" />
+                    <RadzenRequiredValidator Component="margen" Text="El margen es requerido" />
+                </RadzenColumn>
+            </RadzenRow>
+          <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                    <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Guardar" Variant="Variant.Flat" />
+                    <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancelar" Variant="Variant.Flat" Click="@CancelButtonClick"  />
+          </RadzenStack>
+        </RadzenTemplateForm>
+    </RadzenColumn>
+
+@code {
+
+    protected class FamiliaDTO
+    {
+        public string Descripcion {get; set;} = string.Empty;
+        public decimal Margen {get; set;} = 0;
+    }
+
+    protected bool errorVisible;
+    protected string mensajeAlerta = "No se guardo el registro";
+    [SupplyParameterFromForm]
+    protected FamiliaDTO item {get; set;} = default!;
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+    private string? NombreUsuario {get; set;}
+
+    [Parameter] public EventCallback OnFamiliaCreated { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        item ??= new();
+        if (authenticationState is not null)
+        {
+            var authState = await authenticationState;
+
+             if (authState.User?.Identity is not null && authState.User.Identity.IsAuthenticated)
+             {
+                NombreUsuario = authState.User.Identity.Name;
+             }
+
+        }
+    }
+
+    protected async Task FormSubmit()
+    {
+        try
+        {
+            var result = await _mediator.Send(new CreateFamiliaCommand(item.Descripcion, item.Margen, NombreUsuario!));
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Familia creada",
+                Detail = "La familia se ha creado correctamente",
+                Duration = 4000
+            });
+            errorVisible = false;
+
+            if (OnFamiliaCreated.HasDelegate)
+            {
+                await OnFamiliaCreated.InvokeAsync();
+            }
+
+            DialogService.Close(item);
+        }
+        catch (Exception e)
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error al crear la familia",
+                Detail = e.Message,
+                Duration = 4000
+            });
+            mensajeAlerta = $"Error: {e.Message}";
+            errorVisible = true;
+            logger.LogError(e, "Error al crear la familia");
+        }
+    }
+
+    void OnChange(string value, string name)
+    {
+        logger.LogInformation($"{name} se cambió a  {value}");
+    }
+
+    protected async Task CancelButtonClick(MouseEventArgs args)
+    {
+        await Task.Run(() => DialogService.Close(null));
+    }
+}

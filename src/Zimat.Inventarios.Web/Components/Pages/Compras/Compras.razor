@@ -1,0 +1,139 @@
+@page "/compras"
+@using Ardalis.Result
+@using Zimat.Inventarios.UseCases.Compras
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject ILogger<Compras> logger
+@using MediatR
+@inject IMediator _mediator
+@using Zimat.Inventarios.UseCases.Compras.Delete
+@using Zimat.Inventarios.UseCases.Compras.List
+@using Zimat.Inventarios.Web.Components.Pages.Proveedores
+@attribute [Authorize]
+
+
+<PageTitle>Compras</PageTitle>
+<RadzenStack>
+    <RadzenRow AlignItems="AlignItems.Center">
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenText Text="Compras" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton Icon="add_circle_outline" Text="Nuevo" Click="@AddButtonClick" Variant="Variant.Flat" />
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn SizeMD=12>
+            <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
+                            Data="@compras" TItem="CompraListarDTO" RowSelect="@EditRow">
+                <Columns>
+                    <RadzenDataGridColumn TItem="CompraListarDTO" Property="Folio" Title="Folio">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="CompraListarDTO" Property="TipoDocumentoNombre" Title="Tipo">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="CompraListarDTO" Property="Fecha" Title="Fecha">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="CompraListarDTO" Property="ProveedorNombre" Title="Proveedor">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="CompraListarDTO" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
+                        <Template Context="compra">
+
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
+                                          Shade="Shade.Lighter" Variant="Variant.Flat"
+                                          Click=@(args => GridDeleteButtonClick(args, compra)) @onclick:stopPropagation="true" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+
+            </RadzenDataGrid>
+
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+@code {
+
+    protected IEnumerable<CompraListarDTO>? compras;
+
+    protected RadzenDataGrid<CompraListarDTO> grid0 = new();
+    protected override async Task OnInitializedAsync()
+    {
+
+        await base.OnInitializedAsync();
+        Result<IEnumerable<CompraListarDTO>> result = await _mediator.Send(new ListComprasQuery(null, null, null, null));
+
+        if (result.IsSuccess)
+        {
+            compras = result.Value;
+        }
+
+    }
+
+    protected async Task AddButtonClick(MouseEventArgs args)
+    {
+
+        var options = new DialogOptions();
+        string additionalStyle = "min-width:fit-content;min-height:fit-content;height:fit-content;width:fit-content;border: 1px solid black;";
+        options.Style = additionalStyle;
+        await DialogService.OpenAsync<AddCompra>("Nueva Compra", null, options);
+        Result<IEnumerable<CompraListarDTO>> result = await _mediator.Send(new ListComprasQuery(null, null, null, null));
+
+        if (result.IsSuccess)
+        {
+
+            compras = result.Value;
+            await grid0.Reload();
+        }
+
+    }
+
+    protected async Task EditRow(CompraListarDTO args)
+    {
+        //await DialogService.OpenAsync<EditArticulo>("Edit Articulo", new Dictionary<string, object> { { "Id", args.Id } });
+        Result<IEnumerable<CompraListarDTO>> result = await _mediator.Send(new ListComprasQuery(null, null, null, null));
+        if (result.IsSuccess)
+        {
+
+            compras = result.Value;
+            await grid0.Reload();
+        }
+    }
+
+    protected async Task GridDeleteButtonClick(MouseEventArgs args, CompraListarDTO compra)
+    {
+        try
+        {
+            if (await DialogService.Confirm("Está seguro de borrar este elemento?") == true)
+            {
+
+                var result = await _mediator.Send(new DeleteCompraCommand(compra.Id));
+
+                if (result.IsSuccess)
+                {
+                    Result<IEnumerable<CompraListarDTO>> result2 = await _mediator.Send(new ListComprasQuery(null, null, null, null));
+                    if (result2.IsSuccess)
+                    {
+                        compras = result2.Value;
+                        await grid0.Reload();
+                    }
+
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            logger.LogError(0, e, "Error al eliminar un elemento");
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = $"Error",
+                    Detail = $"Unable to delete Product"
+                });
+        }
+    }
+}

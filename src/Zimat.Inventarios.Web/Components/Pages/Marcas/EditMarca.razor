@@ -1,0 +1,69 @@
+@page "/edit-marca"
+@using MediatR
+@using Zimat.Inventarios.UseCases.Marcas.Get
+@using Zimat.Inventarios.UseCases.Marcas.Update
+@inject IMediator _mediator
+@inject DialogService DialogService
+@attribute [Authorize]
+
+<PageTitle>Editar Marca</PageTitle>
+<RadzenColumn SizeMD=12>
+    <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">No se pudo guardar el registro</RadzenAlert>
+    <RadzenTemplateForm TItem="MarcaFormDTO" Data="@marca" Visible="@(marca != null)" Submit="@FormSubmit">
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="3">
+                <RadzenLabel Text="Descripción" Component="descripcion" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="9">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@marca!.Descripcion" Name="descripcion" />
+                <RadzenRequiredValidator Component="descripcion" Text="La descripción es requerida" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Guardar" Variant="Variant.Flat" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancelar" Variant="Variant.Flat" Click="@CancelButtonClick" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenColumn>
+
+@code {
+    protected class MarcaFormDTO
+    {
+        public Guid Id { get; set; }
+        public string Descripcion { get; set; } = string.Empty;
+    }
+
+    [Parameter]
+    public Guid Id { get; set; }
+
+    protected bool errorVisible;
+    protected MarcaFormDTO marca { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await _mediator.Send(new GetMarcaQuery(Id));
+        if (result.IsSuccess)
+        {
+            marca.Id = result.Value.Id;
+            marca.Descripcion = result.Value.Descripcion;
+        }
+    }
+
+    protected async Task FormSubmit()
+    {
+        try
+        {
+            var result = await _mediator.Send(new UpdateMarcaCommand(marca.Id, marca.Descripcion));
+            DialogService.Close(marca);
+        }
+        catch (Exception)
+        {
+            errorVisible = true;
+        }
+    }
+
+    protected async Task CancelButtonClick(MouseEventArgs args)
+    {
+        await Task.Run(() => DialogService.Close(null));
+    }
+}

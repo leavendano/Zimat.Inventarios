@@ -58,7 +58,7 @@
     {
 
         await base.OnInitializedAsync();
-        Result<IEnumerable<UnidadDTO>> result = await _mediator.Send(new ListUnidadesQuery(null, null));
+        Result<IEnumerable<UnidadDTO>> result = await _mediator.Send(new ListUnidadesQuery(null, null, null));
 
         if (result.IsSuccess)
         {
@@ -69,8 +69,8 @@
 
     protected async Task AddButtonClick(MouseEventArgs args)
     {
-        UseCases.Unidades.UnidadDTO item = await DialogService.OpenAsync<AddUnidad>("Nueva Unidad", null);
-        Result<IEnumerable<UnidadDTO>> result = await _mediator.Send(new ListUnidadesQuery(null, null));
+        await DialogService.OpenAsync<AddUnidad>("Nueva Unidad", null);
+        Result<IEnumerable<UnidadDTO>> result = await _mediator.Send(new ListUnidadesQuery(null, null,null));
 
         if (result.IsSuccess)
         {
@@ -84,7 +84,7 @@
     protected async Task EditRow(UnidadDTO args)
     {
         await DialogService.OpenAsync<EditUnidad>("Edit Unidad", new Dictionary<string, object> { { "Id",args.Id} });
-        Result<IEnumerable<UnidadDTO>> result = await _mediator.Send(new ListUnidadesQuery(null, null));
+        Result<IEnumerable<UnidadDTO>> result = await _mediator.Send(new ListUnidadesQuery(null, null, null));
         if (result.IsSuccess)
         {
 
@@ -103,7 +103,7 @@
 
                 if (result.IsSuccess)
                 {
-                    Result<IEnumerable<UnidadDTO>> result2 = await _mediator.Send(new ListUnidadesQuery(null, null));
+                    Result<IEnumerable<UnidadDTO>> result2 = await _mediator.Send(new ListUnidadesQuery(null, null, null));
                     if (result2.IsSuccess)
                     {
     

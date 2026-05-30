@@ -32,17 +32,20 @@
         <RadzenColumn SizeMD=12>
             <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" 
                 ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
-                            Data="@articulos" TItem="ArticuloDTO" RowSelect="@EditRow">
+                            Data="@articulos" TItem="ArticuloListarDTO" RowSelect="@EditRow">
                 <Columns>
-                    <RadzenDataGridColumn TItem="ArticuloDTO" Property="Clave" Title="Clave">
+                    <RadzenDataGridColumn TItem="ArticuloListarDTO" Property="Clave" Title="Clave">
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="ArticuloDTO" Property="Descripcion" Title="Descripcion">
+                    <RadzenDataGridColumn TItem="ArticuloListarDTO" Property="Descripcion" Title="Descripcion">
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="ArticuloDTO" Property="PrecioPublico" Title="Precio">
+                    <RadzenDataGridColumn TItem="ArticuloListarDTO" Property="PrecioPublico" Title="Precio">
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="ArticuloDTO" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
+                    <RadzenDataGridColumn TItem="ArticuloListarDTO" Filterable="false" Sortable="false" Width="140px" TextAlign="TextAlign.Center">
                         <Template Context="articulo">
-
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="assignment" Size="ButtonSize.Medium"
+                                          Shade="Shade.Lighter" Variant="Variant.Flat"
+                                          Click=@(args => UnidadesButtonClick(args, articulo)) @onclick:stopPropagation="true"
+                                          title="Unidades" />
                             <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
                                           Shade="Shade.Lighter" Variant="Variant.Flat"
                                           Click=@(args => GridDeleteButtonClick(args, articulo)) @onclick:stopPropagation="true" />
@@ -57,14 +60,14 @@
 </RadzenStack>
 @code {
 
-    protected IEnumerable<ArticuloDTO>? articulos;
+    protected IEnumerable<ArticuloListarDTO>? articulos;
 
-    protected RadzenDataGrid<ArticuloDTO> grid0 = new();
+    protected RadzenDataGrid<ArticuloListarDTO> grid0 = new();
     protected override async Task OnInitializedAsync()
     {
 
         await base.OnInitializedAsync();
-        Result<IEnumerable<ArticuloDTO>> result = await _mediator.Send(new ListArticulosQuery(null, null));
+        Result<IEnumerable<ArticuloListarDTO>> result = await _mediator.Send(new ListArticulosQuery(null,null, null));
 
         if (result.IsSuccess)
         {
@@ -76,7 +79,7 @@
     protected async Task AddButtonClick(MouseEventArgs args)
     {
         await DialogService.OpenAsync<AddArticulo>("Nuevo Artículo", null,new DialogOptions() { Width = $"{900}px", Height = $"{600}px" });
-        Result<IEnumerable<ArticuloDTO>> result = await _mediator.Send(new ListArticulosQuery(null, null));
+        Result<IEnumerable<ArticuloListarDTO>> result = await _mediator.Send(new ListArticulosQuery(null,null, null));
 
         if (result.IsSuccess)
         {
@@ -87,10 +90,11 @@
 
     }
 
-    protected async Task EditRow(ArticuloDTO args)
+    protected async Task EditRow(ArticuloListarDTO args)
     {
-        await DialogService.OpenAsync<EditArticulo>("Edit Articulo", new Dictionary<string, object> { { "Id",args.Id} });
-        Result<IEnumerable<ArticuloDTO>> result = await _mediator.Send(new ListArticulosQuery(null, null));
+        await DialogService.OpenAsync<EditArticulo>("Editar Articulo", new Dictionary<string, object> { { "Id",args.Id} },
+        new DialogOptions() { Width = $"{900}px", Height = $"{600}px" });
+        Result<IEnumerable<ArticuloListarDTO>> result = await _mediator.Send(new ListArticulosQuery(null,null, null));
         if (result.IsSuccess)
         {
 
@@ -99,7 +103,14 @@
         }
     }
 
-    protected async Task GridDeleteButtonClick(MouseEventArgs args, ArticuloDTO articulo)
+    protected async Task UnidadesButtonClick(MouseEventArgs args, ArticuloListarDTO articulo)
+    {
+        await DialogService.OpenAsync<ArticuloUnidades>("Unidades del Artículo",
+            new Dictionary<string, object> { { "Id", articulo.Id } },
+            new DialogOptions() { Width = "900px", Height = "600px" });
+    }
+
+    protected async Task GridDeleteButtonClick(MouseEventArgs args, ArticuloListarDTO articulo)
     {
         try
         {
@@ -110,7 +121,7 @@
 
                 if (result.IsSuccess)
                 {
-                    Result<IEnumerable<ArticuloDTO>> result2 = await _mediator.Send(new ListArticulosQuery(null, null));
+                    Result<IEnumerable<ArticuloListarDTO>> result2 = await _mediator.Send(new ListArticulosQuery(null,null, null));
                     if (result2.IsSuccess)
                     {
                         articulos = result2.Value;

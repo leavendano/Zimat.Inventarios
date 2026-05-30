@@ -84,3 +84,13 @@ a:focus {
 .loading-progress-text:after {
     content: var(--blazor-load-percentage-text, "Loading");
 }
+
+.rz-dropdown-item {
+        line-height: 0.1; /* Adjust as needed */
+    }
+
+.rz-dropdown-items li {
+    font-size: 0.70rem; /* Adjust this value as needed */
+}
+
+

@@ -4,12 +4,27 @@ using Zimat.Inventarios.Core.Base;
 
 namespace Zimat.Inventarios.Core.CategoriaAggregate;
 
-public class Categoria(string descripcion, decimal margen = 0, string usuario = "ADMINISTRADOR") : EntityBase,IAggregateRoot, IRegisterBase
+public class Categoria : EntityBase<Guid>,IAggregateRoot, IRegisterBase
 {
-  public string Descripcion { get; set; } = Guard.Against.NullOrEmpty(descripcion, nameof(descripcion));
-  public decimal Margen { get; set; } = Guard.Against.Negative(margen, nameof(margen));
-  public string? Usuario { get; set; } = Guard.Against.NullOrEmpty(usuario, nameof(usuario));
-  public int Estatus { get; set; } = 1;
+
+  public Categoria(string descripcion, decimal margen = 0, string user = "Administrador") : base()
+  {
+    Descripcion = Guard.Against.NullOrEmpty(descripcion, nameof(descripcion));
+    Margen = Guard.Against.Negative(margen, nameof(margen));
+    User = Guard.Against.NullOrEmpty(user, nameof(user));
+    
+    // Generar un nuevo ID si no se proporciona uno
+    Status = RegisterStatus.Activo; // Activo por defecto
+    CreatedAt = DateTime.UtcNow;
+    UpdatedAt = DateTime.UtcNow;
+
+    Id = UuidV7.NewGuid();
+  }
+
+  public string Descripcion { get; set; } 
+  public decimal Margen { get; set; } 
+  public string? User { get; set; } 
+  public int Status { get; set; } 
   public DateTime CreatedAt { get; set; }
   public DateTime UpdatedAt { get; set; }
 

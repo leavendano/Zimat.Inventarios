@@ -1,0 +1,180 @@
+@using Ardalis.Result
+@using Zimat.Inventarios.UseCases.Articulos
+@using Zimat.Inventarios.UseCases.Articulos.ArticuloUnidades.List
+@using Zimat.Inventarios.UseCases.Articulos.ArticuloUnidades.Delete
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject ILogger<ArticuloUnidades> logger
+@using MediatR
+@inject IMediator _mediator
+@attribute [Authorize]
+
+<PageTitle>Unidades del Artículo</PageTitle>
+<RadzenStack>
+    <RadzenRow AlignItems="AlignItems.Center">
+        <RadzenColumn Size="12" SizeMD="8">
+            @* <RadzenText Text="Unidades del Artículo." TextStyle="TextStyle.H4" TagName="TagName.H2" style="margin: 0" /> *@
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="4">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton Icon="add_circle_outline" Text="Agregar Unidad" Click="@AddButtonClick" Variant="Variant.Flat" />
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn SizeMD=12>
+            <RadzenDataGrid @ref="grid0" AllowFiltering="false" FilterMode="FilterMode.Simple" AllowPaging="true" AllowSorting="true"
+                            ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
+                            Data="@articuloUnidades" TItem="ArticuloUnidadListarDTO">
+                <Columns>
+                    <RadzenDataGridColumn TItem="ArticuloUnidadListarDTO" Property="Unidad" Title="Unidad">
+                        <Template Context="unidad">
+                            @unidad.UnidadNombre
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="ArticuloUnidadListarDTO" Property="FactorConversion" Title="Factor Conversión">
+                        <Template Context="unidad">
+                            @unidad.FactorConversion.ToString("N4")
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="ArticuloUnidadListarDTO" Property="User" Title="Usuario">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="ArticuloUnidadListarDTO" Property="UpdatedAt" Title="Última Actualización">
+                        <Template Context="unidad">
+                            @unidad.UpdatedAt.ToString("dd/MM/yyyy HH:mm")
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="ArticuloUnidadListarDTO" Filterable="false" Sortable="false" Width="200px" TextAlign="TextAlign.Center">
+                        <Template Context="unidad">
+                            <RadzenButton ButtonStyle="ButtonStyle.Warning" Icon="attach_money" Size="ButtonSize.Small"
+                                          Shade="Shade.Lighter" Variant="Variant.Flat"
+                                          Click=@(args => PreciosButtonClick(args, unidad)) @onclick:stopPropagation="true" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="edit" Size="ButtonSize.Small"
+                                          Shade="Shade.Lighter" Variant="Variant.Flat"
+                                          Click=@(args => EditButtonClick(args, unidad)) @onclick:stopPropagation="true" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Small"
+                                          Shade="Shade.Lighter" Variant="Variant.Flat"
+                                          Click=@(args => DeleteButtonClick(args, unidad)) @onclick:stopPropagation="true" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    protected IEnumerable<ArticuloUnidadListarDTO>? articuloUnidades;
+    protected RadzenDataGrid<ArticuloUnidadListarDTO> grid0 = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        Result<IEnumerable<ArticuloUnidadListarDTO>> result = await _mediator.Send(new ListArticuloUnidadesQuery(Id));
+
+        if (result.IsSuccess)
+        {
+            articuloUnidades = result.Value;
+        }
+        else
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "No se pudieron cargar las unidades del artículo"
+            });
+        }
+    }
+
+    protected async Task AddButtonClick(MouseEventArgs args)
+    {
+        await DialogService.OpenAsync<AddArticuloUnidad>("Agregar Unidad",
+            new Dictionary<string, object> { { "ArticuloId", Id } },
+            new DialogOptions() { Width = "500px", Height = "350px" });
+
+        await LoadData();
+        await grid0.Reload();
+    }
+
+    protected async Task PreciosButtonClick(MouseEventArgs args, ArticuloUnidadListarDTO unidad)
+    {
+        await DialogService.OpenAsync<ArticuloPrecios>("Precios de la Unidad",
+            new Dictionary<string, object>
+            {
+                { "ArticuloId", Id },
+                { "ArticuloUnidadId", unidad.Id }
+            },
+            new DialogOptions() { Width = "800px", Height = "500px" });
+    }
+
+    protected async Task EditButtonClick(MouseEventArgs args, ArticuloUnidadListarDTO unidad)
+    {
+        await DialogService.OpenAsync<EditArticuloUnidad>("Editar Unidad",
+            new Dictionary<string, object>
+            {
+                { "ArticuloId", Id },
+                { "ArticuloUnidadId", unidad.Id },
+                { "FactorConversion", unidad.FactorConversion }
+            },
+            new DialogOptions() { Width = "500px", Height = "300px" });
+
+        await LoadData();
+        await grid0.Reload();
+    }
+
+    protected async Task DeleteButtonClick(MouseEventArgs args, ArticuloUnidadListarDTO unidad)
+    {
+        try
+        {
+            if (await DialogService.Confirm("¿Está seguro de eliminar esta unidad?") == true)
+            {
+                var result = await _mediator.Send(new DeleteArticuloUnidadCommand(Id, unidad.Id));
+
+                if (result.IsSuccess)
+                {
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Éxito",
+                        Detail = "Unidad eliminada correctamente"
+                    });
+
+                    await LoadData();
+                    await grid0.Reload();
+                }
+                else
+                {
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error",
+                        Detail = result.Errors.FirstOrDefault() ?? "No se pudo eliminar la unidad"
+                    });
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            logger.LogError(0, e, "Error al eliminar unidad");
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Error al eliminar la unidad"
+            });
+        }
+    }
+}

@@ -1,15 +1,28 @@
 ﻿
 using Ardalis.GuardClauses;
 using Ardalis.SharedKernel;
+using Zimat.Inventarios.Core.Base;
 
 namespace Zimat.Inventarios.Core.UnidadAggregate;
 
-public class Unidad(string descripcion,string claveSat, string usuario = "ADMINISTRADOR") : EntityBase, IAggregateRoot,IRegisterBase
+public class Unidad : EntityBase<Guid>, IRegisterBase, IAggregateRoot
 {
-    public string Descripcion { get; set; } = Guard.Against.NullOrEmpty(descripcion,nameof(descripcion));
-    public string ClaveSat { get; set; } = Guard.Against.NullOrEmpty(claveSat,nameof(claveSat));
-    public string? Usuario { get; set; } = Guard.Against.NullOrEmpty(usuario,nameof(usuario));
-    public int Estatus { get; set; } = 1;
+    public Unidad(string descripcion, string claveSat, string user = "Administrador") : base()
+    {
+
+        Descripcion  = Guard.Against.NullOrEmpty(descripcion, nameof(descripcion));
+        ClaveSat = Guard.Against.NullOrEmpty(claveSat,nameof(claveSat));
+        Id =  UuidV7.NewGuid();
+        User  = Guard.Against.NullOrEmpty(user,nameof(user));
+        Status = RegisterStatus.Activo; // Activo por defecto
+        CreatedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
+    }
+    
+    public string Descripcion { get; set; }
+    public string ClaveSat { get; set; } 
+    public string? User { get; set; } 
+    public int Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public void UpdateDescripcion(string newName)

@@ -2,4 +2,4 @@
 using Ardalis.SharedKernel;
 
 namespace Zimat.Inventarios.UseCases.Proveedores.Delete;
-public record DeleteProveedorCommand(int ProveedorId) : ICommand<Result>;
+public record DeleteProveedorCommand(Guid ProveedorId) : ICommand<Result>;

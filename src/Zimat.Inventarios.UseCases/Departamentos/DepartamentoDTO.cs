@@ -5,4 +5,4 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Zimat.Inventarios.UseCases.Departamentos;
-public record DepartamentoDTO(int Id, string Nombre);
+public record DepartamentoDTO(Guid Id, string Nombre);

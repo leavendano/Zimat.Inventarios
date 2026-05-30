@@ -2,4 +2,4 @@
 using Ardalis.SharedKernel;
 
 namespace Zimat.Inventarios.UseCases.Articulos.List;
-public record ListArticulosQuery(int? Skip, int? Take) : IQuery<Result<IEnumerable<ArticuloDTO>>>;
+public record ListArticulosQuery(string? filtro,int? Skip, int? Take) : IQuery<Result<IEnumerable<ArticuloListarDTO>>>;

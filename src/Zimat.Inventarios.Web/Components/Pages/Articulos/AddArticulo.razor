@@ -19,6 +19,8 @@
 @using Zimat.Inventarios.UseCases.Categorias.List
 @using Zimat.Inventarios.UseCases.Departamentos
 @using Zimat.Inventarios.UseCases.Departamentos.List
+@using Zimat.Inventarios.UseCases.Marcas
+@using Zimat.Inventarios.UseCases.Marcas.List
 @inject IMediator _mediator
 @inject AuthenticationStateProvider GetAuthenticationStateAsync
 @attribute [Authorize]
@@ -51,7 +53,9 @@
                 <RadzenLabel Text="Marca" Component="marca" style="width: 100%" />
             </RadzenColumn>
             <RadzenColumn SizeMD="4">
-                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@product!.Marca" Name="marca" />
+                <RadzenDropDown @bind-Value="@product!.Marca" Data=@listadoMarcas TextProperty="@nameof(MarcaDTO.Descripcion)" ValueProperty="@nameof(MarcaDTO.Descripcion)"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
+                                AllowClear=true Placeholder="Seleccione una marca" style="display: block; width: 100%" Name="DropDownMarca" />
             </RadzenColumn>
             <RadzenColumn SizeMD="2">
                 <RadzenLabel Text="Modelo" Component="modelo" style="width: 100%" />
@@ -71,9 +75,9 @@
                 <RadzenLabel Text="Unidad" Component="unidad" style="width: 100%" />
             </RadzenColumn>
             <RadzenColumn SizeMD="4">
-                <RadzenDropDown @bind-Value="@product!.UnidadId" Data=@listadoUnidades TextProperty="@nameof(UnidadDTO.Descripcion)" ValueProperty="Id"
+                @* <RadzenDropDown @bind-Value="@product!.UnidadId" Data=@listadoUnidades TextProperty="@nameof(UnidadDTO.Descripcion)" ValueProperty="Id"
                                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
-                                AllowClear=false Placeholder="Seleccione una unidad" style="display: block; width: 100%" Name="DropDownUnidad"/>
+                                AllowClear=false Placeholder="Seleccione una unidad" style="display: block; width: 100%" Name="DropDownUnidad"/> *@
             </RadzenColumn>
         </RadzenRow>
         
@@ -121,13 +125,6 @@
                 <RadzenTabsItem Text="Precios">
                     <RadzenRow style="margin-bottom: 1rem">
                         <RadzenColumn SizeMD="2">
-                            <RadzenLabel Text="%Imp 1" Component="impuesto1" />
-                        </RadzenColumn>
-                        <RadzenColumn SizeMD="2">
-                            <RadzenDropDown @bind-Value="@product!.Impuesto1" Data=@listadoImpuestos 
-                                            AllowClear=false Placeholder="Seleccione una Departamento" style="display: block; width: 100%" Name="DropDownImpuestos" />
-                        </RadzenColumn>
-                        <RadzenColumn SizeMD="2">
                             <RadzenLabel Text="Precio 1" Component="precio1" />
                         </RadzenColumn>
                         <RadzenColumn SizeMD="2">
@@ -137,47 +134,50 @@
                     </RadzenRow>
                     <RadzenRow style="margin-bottom: 1rem">
                         <RadzenColumn SizeMD="2">
-                            <RadzenLabel Text="%Imp 2" Component="impuesto2" />
-                        </RadzenColumn>
-                        <RadzenColumn SizeMD="2">
-                            <RadzenNumeric TValue="decimal" style="display: block;" Name="impuesto2" @bind-Value="@product!.Impuesto2" />
-                        </RadzenColumn>
-                        <RadzenColumn SizeMD="2">
-                            <RadzenLabel Text="Precio 2" Component="precio1" />
+                            <RadzenLabel Text="Precio 2" Component="precio2" />
                         </RadzenColumn>
                         <RadzenColumn SizeMD="2">
                             <RadzenNumeric TValue="decimal" style="display: block;" Name="precio2" @bind-Value="@product!.Precio2" />
-                          
                         </RadzenColumn>
                     </RadzenRow>
                     <RadzenRow style="margin-bottom: 1rem">
-                        <RadzenColumn SizeMD="2">
-                           
-                        </RadzenColumn>
-                        <RadzenColumn SizeMD="2">
-                            
-                        </RadzenColumn>
                         <RadzenColumn SizeMD="2">
                             <RadzenLabel Text="Precio 3" Component="precio3" />
                         </RadzenColumn>
                         <RadzenColumn SizeMD="2">
                             <RadzenNumeric TValue="decimal" style="display: block;" Name="precio3" @bind-Value="@product!.Precio3" />
-
                         </RadzenColumn>
                     </RadzenRow>
                     <RadzenRow style="margin-bottom: 1rem">
-                        <RadzenColumn SizeMD="2">
-
-                        </RadzenColumn>
-                        <RadzenColumn SizeMD="2">
-
-                        </RadzenColumn>
                         <RadzenColumn SizeMD="2">
                             <RadzenLabel Text="Precio 4" Component="precio4" />
                         </RadzenColumn>
                         <RadzenColumn SizeMD="2">
                             <RadzenNumeric TValue="decimal" style="display: block;" Name="precio4" @bind-Value="@product!.Precio4" />
-
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Datos Fiscales">
+                    <RadzenRow style="margin-bottom: 1rem">
+                        <RadzenColumn SizeMD="2">
+                            <RadzenLabel Text="% Impuesto 1" Component="impuesto1" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeMD="2">
+                            <RadzenNumeric TValue="decimal" style="display: block; width: 100%" Name="impuesto1" @bind-Value="@product!.Impuesto1" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeMD="2">
+                            <RadzenLabel Text="% Impuesto 2" Component="impuesto2" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeMD="2">
+                            <RadzenNumeric TValue="decimal" style="display: block; width: 100%" Name="impuesto2" @bind-Value="@product!.Impuesto2" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow style="margin-bottom: 1rem">
+                        <RadzenColumn SizeMD="2">
+                            <RadzenLabel Text="Clave SAT" Component="claveSat" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeMD="4">
+                            <RadzenTextBox style="display: block; width: 100%" @bind-Value="@product!.ClaveSat" Name="claveSat" />
                         </RadzenColumn>
                     </RadzenRow>
                 </RadzenTabsItem>
@@ -205,18 +205,19 @@
         public string Clave { get; set; } = "";
         public string? Descripcion { get; set; } 
         public string? Codigo { get; set; }
-        public int UnidadId { get; set; }
+       // public Guid UnidadId { get; set; }
         public string? Marca { get; set; }
         public string? Modelo { get; set; }
-        public int? LineaId { get; set; }
-        public int? FamiliaId { get; set; }
-        public int? CategoriaId { get; set; }
-        public int? DepartamentoId { get; set; }
+        public Guid? LineaId { get; set; }
+        public Guid? FamiliaId { get; set; }
+        public Guid? CategoriaId { get; set; }
+        public Guid? DepartamentoId { get; set; }
         public string? Valdep { get; set; }
         public string? Ubicacion { get; set; }
         public bool Series { get; set; }
         public decimal Impuesto1 { get; set; } = 0;
         public decimal Impuesto2 { get; set; } = 0;
+        public string? ClaveSat { get; set; }
         public decimal Precio1 { get; set; } = 0;
         public decimal Precio2 { get; set; } = 0;
         public decimal Precio3 { get; set; } = 0;
@@ -235,17 +236,17 @@
 
     protected bool errorVisible;
     [SupplyParameterFromForm]
-    protected ArticuloDTO product { get; set; } = new();
+    protected ArticuloDTO product { get; set; } = default!;
 
     int selectedIndex = 0;
     string? UserName = null;
 
-    IEnumerable<UnidadDTO>? listadoUnidades { get; set; }
+    //IEnumerable<UnidadDTO>? listadoUnidades { get; set; }
     IEnumerable<LineaDTO>? listadoLineas { get; set; }
     IEnumerable<FamiliaDTO>? listadoFamilias { get; set; }
     IEnumerable<CategoriaDTO>? listadoCategorias { get; set; }
     IEnumerable<DepartamentoDTO>? listadoDepartamentos { get; set; }
-    IEnumerable<decimal> listadoImpuestos { get; set; } = new decimal[] { 0, 8, 16 };
+    IEnumerable<MarcaDTO>? listadoMarcas { get; set; }
 
 
     protected override async Task OnInitializedAsync()
@@ -254,11 +255,11 @@
         var user = authstate.User;
         UserName = user?.Identity?.Name;
 
-        var resultUnidades = await _mediator.Send(new ListUnidadesQuery(null, null));
+        @* var resultUnidades = await _mediator.Send(new ListUnidadesQuery(null, null, null));
         if (resultUnidades.IsSuccess)
         {
             listadoUnidades = resultUnidades.Value;
-        }
+        } *@
         var resultLineas = await _mediator.Send(new ListLineasQuery(null, null));
         if (resultLineas.IsSuccess)
         {
@@ -283,6 +284,12 @@
             listadoDepartamentos = resultDepartamentos.Value;
         }
 
+        var resultMarcas = await _mediator.Send(new ListMarcasQuery(null, null));
+        if (resultMarcas.IsSuccess)
+        {
+            listadoMarcas = resultMarcas.Value;
+        }
+
     }
    
 
@@ -292,7 +299,9 @@
         try
         {
             //await zimatService.CreateProduct(product);
-            var result = await _mediator.Send(new CreateArticuloCommand(product.Clave!,product.Descripcion!, product.Precio1,1,UserName));
+            var result = await _mediator.Send(new CreateArticuloCommand(product.Clave!,product.Descripcion!, product.Precio1,
+                   product.CategoriaId,product.LineaId,product.FamiliaId,product.DepartamentoId,null,UserName,
+                   product.Impuesto1, product.Impuesto2, product.ClaveSat));
             DialogService.Close(product);
         }
         catch (Exception)

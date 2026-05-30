@@ -1,0 +1,211 @@
+@page "/tipo-documentos"
+@using Ardalis.Result
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject ILogger<ListTipoDocumentos> logger
+@using MediatR
+@inject IMediator _mediator
+@using Zimat.Inventarios.UseCases.TipoDocumentos
+@using Zimat.Inventarios.UseCases.TipoDocumentos.List
+@using Zimat.Inventarios.UseCases.TipoDocumentos.Create
+@using Zimat.Inventarios.UseCases.TipoDocumentos.Delete
+@using Zimat.Inventarios.UseCases.TipoDocumentos.Update
+@attribute [Authorize]
+
+
+<PageTitle>Tipos de Documentos</PageTitle>
+<RadzenStack>
+    <RadzenRow AlignItems="AlignItems.Center">
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenText Text="Tipos de Documentos" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton Icon="add_circle_outline" Text="Nuevo" Click="@AddButtonClick" Variant="Variant.Flat" />
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn SizeMD=12>
+            <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
+                            Data="@tipoDocumentos" TItem="TipoDocumentoDTO" RowSelect="@EditRow">
+                <Columns>
+                    <RadzenDataGridColumn TItem="TipoDocumentoDTO" Property="Nombre" Title="Nombre" Width="180px">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="TipoDocumentoDTO" Property="Prefijo" Title="Prefijo" Width="100px">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="TipoDocumentoDTO" Property="EsEntrada" Title="Entrada" Width="80px">
+                        <Template Context="tipo">
+                            <RadzenCheckBox TValue="bool" Value="@tipo.EsEntrada" Disabled="true" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="TipoDocumentoDTO" Property="EsSalida" Title="Salida" Width="80px">
+                        <Template Context="tipo">
+                            <RadzenCheckBox TValue="bool" Value="@tipo.EsSalida" Disabled="true" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="TipoDocumentoDTO" Property="AfectaInventario" Title="Afecta Inv." Width="100px">
+                        <Template Context="tipo">
+                            <RadzenCheckBox TValue="bool" Value="@tipo.AfectaInventario" Disabled="true" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="TipoDocumentoDTO" Property="RequiereProveedor" Title="Req. Prov." Width="100px">
+                        <Template Context="tipo">
+                            <RadzenCheckBox TValue="bool" Value="@tipo.RequiereProveedor" Disabled="true" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="TipoDocumentoDTO" Property="RequiereCliente" Title="Req. Cliente" Width="100px">
+                        <Template Context="tipo">
+                            <RadzenCheckBox TValue="bool" Value="@tipo.RequiereCliente" Disabled="true" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="TipoDocumentoDTO" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
+                        <Template Context="tipo">
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
+                                          Shade="Shade.Lighter" Variant="Variant.Flat"
+                                          Click=@(args => GridDeleteButtonClick(args, tipo)) @onclick:stopPropagation="true" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+@code {
+
+    protected IEnumerable<TipoDocumentoDTO>? tipoDocumentos;
+
+    protected RadzenDataGrid<TipoDocumentoDTO> grid0 = new();
+    protected override async Task OnInitializedAsync()
+    {
+
+        await base.OnInitializedAsync();
+        Result<IEnumerable<TipoDocumentoDTO>> result = await _mediator.Send(new ListTipoDocumentosQuery(null, null));
+
+        if (result.IsSuccess)
+        {
+            tipoDocumentos = result.Value;
+        }
+
+    }
+
+    protected async Task AddButtonClick(MouseEventArgs args)
+    {
+        try
+        {
+            
+
+            _ = await DialogService.OpenAsync<AddTipoDocumento>("Nuevo Tipo de Documento", null, new DialogOptions()
+            {
+                Width = "700px",
+                Height = "600px",
+                Resizable = true,
+                Draggable = true
+            });
+
+            Result<IEnumerable<TipoDocumentoDTO>> result = await _mediator.Send(new ListTipoDocumentosQuery(null, null));
+
+        if (result.IsSuccess)
+        {
+            tipoDocumentos = result.Value;
+            await grid0.Reload();
+        }
+
+        }
+        catch (Exception e)
+        {
+            logger.LogError(0, e, "Error al abrir diálogo de nuevo tipo de documento");
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "No se pudo abrir el diálogo para crear nuevo tipo de documento"
+            });
+        }
+    }
+
+    protected async Task EditRow(TipoDocumentoDTO args)
+    {
+        try
+        {
+            var dialogParams = new Dictionary<string, object>
+            {
+                ["Id"] = args.Id,
+                ["OnTipoDocumentoUpdated"] = EventCallback.Factory.Create(this, RefreshGrid)
+            };
+
+            await DialogService.OpenAsync<EditTipoDocumento>("Editar Tipo de Documento", dialogParams, new DialogOptions()
+            {
+                Width = "700px",
+                Height = "600px",
+                Resizable = true,
+                Draggable = true
+            });
+        }
+        catch (Exception e)
+        {
+            logger.LogError(0, e, "Error al abrir diálogo de edición de tipo de documento");
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "No se pudo abrir el diálogo para editar el tipo de documento"
+            });
+        }
+    }
+
+    protected async Task GridDeleteButtonClick(MouseEventArgs args, TipoDocumentoDTO tipoDocumento)
+    {
+        try
+        {
+            if (await DialogService.Confirm("¿Está seguro de borrar este elemento?") == true)
+            {
+                var result = await _mediator.Send(new DeleteTipoDocumentoCommand(tipoDocumento.Id));
+
+                if (result.IsSuccess)
+                {
+                    await RefreshGrid();
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Éxito",
+                        Detail = "Tipo de documento eliminado correctamente"
+                    });
+                }
+                else
+                {
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error",
+                        Detail = "No se pudo eliminar el tipo de documento"
+                    });
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            logger.LogError(0, e, "Error al eliminar un elemento");
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = $"Error",
+                    Detail = $"Unable to delete TipoDocumento"
+                });
+        }
+    }
+
+    protected async Task RefreshGrid()
+    {
+        Result<IEnumerable<TipoDocumentoDTO>> result = await _mediator.Send(new ListTipoDocumentosQuery(null, null));
+        if (result.IsSuccess)
+        {
+            tipoDocumentos = result.Value;
+            await grid0.Reload();
+        }
+    }
+}

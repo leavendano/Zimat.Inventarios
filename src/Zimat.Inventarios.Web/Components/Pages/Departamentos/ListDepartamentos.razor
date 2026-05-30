@@ -1,0 +1,179 @@
+@page "/departamentos"
+@using Ardalis.Result
+@using Zimat.Inventarios.Core.Base
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject ILogger<ListDepartamentos> logger
+@using MediatR
+@inject IMediator _mediator
+@using Zimat.Inventarios.UseCases.Departamentos
+@using Zimat.Inventarios.UseCases.Departamentos.List
+@using Zimat.Inventarios.UseCases.Departamentos.Create
+@using Zimat.Inventarios.UseCases.Departamentos.Delete
+@using Zimat.Inventarios.UseCases.Departamentos.Update
+@attribute [Authorize]
+
+
+<PageTitle>Departamentos</PageTitle>
+<RadzenStack>
+    <RadzenRow AlignItems="AlignItems.Center">
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenText Text="Departamentos" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton Icon="add_circle_outline" Text="Nuevo" Click="@AddButtonClick" Variant="Variant.Flat" />
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn SizeMD=12>
+            <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
+                            Data="@departamentos" TItem="DepartamentoDTO" RowSelect="@EditRow">
+                <Columns>
+                    <RadzenDataGridColumn TItem="DepartamentoDTO" Property="Nombre" Title="Nombre">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="DepartamentoDTO" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
+                        <Template Context="departamento">
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
+                                          Shade="Shade.Lighter" Variant="Variant.Flat"
+                                          Click=@(args => GridDeleteButtonClick(args, departamento)) @onclick:stopPropagation="true" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+@code {
+
+    protected IEnumerable<DepartamentoDTO>? departamentos;
+
+    protected RadzenDataGrid<DepartamentoDTO> grid0 = new();
+    protected override async Task OnInitializedAsync()
+    {
+
+        await base.OnInitializedAsync();
+        Result<IEnumerable<DepartamentoDTO>> result = await _mediator.Send(new ListDepartamentosQuery(null, null));
+
+        if (result.IsSuccess)
+        {
+            departamentos = result.Value;
+        }
+
+    }
+
+    protected async Task AddButtonClick(MouseEventArgs args)
+    {
+        try
+        {
+            var dialogParams = new Dictionary<string, object>
+            {
+                ["OnDepartamentoCreated"] = EventCallback.Factory.Create(this, RefreshGrid)
+            };
+
+            await DialogService.OpenAsync<AddDepartamento>("Nuevo Departamento", dialogParams, new DialogOptions()
+            {
+                Width = "600px",
+                Height = "400px",
+                Resizable = true,
+                Draggable = true
+            });
+        }
+        catch (Exception e)
+        {
+            logger.LogError(0, e, "Error al abrir diálogo de nuevo departamento");
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "No se pudo abrir el diálogo para crear nuevo departamento"
+            });
+        }
+    }
+
+    protected async Task EditRow(DepartamentoDTO args)
+    {
+        try
+        {
+            var dialogParams = new Dictionary<string, object>
+            {
+                ["Id"] = args.Id,
+                ["OnDepartamentoUpdated"] = EventCallback.Factory.Create(this, RefreshGrid)
+            };
+
+            await DialogService.OpenAsync<EditDepartamento>("Editar Departamento", dialogParams, new DialogOptions()
+            {
+                Width = "600px",
+                Height = "400px",
+                Resizable = true,
+                Draggable = true
+            });
+        }
+        catch (Exception e)
+        {
+            logger.LogError(0, e, "Error al abrir diálogo de edición de departamento");
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "No se pudo abrir el diálogo para editar el departamento"
+            });
+        }
+    }
+
+    protected async Task GridDeleteButtonClick(MouseEventArgs args, DepartamentoDTO departamento)
+    {
+        try
+        {
+            if (await DialogService.Confirm("¿Está seguro de borrar este elemento?") == true)
+            {
+                var result = await _mediator.Send(new DeleteDepartamentoCommand(departamento.Id));
+
+                if (result.IsSuccess)
+                {
+                    await RefreshGrid();
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Success,
+                        Summary = "Éxito",
+                        Detail = "Departamento eliminado correctamente"
+                    });
+                }
+                else
+                {
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Error",
+                        Detail = "No se pudo eliminar el departamento"
+                    });
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            logger.LogError(0, e, "Error al eliminar un elemento");
+            NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = $"Error",
+                    Detail = $"Unable to delete Departamento"
+                });
+        }
+    }
+
+    protected async Task RefreshGrid()
+    {
+        Result<IEnumerable<DepartamentoDTO>> result = await _mediator.Send(new ListDepartamentosQuery(null, null));
+        if (result.IsSuccess)
+        {
+            departamentos = result.Value;
+            await grid0.Reload();
+        }
+    }
+}

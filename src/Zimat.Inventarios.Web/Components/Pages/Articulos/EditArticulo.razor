@@ -4,6 +4,18 @@
 @using Zimat.Inventarios.Core.Base
 @using Zimat.Inventarios.UseCases.Articulos.Get
 @using Zimat.Inventarios.UseCases.Articulos.Update
+@using Zimat.Inventarios.UseCases.Categorias
+@using Zimat.Inventarios.UseCases.Categorias.List
+@using Zimat.Inventarios.UseCases.Departamentos
+@using Zimat.Inventarios.UseCases.Departamentos.List
+@using Zimat.Inventarios.UseCases.Familias
+@using Zimat.Inventarios.UseCases.Familias.List
+@using Zimat.Inventarios.UseCases.Lineas
+@using Zimat.Inventarios.UseCases.Lineas.List
+@using Zimat.Inventarios.UseCases.Unidades
+@using Zimat.Inventarios.UseCases.Unidades.List
+@using Zimat.Inventarios.UseCases.Marcas
+@using Zimat.Inventarios.UseCases.Marcas.List
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @inject DialogService DialogService
@@ -11,39 +23,138 @@
 @inject TooltipService TooltipService
 @inject NotificationService NotificationService
 @inject IMediator _mediator
+@inject ILogger<AddArticulo> logger
 
 <PageTitle>Editar Producto</PageTitle>
 
 <RadzenColumn SizeMD=12>
     <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">Cannot save Product</RadzenAlert>
-    <RadzenTemplateForm TItem="ArticuloDTO" Data="@articulo" Visible="@(articulo != null)" Submit="@FormSubmit">
+    <RadzenTemplateForm TItem="ArticuloDTO" Data="@product" Visible="@(product != null)" Submit="@FormSubmit">
         <RadzenRow style="margin-bottom: 1rem">
-            <RadzenColumn SizeMD="3">
+            <RadzenColumn SizeMD="2">
                 <RadzenLabel Text="Clave" Component="clave" style="width: 100%" />
             </RadzenColumn>
-            <RadzenColumn SizeMD="9">
-                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@articulo!.Clave" Name="clave" />
-                <RadzenRequiredValidator Component="clave" Text="La clave del artículo es requerida" />
+            <RadzenColumn SizeMD="5">
+                <RadzenTextBox style="display: block; width: 50%" @bind-Value="@product!.Clave" Name="clave" ReadOnly=true/>
+                <RadzenRequiredValidator Component="clave" Text="La clave del producto es requerida" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow style="margin-bottom: 1rem">
-            <RadzenColumn SizeMD="3">
+            <RadzenColumn SizeMD="2">
                 <RadzenLabel Text="Descripción" Component="descripcion" style="width: 100%" />
             </RadzenColumn>
-            <RadzenColumn SizeMD="9">
-                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@articulo!.Descripcion" Name="descripcion" />
+            <RadzenColumn SizeMD="10">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@product!.Descripcion" Name="descripcion" />
                 <RadzenRequiredValidator Component="descripcion" Text="La descripción es requerida" />
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow style="margin-bottom: 1rem">
-            <RadzenColumn SizeMD="3">
-                <RadzenLabel Text="Precio" Component="descripcion" style="width: 100%" />
+            <RadzenColumn SizeMD="2">
+                <RadzenLabel Text="Marca" Component="marca" style="width: 100%" />
             </RadzenColumn>
-            <RadzenColumn SizeMD="9">
-                <RadzenNumeric style="display: block; width: 100%" @bind-Value="@articulo!.PrecioPublico" Name="precio" />
-                <RadzenRequiredValidator Component="precio" Text="El precio es requerida" />
+            <RadzenColumn SizeMD="4">
+                <RadzenDropDown @bind-Value="@product!.Marca" Data=@listadoMarcas TextProperty="@nameof(MarcaDTO.Descripcion)" ValueProperty="@nameof(MarcaDTO.Descripcion)"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
+                                AllowClear=true Placeholder="Seleccione una marca" style="display: block; width: 100%" Name="DropDownMarca" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="2">
+                <RadzenLabel Text="Modelo" Component="modelo" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="4">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@product!.Modelo" Name="modelo" />
             </RadzenColumn>
         </RadzenRow>
+        <RadzenRow style="margin-bottom: 1rem">
+            <RadzenColumn SizeMD="2">
+                <RadzenLabel Text="Código" Component="codigo" style="width: 100%" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="4">
+                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@product!.Codigo" Name="codigo" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="2">
+                @* <RadzenLabel Text="Unidad" Component="unidad" style="width: 100%" /> *@
+            </RadzenColumn>
+            <RadzenColumn SizeMD="4">
+                
+            </RadzenColumn>
+        </RadzenRow>
+        
+        <RadzenTabs @bind-SelectedIndex=@selectedIndex>
+            <Tabs>
+                <RadzenTabsItem Text="Clasificación">
+                    <RadzenRow style="margin-bottom: 1rem">
+                        <RadzenColumn SizeMD="2">
+                            <RadzenLabel Text="Linea" Component="DropDownLinea"  />
+                        </RadzenColumn>
+                        <RadzenColumn SizeMD="4">
+                            <RadzenDropDown @bind-Value="@product!.LineaId" Data=@listadoLineas TextProperty="@nameof(LineaDTO.Descripcion)" ValueProperty="Id"
+                                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
+                                            AllowClear=false Placeholder="Seleccione una linea" style="display: block; width: 100%" Name="DropDownLinea" />
+                           
+                        </RadzenColumn>
+                        <RadzenColumn SizeMD="2">
+                            <RadzenLabel Text="Familia" Component="DropDownFamilia" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeMD="4">
+                            <RadzenDropDown @bind-Value="@product!.FamiliaId" Data=@listadoFamilias TextProperty="@nameof(FamiliaDTO.Descripcion)" ValueProperty="Id"
+                                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
+                                            AllowClear=true Placeholder="Seleccione una familia" style="display: block; width: 100%" Name="DropDownFamilia" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow style="margin-bottom: 1rem">
+                        <RadzenColumn SizeMD="2">
+                            <RadzenLabel Text="Categoria" Component="categoria" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeMD="4">
+                            <RadzenDropDown @bind-Value="@product!.CategoriaId" Data=@listadoCategorias TextProperty="@nameof(CategoriaDTO.Descripcion)" ValueProperty="Id"
+                                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
+                                            AllowClear=false Placeholder="Seleccione una Categoria" style="display: block; width: 100%" Name="DropDownCategoria" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeMD="2">
+                            <RadzenLabel Text="Departamento" Component="producto_id" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeMD="4">
+                            <RadzenDropDown @bind-Value="@product!.DepartamentoId" Data=@listadoDepartamentos TextProperty="@nameof(DepartamentoDTO.Nombre)" ValueProperty="Id"
+                                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
+                                            AllowClear=false Placeholder="Seleccione una Departamento" style="display: block; width: 100%" Name="DropDownDepartamento" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                 </RadzenTabsItem>
+                
+                <RadzenTabsItem Text="Datos Fiscales">
+                    <RadzenRow style="margin-bottom: 1rem">
+                        <RadzenColumn SizeMD="2">
+                            <RadzenLabel Text="% Impuesto 1" Component="impuesto1" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeMD="2">
+                            <RadzenNumeric TValue="decimal" style="display: block; width: 100%" Name="impuesto1" @bind-Value="@product!.Impuesto1" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeMD="2">
+                            <RadzenLabel Text="% Impuesto 2" Component="impuesto2" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeMD="2">
+                            <RadzenNumeric TValue="decimal" style="display: block; width: 100%" Name="impuesto2" @bind-Value="@product!.Impuesto2" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow style="margin-bottom: 1rem">
+                        <RadzenColumn SizeMD="2">
+                            <RadzenLabel Text="Clave SAT" Component="claveSat" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeMD="4">
+                            <RadzenTextBox style="display: block; width: 100%" @bind-Value="@product!.ClaveSat" Name="claveSat" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Observaciones">
+                    <RadzenColumn Size="12" SizeMD="4">
+                    <RadzenCard>
+                        
+                        <RadzenTextArea Change=@(args => OnChange(args, "TextArea")) Style="width: 100%" aria-label="TextArea" />
+                    </RadzenCard>
+                </RadzenColumn>
+                </RadzenTabsItem>
+            </Tabs>
+        </RadzenTabs>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
             <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Save" Variant="Variant.Flat" />
             <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancel" Variant="Variant.Flat" Click="@CancelButtonClick" />
@@ -57,31 +168,108 @@
     protected class ArticuloDTO
     {
         public Guid Id { get; set; }
-        public string Clave { get; set; } = string.Empty;
-        public string Descripcion { get; set; } = string.Empty;
-        public decimal PrecioPublico { get; set; }
-
+        public string Clave { get; set; } = "";
+        public string Descripcion { get; set; } = "";
+        public string? Codigo { get; set; }
+        public string? Observaciones { get; set; }
+        public string? Marca { get; set; }
+        public string? Modelo { get; set; }
+        public Guid? LineaId { get; set; }
+        public Guid? FamiliaId { get; set; }
+        public Guid? CategoriaId { get; set; }
+        public Guid? DepartamentoId { get; set; }
+        public string? Valdep { get; set; }
+        public string? Ubicacion { get; set; }
+        public bool Series { get; set; }
+        public decimal Impuesto1 { get; set; } = 0;
+        public decimal Impuesto2 { get; set; } = 0;
+        public string? ClaveSat { get; set; }
+        public DateTime Ultcomp { get; set; }
+        public DateTime Ultvent { get; set; }
+        public decimal Existencia { get; set; }
+        public decimal StockMinimo { get; set; }
+        public decimal StockMaximo { get; set; }
+        public decimal DescuentoMaximo { get; set; }
+        public decimal Reorden { get; set; }
+        public string? RutaImagen { get; set; }
+        public decimal UltimoCosto { get; set; }
+        public bool Activo { get; set; }
     }
+
+    //IEnumerable<UnidadDTO>? listadoUnidades { get; set; }
+    IEnumerable<LineaDTO>? listadoLineas { get; set; }
+    IEnumerable<FamiliaDTO>? listadoFamilias { get; set; }
+    IEnumerable<CategoriaDTO>? listadoCategorias { get; set; }
+    IEnumerable<DepartamentoDTO>? listadoDepartamentos { get; set; }
+    IEnumerable<MarcaDTO>? listadoMarcas { get; set; }
+    int selectedIndex = 0;
 
     [Parameter]
     public Guid Id { get; set; }
-
+   
     protected override async Task OnInitializedAsync()
     {
         //product = await zimatService.GetProductByProductoId(producto_id);
         var result = await _mediator.Send(new GetArticuloQuery(Id));
         if (result.IsSuccess)
         {
-            articulo.Id = result.Value.Id;
-            articulo.Clave = result.Value.Clave;
-            articulo.Descripcion = result.Value.Descripcion;
-            articulo.PrecioPublico = result.Value.PrecioPublico;
+            product.Id = result.Value.Id;
+            product.Clave = result.Value.Clave;
+            product.Descripcion = result.Value.Descripcion;
+            product.RutaImagen = result.Value.RutaImagen;
+            product.Codigo = result.Value.CodigoBarras;
+            product.Marca = result.Value.Marca;
+            product.Modelo = result.Value.Modelo;
+            product.LineaId = result.Value.LineaId;
+            product.FamiliaId = result.Value.FamiliaId;
+            product.CategoriaId = result.Value.CategoriaId;
+            product.DepartamentoId = result.Value.DepartamentoId;
+            product.Impuesto1 = result.Value.Impuesto1;
+            product.Impuesto2 = result.Value.Impuesto2;
+            product.ClaveSat = result.Value.ClaveSat;
+            product.Marca = result.Value.Marca;
+
+        }
+
+       @*  var resultUnidades = await _mediator.Send(new ListUnidadesQuery(null, null, null));
+        if (resultUnidades.IsSuccess)
+        {
+            listadoUnidades = resultUnidades.Value;
+        } *@
+        var resultLineas = await _mediator.Send(new ListLineasQuery(null, null));
+        if (resultLineas.IsSuccess)
+        {
+            listadoLineas = resultLineas.Value;
+        }
+
+        var resultFamilias = await _mediator.Send(new ListFamiliasQuery(null, null));
+        if (resultFamilias.IsSuccess)
+        {
+            listadoFamilias = resultFamilias.Value;
+        }
+
+        var resultCategorias = await _mediator.Send(new ListCategoriasQuery(null, null));
+        if (resultCategorias.IsSuccess)
+        {
+            listadoCategorias = resultCategorias.Value;
+        }
+
+        var resultDepartamentos = await _mediator.Send(new ListDepartamentosQuery(null, null));
+        if (resultDepartamentos.IsSuccess)
+        {
+            listadoDepartamentos = resultDepartamentos.Value;
+        }
+
+        var resultMarcas = await _mediator.Send(new ListMarcasQuery(null, null));
+        if (resultMarcas.IsSuccess)
+        {
+            listadoMarcas = resultMarcas.Value;
         }
 
     }
     protected bool errorVisible;
   
-    protected ArticuloDTO articulo { get; set; } = new();
+    protected ArticuloDTO product { get; set; } = new();
 
     protected async Task FormSubmit()
     {
@@ -89,9 +277,30 @@
         try
         {
 
-            var result = await _mediator.Send(new UpdateArticuloCommand(articulo.Id, articulo.Descripcion, articulo.PrecioPublico));
+            var result = await _mediator.Send(new UpdateArticuloCommand(
+                product.Id,
+                product.Descripcion,
+                product.Clave,
+                product.Observaciones,
+                product.Codigo,
+                product.Marca,
+                product.Modelo,
+                product.LineaId,
+                product.FamiliaId,
+                product.CategoriaId,
+                product.DepartamentoId,
+                product.Ubicacion,
+                product.Series,
+                product.Impuesto1,
+                product.Impuesto2,
+                product.ClaveSat,
+                product.StockMinimo,
+                product.StockMaximo,
+                product.DescuentoMaximo,
+                product.RutaImagen
+                ));
 
-            DialogService.Close(articulo);
+            DialogService.Close(product);
         }
         catch (Exception)
         {
@@ -100,6 +309,10 @@
 
     }
 
+    void OnChange(string value, string name)
+    {
+        logger.LogInformation($"{name} value changed to {value}");
+    }
     protected async Task CancelButtonClick(MouseEventArgs args)
     {
         await Task.Run(() => DialogService.Close(null));

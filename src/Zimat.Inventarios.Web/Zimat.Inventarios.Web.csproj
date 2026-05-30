@@ -21,6 +21,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" PrivateAssets="All" />
     <PackageReference Include="Radzen.Blazor" />
     <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="System.IO.Packaging" />
   </ItemGroup>
 
   <ItemGroup>

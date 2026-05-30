@@ -1,0 +1,277 @@
+@page "/proveedores/edit"
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+@using MediatR
+@inject IMediator _mediator
+@inject ILogger<EditProveedor> logger
+@using Zimat.Inventarios.UseCases.Proveedores
+@using Zimat.Inventarios.UseCases.Proveedores.Get
+@using Zimat.Inventarios.UseCases.Proveedores.Update
+
+<RadzenTemplateForm TItem="ProveedorEditDTO" Data="@item" Visible="@(item != null)" Submit="@FormSubmit">
+    <RadzenFieldset Text="Información General">
+        <RadzenRow Gap="1rem" class="rz-p-0 rz-p-lg-4">
+            <RadzenColumn>
+                <RadzenStack Gap="1rem">
+                    <RadzenRow AlignItems="AlignItems.Center">
+                        <RadzenColumn Size="12" SizeMD="2">
+                            <RadzenLabel Text="Clave" Component="Clave" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="10">
+                            <RadzenTextBox Style="width: 50%;" Name="Clave" @bind-Value="@item!.Clave" Required="true" RequiredMessage="La clave es requerida" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center">
+                        <RadzenColumn Size="12" SizeMD="2">
+                            <RadzenLabel Text="Nombre" Component="Nombre" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="10">
+                            <RadzenTextBox Style="width: 100%;" Name="Nombre" @bind-Value="@item!.Nombre" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenTabs SelectedIndex="0">
+            <Tabs>
+                <RadzenTabsItem Text="Domicilio">
+                    <RadzenRow AlignItems="AlignItems.Center">
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenStack>
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="2">
+                                        <RadzenLabel Text="Calle" Component="Calle" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="10">
+                                        <RadzenTextBox Style="width: 100%;" Name="Calle" @bind-Value="@item!.Calle" />
+                                    </RadzenColumn>
+                                </RadzenRow>
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="2">
+                                        <RadzenLabel Text="Ciudad" Component="Ciudad" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="10">
+                                        <RadzenTextBox Style="width: 100%;" Name="Ciudad" @bind-Value="@item!.Ciudad" />
+                                    </RadzenColumn>
+                                </RadzenRow>
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="2">
+                                        <RadzenLabel Text="Estado" Component="Estado" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="10">
+                                        <RadzenTextBox Style="width: 100%;" Name="Estado" @bind-Value="@item!.Estado" />
+                                    </RadzenColumn>
+                                </RadzenRow>
+                            </RadzenStack>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenStack>
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="2">
+                                        <RadzenLabel Text="Numero" Component="NumeroExterior" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="10">
+                                        <RadzenTextBox Style="width: 50%;" Name="NumeroExterior" @bind-Value="@item!.NumeroExterior" />
+                                    </RadzenColumn>
+                                </RadzenRow>
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="2">
+                                        <RadzenLabel Text="Colonia" Component="Colonia" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="10">
+                                        <RadzenTextBox Style="width: 100%;" Name="Colonia" @bind-Value="@item!.Colonia" />
+                                    </RadzenColumn>
+                                </RadzenRow>
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="2">
+                                        <RadzenLabel Text="CP" Component="CodigoPostal" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="10">
+                                        <RadzenTextBox Style="width: 50%;" Name="CodigoPostal" @bind-Value="@item!.CodigoPostal" />
+                                    </RadzenColumn>
+                                </RadzenRow>
+                            </RadzenStack>
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Contacto">
+                    <RadzenStack Gap="1rem">
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="2">
+                                <RadzenLabel Text="Teléfono" Component="Telefono" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="10">
+                                <RadzenTextBox Style="width: 100%;" Name="Telefono" @bind-Value="@item!.Telefono" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="2">
+                                <RadzenLabel Text="Email" Component="Email" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="10">
+                                <RadzenTextBox Style="width: 100%;" Name="Email" @bind-Value="@item!.Email" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="2">
+                                <RadzenLabel Text="Contacto" Component="Contacto" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="10">
+                                <RadzenTextBox Style="width: 100%;" Name="Contacto" @bind-Value="@item!.Contacto" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Datos Fiscales">
+                    <RadzenStack Gap="1rem">
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="2">
+                                <RadzenLabel Text="RFC" Component="Rfc" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="10">
+                                <RadzenTextBox Style="width: 100%;" Name="Rfc" @bind-Value="@item!.Rfc" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="2">
+                                <RadzenLabel Text="Clasificación" Component="Clasificacion" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="10">
+                                <RadzenTextBox Style="width: 100%;" Name="Clasificacion" @bind-Value="@item!.Clasificacion" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="2">
+                                <RadzenLabel Text="Cuenta Contable" Component="CuentaContable" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="10">
+                                <RadzenTextBox Style="width: 100%;" Name="CuentaContable" @bind-Value="@item!.CuentaContable" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Crédito">
+                    <RadzenStack Gap="1rem">
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="2">
+                                <RadzenLabel Text="Días Crédito" Component="DiasCredito" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="10">
+                                <RadzenNumeric Style="width: 50%;" Name="DiasCredito" @bind-Value="@item!.DiasCredito" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="2">
+                                <RadzenLabel Text="Tipo Proveedor" Component="TipoProveedor" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="10">
+                                <RadzenNumeric Style="width: 50%;" Name="TipoProveedor" @bind-Value="@item!.TipoProveedor" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenTabsItem>
+            </Tabs>
+        </RadzenTabs>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" class="rz-mt-8 rz-mb-4">
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Guardar" ButtonStyle="ButtonStyle.Primary" Icon="save" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancelar" Variant="Variant.Flat" Click="@CancelButtonClick" />
+        </RadzenStack>
+    </RadzenFieldset>
+</RadzenTemplateForm>
+
+@code {
+    protected class ProveedorEditDTO
+    {
+        public Guid Id { get; set; }
+        public string Clave { get; set; } = string.Empty;
+        public string Nombre { get; set; } = string.Empty;
+        public string Rfc { get; set; } = string.Empty;
+        public string CodigoPostal { get; set; } = string.Empty;
+        public string? Calle { get; set; }
+        public string? NumeroExterior { get; set; }
+        public string? Colonia { get; set; }
+        public string? Ciudad { get; set; }
+        public string? Estado { get; set; }
+        public string? Telefono { get; set; }
+        public string? Email { get; set; }
+        public string? Clasificacion { get; set; }
+        public string? Contacto { get; set; }
+        public string? CuentaContable { get; set; }
+        public int DiasCredito { get; set; }
+        public int TipoProveedor { get; set; } = 1;
+    }
+
+    [Parameter]
+    public Guid Id { get; set; }
+
+    protected ProveedorEditDTO? item { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await _mediator.Send(new GetProveedorQuery(Id));
+        if (result.IsSuccess)
+        {
+            item = new ProveedorEditDTO
+            {
+                Id = result.Value.Id,
+                Clave = result.Value.Clave,
+                Nombre = result.Value.Nombre,
+                Rfc = result.Value.Rfc,
+                CodigoPostal = result.Value.CodigoPostal,
+                Calle = result.Value.Calle,
+                NumeroExterior = result.Value.NumeroExterior,
+                Colonia = result.Value.Colonia,
+                Ciudad = result.Value.Ciudad,
+                Estado = result.Value.Estado,
+                Telefono = result.Value.Telefono,
+                Email = result.Value.Email,
+                Clasificacion = result.Value.Clasificacion,
+                Contacto = result.Value.Contacto,
+                CuentaContable = result.Value.CuentaContable,
+                DiasCredito = result.Value.DiasCredito,
+                TipoProveedor = result.Value.TipoProveedor
+            };
+        }
+    }
+
+    protected async Task FormSubmit()
+    {
+        try
+        {
+            if (item == null)
+                throw new InvalidOperationException("No se pueden guardar datos vacíos");
+
+            var result = await _mediator.Send(new UpdateProveedorCommand(
+                item.Id, item.Clave, item.Nombre, item.Rfc, item.CodigoPostal,
+                item.Calle, item.NumeroExterior, item.Colonia, item.Ciudad, item.Estado,
+                item.Telefono, item.Email, item.Clasificacion, item.Contacto, item.CuentaContable,
+                item.DiasCredito, item.TipoProveedor
+            ));
+
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Proveedor actualizado",
+                Detail = "El proveedor se ha actualizado correctamente",
+                Duration = 4000
+            });
+            DialogService.Close(item);
+        }
+        catch (Exception e)
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error al actualizar el proveedor",
+                Detail = e.Message,
+                Duration = 4000
+            });
+            logger.LogError(e, "Error al actualizar proveedor");
+        }
+    }
+
+    protected async Task CancelButtonClick(MouseEventArgs args)
+    {
+        await Task.Run(() => DialogService.Close(null));
+    }
+}
