@@ -14,6 +14,8 @@
 @using Zimat.Inventarios.UseCases.Lineas.List
 @using Zimat.Inventarios.UseCases.Unidades
 @using Zimat.Inventarios.UseCases.Unidades.List
+@using Zimat.Inventarios.UseCases.Marcas
+@using Zimat.Inventarios.UseCases.Marcas.List
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @inject DialogService DialogService
@@ -51,7 +53,9 @@
                 <RadzenLabel Text="Marca" Component="marca" style="width: 100%" />
             </RadzenColumn>
             <RadzenColumn SizeMD="4">
-                <RadzenTextBox style="display: block; width: 100%" @bind-Value="@product!.Marca" Name="marca" />
+                <RadzenDropDown @bind-Value="@product!.Marca" Data=@listadoMarcas TextProperty="@nameof(MarcaDTO.Descripcion)" ValueProperty="@nameof(MarcaDTO.Descripcion)"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterOperator="StringFilterOperator.StartsWith" AllowFiltering="true"
+                                AllowClear=true Placeholder="Seleccione una marca" style="display: block; width: 100%" Name="DropDownMarca" />
             </RadzenColumn>
             <RadzenColumn SizeMD="2">
                 <RadzenLabel Text="Modelo" Component="modelo" style="width: 100%" />
@@ -68,7 +72,7 @@
                 <RadzenTextBox style="display: block; width: 100%" @bind-Value="@product!.Codigo" Name="codigo" />
             </RadzenColumn>
             <RadzenColumn SizeMD="2">
-                <RadzenLabel Text="Unidad" Component="unidad" style="width: 100%" />
+                @* <RadzenLabel Text="Unidad" Component="unidad" style="width: 100%" /> *@
             </RadzenColumn>
             <RadzenColumn SizeMD="4">
                 
@@ -117,6 +121,30 @@
                     </RadzenRow>
                  </RadzenTabsItem>
                 
+                <RadzenTabsItem Text="Datos Fiscales">
+                    <RadzenRow style="margin-bottom: 1rem">
+                        <RadzenColumn SizeMD="2">
+                            <RadzenLabel Text="% Impuesto 1" Component="impuesto1" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeMD="2">
+                            <RadzenNumeric TValue="decimal" style="display: block; width: 100%" Name="impuesto1" @bind-Value="@product!.Impuesto1" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeMD="2">
+                            <RadzenLabel Text="% Impuesto 2" Component="impuesto2" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeMD="2">
+                            <RadzenNumeric TValue="decimal" style="display: block; width: 100%" Name="impuesto2" @bind-Value="@product!.Impuesto2" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow style="margin-bottom: 1rem">
+                        <RadzenColumn SizeMD="2">
+                            <RadzenLabel Text="Clave SAT" Component="claveSat" />
+                        </RadzenColumn>
+                        <RadzenColumn SizeMD="4">
+                            <RadzenTextBox style="display: block; width: 100%" @bind-Value="@product!.ClaveSat" Name="claveSat" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenTabsItem>
                 <RadzenTabsItem Text="Observaciones">
                     <RadzenColumn Size="12" SizeMD="4">
                     <RadzenCard>
@@ -173,7 +201,7 @@
     IEnumerable<FamiliaDTO>? listadoFamilias { get; set; }
     IEnumerable<CategoriaDTO>? listadoCategorias { get; set; }
     IEnumerable<DepartamentoDTO>? listadoDepartamentos { get; set; }
-    IEnumerable<decimal> listadoImpuestos { get; set; } = new decimal[] { 0, 8, 16 };
+    IEnumerable<MarcaDTO>? listadoMarcas { get; set; }
     int selectedIndex = 0;
 
     [Parameter]
@@ -198,7 +226,9 @@
             product.DepartamentoId = result.Value.DepartamentoId;
             product.Impuesto1 = result.Value.Impuesto1;
             product.Impuesto2 = result.Value.Impuesto2;
-            
+            product.ClaveSat = result.Value.ClaveSat;
+            product.Marca = result.Value.Marca;
+
         }
 
        @*  var resultUnidades = await _mediator.Send(new ListUnidadesQuery(null, null, null));
@@ -228,6 +258,12 @@
         if (resultDepartamentos.IsSuccess)
         {
             listadoDepartamentos = resultDepartamentos.Value;
+        }
+
+        var resultMarcas = await _mediator.Send(new ListMarcasQuery(null, null));
+        if (resultMarcas.IsSuccess)
+        {
+            listadoMarcas = resultMarcas.Value;
         }
 
     }

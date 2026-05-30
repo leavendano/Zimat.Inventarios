@@ -9,8 +9,9 @@ public class CartItem
     public decimal Cantidad { get; set; }
     public string Unidad { get; set; } = string.Empty;
     public decimal Impuesto1 { get; set; }
-    
+    public decimal Impuesto2 { get; set; }
+
     public decimal Subtotal => PrecioUnitario * Cantidad;
-    public decimal ImpuestoTotal => Subtotal * (Impuesto1 / 100);
+    public decimal ImpuestoTotal => Subtotal * ((Impuesto1 + Impuesto2) / 100);
     public decimal Total => Subtotal + ImpuestoTotal;
 }

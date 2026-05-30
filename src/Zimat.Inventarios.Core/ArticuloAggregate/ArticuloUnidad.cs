@@ -50,11 +50,22 @@ public class ArticuloUnidad : EntityBase<Guid>, IRegisterBase
         base.RegisterDomainEvent(precioUpdatedEvent);
         return;
       }
-      else 
+      else
       {
         _precios.Add(newItem);
         var newItemAddedEvent = new NewPrecioAddedEvent(this, newItem);
         base.RegisterDomainEvent(newItemAddedEvent);
       }
+    }
+
+    public void RemovePrecio(Guid precioId)
+    {
+      var precio = _precios.FirstOrDefault(x => x.Id == precioId);
+      if (precio == null)
+      {
+        throw new InvalidOperationException($"No se encontró Precio con Id {precioId}");
+      }
+
+      _precios.Remove(precio);
     }
 }

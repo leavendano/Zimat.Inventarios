@@ -14,6 +14,12 @@ public class GetClienteHandler(IReadRepository<Cliente> _repository)
     var entity = await _repository.FirstOrDefaultAsync(spec, cancellationToken);
     if (entity == null) return Result.NotFound();
 
-    return new ClienteDTO(entity.Id, entity.Clave, entity.Nombre, entity.Rfc, entity.CodigoPostal);
+    return new ClienteDTO(
+      entity.Id, entity.Clave, entity.Nombre, entity.Rfc, entity.CodigoPostal,
+      entity.Calle, entity.NumeroExterior, entity.Colonia, entity.Ciudad, entity.Estado, entity.Pais,
+      entity.Telefono, entity.Email, entity.ContactoVentas, entity.ContactoPago,
+      entity.RegimenFiscal, entity.UsoCfdi, entity.Observaciones,
+      entity.DiasCredito, entity.LimiteCredito
+    );
   }
 }

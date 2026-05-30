@@ -8,7 +8,8 @@ public class ListProveedoresQueryService(AppDbContext _db) : IListProveedoresQue
   public async Task<IEnumerable<ProveedorDTO>> ListAsync()
   {
     var result = await _db.Database.SqlQuery<ProveedorDTO>(
-      $"SELECT id,clave , nombre, rfc, codigo_postal FROM Proveedores") // don't fetch other big columns
+      $@"SELECT id,clave , nombre, rfc, codigo_postal, calle, numero_exterior, colonia, ciudad, estado, telefono
+      ,email, clasificacion, contacto, cuenta_contable, dias_credito, tipo_proveedor FROM Proveedores") // don't fetch other big columns
       .ToListAsync();
 
     return result;

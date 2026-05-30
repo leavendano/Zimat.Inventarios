@@ -54,7 +54,7 @@
                     </RadzenColumn>
                     <RadzenColumn Size="2">
                         <RadzenDropDown @bind-Value="selectedTipoDePago"
-                                        Data="@tiposDePago"
+                                        Data="@tiposDePagoDisponibles"
                                         Placeholder="Tipo de Pago"
                                         Style="width: 100%;" />
                     </RadzenColumn>
@@ -186,7 +186,8 @@
     private Guid? selectedClienteId;
     private ClienteDTO? selectedCliente;
     List<VentaConceptoDTO> conceptosToSave = [];
-    private string[] tiposDePago = new[] { "Contado", "Crédito" };
+    private string[] tiposDePagoDisponibles => ClientePermiteCredito ? ["Contado", "Crédito"] : ["Contado"];
+    private bool ClientePermiteCredito => selectedCliente?.DiasCredito > 0;
     private int idTipoDePago = 0; // 0: Contado, 1: Crédito
     private string selectedTipoDePago = "Contado";
 
@@ -317,17 +318,34 @@
 
     private void OnClienteSelected(object value)
     {
-        if (value != null && Guid.TryParse(value.ToString(), out var clienteId))
+        if (value == null || !Guid.TryParse(value.ToString(), out var clienteId))
         {
-            selectedClienteId = clienteId;
-            selectedCliente = clientes?.FirstOrDefault(c => c.Id == clienteId);
+            selectedClienteId = null;
+            selectedCliente = null;
+            ValidarTipoDePagoPermitido();
+            return;
+        }
 
+        selectedClienteId = clienteId;
+        selectedCliente = clientes?.FirstOrDefault(c => c.Id == clienteId);
+        ValidarTipoDePagoPermitido();
+
+        if (selectedCliente != null)
+        {
             NotificationService.Notify(new NotificationMessage
             {
                 Severity = NotificationSeverity.Info,
                 Summary = "Cliente seleccionado",
                 Detail = $"Cliente: {selectedCliente?.Nombre}"
             });
+        }
+    }
+
+    private void ValidarTipoDePagoPermitido()
+    {
+        if (!ClientePermiteCredito && selectedTipoDePago == "Crédito")
+        {
+            selectedTipoDePago = "Contado";
         }
     }
 }

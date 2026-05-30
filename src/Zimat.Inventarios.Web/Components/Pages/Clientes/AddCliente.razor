@@ -1,93 +1,225 @@
 @page "/add-cliente"
-@inject IJSRuntime JSRuntime
-@inject NavigationManager NavigationManager
 @inject DialogService DialogService
-@inject ContextMenuService ContextMenuService
-@inject TooltipService TooltipService
 @inject NotificationService NotificationService
-@inject ILogger<AddCliente> logger
 @using MediatR
+@inject IMediator _mediator
+@inject ILogger<AddCliente> logger
+@using Zimat.Inventarios.UseCases.Clientes
 @using Zimat.Inventarios.UseCases.Clientes.Create
-@using Ardalis.Result
-@inject IMediator  _mediator
 @attribute [Authorize]
 
 <PageTitle>Nuevo Cliente</PageTitle>
-    <RadzenColumn SizeMD=12>
-        <RadzenAlert Shade="Shade.Lighter" Variant="Variant.Flat" Size="AlertSize.Small" AlertStyle="AlertStyle.Danger" Visible="@errorVisible">@mensajeAlerta</RadzenAlert>
-        <RadzenTemplateForm TItem="ClienteDTO" Data="@item" Visible="@(item != null)" Submit="@FormSubmit">
-            <RadzenRow style="margin-bottom: 1rem">
-                <RadzenColumn SizeMD="3">
-                    <RadzenLabel Text="Clave" Component="clave" style="width: 100%" />
-                </RadzenColumn>
-                <RadzenColumn SizeMD="9">
-                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@item!.Clave" Name="clave" />
-                    <RadzenRequiredValidator Component="clave" Text="La Clave es requerida" />
-                </RadzenColumn>
-            </RadzenRow>
-            <RadzenRow style="margin-bottom: 1rem">
-                <RadzenColumn SizeMD="3">
-                    <RadzenLabel Text="Nombre" Component="nombre" style="width: 100%" />
-                </RadzenColumn>
-                <RadzenColumn SizeMD="9">
-                    <RadzenTextBox style="display: block; width: 100%" @bind-Value="@item!.Nombre" Name="nombre" />
-                    <RadzenRequiredValidator Component="nombre" Text="El Nombre es requerido" />
-                </RadzenColumn>
-            </RadzenRow>
-            <RadzenRow style="margin-bottom: 1rem">
-                <RadzenColumn SizeMD="3">
-                    <RadzenLabel Text="RFC" Component="rfc" style="width: 100%" />
-                </RadzenColumn>
-                <RadzenColumn SizeMD="9">
-                    <RadzenTextBox Name="rfc" @bind-Value="@item!.Rfc" Style="width: 100%;" aria-label="rfc" />
-                    <RadzenRequiredValidator Component="rfc" Text="El RFC es requerido" />
-                </RadzenColumn>
-            </RadzenRow>
-            <RadzenRow style="margin-bottom: 1rem">
-                <RadzenColumn SizeMD="3">
-                    <RadzenLabel Text="Código Postal" Component="codigo_postal" style="width: 100%" />
-                </RadzenColumn>
-                <RadzenColumn SizeMD="9">
-                    <RadzenTextBox Name="codigo_postal" @bind-Value="@item!.CodigoPostal" Style="width: 100%;" aria-label="codigo_postal" />
-                    <RadzenRequiredValidator Component="codigo_postal" Text="El Código Postal es requerido" />
-                </RadzenColumn>
-            </RadzenRow>
-          <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
-                    <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Icon="save" Text="Guardar" Variant="Variant.Flat" />
-                    <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancelar" Variant="Variant.Flat" Click="@CancelButtonClick"  />
-          </RadzenStack>
-        </RadzenTemplateForm>
-    </RadzenColumn>
+
+<RadzenTemplateForm TItem="ClienteCrearDTO" Data="@item" Visible="@(item != null)" Submit="@FormSubmit">
+    <RadzenFieldset Text="Información General">
+        <RadzenRow Gap="1rem" class="rz-p-0 rz-p-lg-4">
+            <RadzenColumn>
+                <RadzenStack Gap="1rem">
+                    <RadzenRow AlignItems="AlignItems.Center">
+                        <RadzenColumn Size="12" SizeMD="2">
+                            <RadzenLabel Text="Clave" Component="Clave" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="10">
+                            <RadzenTextBox Style="width: 50%;" Name="Clave" @bind-Value="@item!.Clave" Required="true" RequiredMessage="La clave es requerida" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center">
+                        <RadzenColumn Size="12" SizeMD="2">
+                            <RadzenLabel Text="Nombre" Component="Nombre" />
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="10">
+                            <RadzenTextBox Style="width: 100%;" Name="Nombre" @bind-Value="@item!.Nombre" Required="true" RequiredMessage="El nombre es requerido" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenTabs SelectedIndex="0">
+            <Tabs>
+                <RadzenTabsItem Text="Domicilio">
+                    <RadzenRow AlignItems="AlignItems.Center">
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenStack>
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="3">
+                                        <RadzenLabel Text="Calle" Component="Calle" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="9">
+                                        <RadzenTextBox Style="width: 100%;" Name="Calle" @bind-Value="@item!.Calle" />
+                                    </RadzenColumn>
+                                </RadzenRow>
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="3">
+                                        <RadzenLabel Text="Número" Component="NumeroExterior" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="9">
+                                        <RadzenTextBox Style="width: 50%;" Name="NumeroExterior" @bind-Value="@item!.NumeroExterior" />
+                                    </RadzenColumn>
+                                </RadzenRow>
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="3">
+                                        <RadzenLabel Text="Colonia" Component="Colonia" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="9">
+                                        <RadzenTextBox Style="width: 100%;" Name="Colonia" @bind-Value="@item!.Colonia" />
+                                    </RadzenColumn>
+                                </RadzenRow>
+                            </RadzenStack>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenStack>
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="3">
+                                        <RadzenLabel Text="Ciudad" Component="Ciudad" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="9">
+                                        <RadzenTextBox Style="width: 100%;" Name="Ciudad" @bind-Value="@item!.Ciudad" />
+                                    </RadzenColumn>
+                                </RadzenRow>
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="3">
+                                        <RadzenLabel Text="Estado" Component="Estado" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="9">
+                                        <RadzenTextBox Style="width: 100%;" Name="Estado" @bind-Value="@item!.Estado" />
+                                    </RadzenColumn>
+                                </RadzenRow>
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="3">
+                                        <RadzenLabel Text="CP" Component="CodigoPostal" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="9">
+                                        <RadzenTextBox Style="width: 50%;" Name="CodigoPostal" @bind-Value="@item!.CodigoPostal" Required="true" RequiredMessage="El Código Postal es requerido" />
+                                    </RadzenColumn>
+                                </RadzenRow>
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="3">
+                                        <RadzenLabel Text="País" Component="Pais" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="9">
+                                        <RadzenTextBox Style="width: 100%;" Name="Pais" @bind-Value="@item!.Pais" />
+                                    </RadzenColumn>
+                                </RadzenRow>
+                            </RadzenStack>
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Contacto">
+                    <RadzenStack Gap="1rem">
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="2">
+                                <RadzenLabel Text="Teléfono" Component="Telefono" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="10">
+                                <RadzenTextBox Style="width: 100%;" Name="Telefono" @bind-Value="@item!.Telefono" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="2">
+                                <RadzenLabel Text="Email" Component="Email" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="10">
+                                <RadzenTextBox Style="width: 100%;" Name="Email" @bind-Value="@item!.Email" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="2">
+                                <RadzenLabel Text="Contacto Ventas" Component="ContactoVentas" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="10">
+                                <RadzenTextBox Style="width: 100%;" Name="ContactoVentas" @bind-Value="@item!.ContactoVentas" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="2">
+                                <RadzenLabel Text="Contacto Pago" Component="ContactoPago" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="10">
+                                <RadzenTextBox Style="width: 100%;" Name="ContactoPago" @bind-Value="@item!.ContactoPago" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Datos Fiscales">
+                    <RadzenStack Gap="1rem">
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="2">
+                                <RadzenLabel Text="RFC" Component="Rfc" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="10">
+                                <RadzenTextBox Style="width: 100%;" Name="Rfc" @bind-Value="@item!.Rfc" Required="true" RequiredMessage="El RFC es requerido" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="2">
+                                <RadzenLabel Text="Régimen Fiscal" Component="RegimenFiscal" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="10">
+                                <RadzenTextBox Style="width: 100%;" Name="RegimenFiscal" @bind-Value="@item!.RegimenFiscal" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="2">
+                                <RadzenLabel Text="Uso CFDI" Component="UsoCfdi" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="10">
+                                <RadzenTextBox Style="width: 100%;" Name="UsoCfdi" @bind-Value="@item!.UsoCfdi" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Crédito">
+                    <RadzenStack Gap="1rem">
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="2">
+                                <RadzenLabel Text="Días Crédito" Component="DiasCredito" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="10">
+                                <RadzenNumeric Style="width: 50%;" Name="DiasCredito" @bind-Value="@item!.DiasCredito" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="2">
+                                <RadzenLabel Text="Límite Crédito" Component="LimiteCredito" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="10">
+                                <RadzenNumeric Style="width: 50%;" Name="LimiteCredito" @bind-Value="@item!.LimiteCredito" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="2">
+                                <RadzenLabel Text="Observaciones" Component="Observaciones" />
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="10">
+                                <RadzenTextArea Style="width: 100%;" Name="Observaciones" @bind-Value="@item!.Observaciones" Rows="3" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenTabsItem>
+            </Tabs>
+        </RadzenTabs>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" class="rz-mt-8 rz-mb-4">
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Guardar" ButtonStyle="ButtonStyle.Primary" Icon="save" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="Cancelar" Variant="Variant.Flat" Click="@CancelButtonClick" />
+        </RadzenStack>
+    </RadzenFieldset>
+</RadzenTemplateForm>
 
 @code {
-
-    protected class ClienteDTO
-    {
-        public string Clave {get; set;} = string.Empty;
-        public string Nombre {get; set;} = string.Empty;
-        public string Rfc {get; set;} = string.Empty;
-        public string CodigoPostal {get; set;} = string.Empty;
-    }
-
-    protected bool errorVisible;
-    protected string mensajeAlerta = "No se guardó el registro";
-    [SupplyParameterFromForm]
-    protected ClienteDTO item {get; set;} = default!;
+    protected ClienteCrearDTO item { get; set; } = new();
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
-    private string? NombreUsuario {get; set;}
+    private string? NombreUsuario { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        item ??= new();
         if (authenticationState is not null)
         {
             var authState = await authenticationState;
-
-             if (authState.User?.Identity is not null && authState.User.Identity.IsAuthenticated)
-             {
+            if (authState.User?.Identity is not null && authState.User.Identity.IsAuthenticated)
+            {
                 NombreUsuario = authState.User.Identity.Name;
-             }
+            }
         }
     }
 
@@ -95,7 +227,7 @@
     {
         try
         {
-            var result = await _mediator.Send(new CreateClienteCommand(item.Clave, item.Nombre, item.Rfc, item.CodigoPostal, NombreUsuario!));
+            var result = await _mediator.Send(new CreateClienteCommand(item, NombreUsuario ?? "ADMINISTRADOR"));
             NotificationService.Notify(new NotificationMessage
             {
                 Severity = NotificationSeverity.Success,
@@ -103,7 +235,6 @@
                 Detail = "El cliente se ha creado correctamente",
                 Duration = 4000
             });
-            errorVisible = false;
             DialogService.Close(item);
         }
         catch (Exception e)
@@ -115,15 +246,8 @@
                 Detail = e.Message,
                 Duration = 4000
             });
-            mensajeAlerta = $"Error: {e.Message}";
-            errorVisible = true;
             logger.LogError(e, "Error al crear el cliente");
         }
-    }
-
-    void OnChange(string value, string name)
-    {
-        logger.LogInformation($"{name} se cambió a  {value}");
     }
 
     protected async Task CancelButtonClick(MouseEventArgs args)

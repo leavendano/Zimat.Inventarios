@@ -25,6 +25,7 @@ public class UpdateArticuloHandler(IRepository<Articulo> _repository, IEmailSend
     existingArticulo.DepartamentoId = request.DepartamentoId;
     existingArticulo.Impuesto1 = request.Impuesto1;
     existingArticulo.Impuesto2 = request.Impuesto2;
+    existingArticulo.ClaveSat = request.ClaveSat;
     existingArticulo.Observaciones = request.Observaciones;
     existingArticulo.CodigoBarras = request.CodigoBarras;
     existingArticulo.Marca = request.Marca;

@@ -18,6 +18,9 @@ public class CreateArticuloHandler(IRepository<Articulo> _repository)
     newArticulo.FamiliaId = request.FamiliaId;
     newArticulo.DepartamentoId = request.DepartamentoId;
     newArticulo.RutaImagen = request.RutaImagen;
+    newArticulo.Impuesto1 = request.Impuesto1;
+    newArticulo.Impuesto2 = request.Impuesto2;
+    newArticulo.ClaveSat = request.ClaveSat;
 
     var createdItem = await _repository.AddAsync(newArticulo, cancellationToken);
 

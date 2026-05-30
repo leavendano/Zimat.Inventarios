@@ -16,8 +16,14 @@ public class Proveedor : EntityBase<Guid>, IAggregateRoot, IRegisterBase
     CreatedAt = DateTime.UtcNow;
     UpdatedAt = DateTime.UtcNow;
   }
-  public string Clave {  get; private set; } 
-  public string Nombre {  get; private set; } 
+  public string Clave {  get; private set; }
+  public string Nombre {  get; private set; }
+
+  public void UpdateClave(string newClave) => Clave = Guard.Against.NullOrEmpty(newClave, nameof(newClave));
+  public void UpdateNombre(string newNombre) => Nombre = Guard.Against.NullOrEmpty(newNombre, nameof(newNombre));
+  public void UpdateRfc(string newRfc) => Rfc = Guard.Against.NullOrEmpty(newRfc, nameof(newRfc));
+  public void UpdateCodigoPostal(string newCodigoPostal) => CodigoPostal = Guard.Against.NullOrEmpty(newCodigoPostal, nameof(newCodigoPostal));
+
   public string? Calle {  get; set; }
   public string? NumeroExterior {  get; set; }
   public string? Colonia { get;set; }

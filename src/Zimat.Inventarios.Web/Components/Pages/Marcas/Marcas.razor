@@ -1,0 +1,105 @@
+@page "/marcas"
+@using Ardalis.Result
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+@inject ILogger<Marcas> logger
+@using MediatR
+@inject IMediator _mediator
+@using Zimat.Inventarios.UseCases.Marcas
+@using Zimat.Inventarios.UseCases.Marcas.Delete
+@using Zimat.Inventarios.UseCases.Marcas.List
+@attribute [Authorize]
+
+<PageTitle>Marcas</PageTitle>
+<RadzenStack>
+    <RadzenRow AlignItems="AlignItems.Center">
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenText Text="Marcas" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton Icon="add_circle_outline" Text="Nuevo" Click="@AddButtonClick" Variant="Variant.Flat" />
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn SizeMD=12>
+            <RadzenDataGrid @ref="grid0" ColumnWidth="200px" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowPaging="true" AllowSorting="true" ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
+                            Data="@marcas" TItem="MarcaDTO" RowSelect="@EditRow">
+                <Columns>
+                    <RadzenDataGridColumn TItem="MarcaDTO" Property="Descripcion" Title="Descripción">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="MarcaDTO" Filterable="false" Sortable="false" Width="70px" TextAlign="TextAlign.Center">
+                        <Template Context="marca">
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Size="ButtonSize.Medium"
+                                          Shade="Shade.Lighter" Variant="Variant.Flat"
+                                          Click=@(args => GridDeleteButtonClick(args, marca)) @onclick:stopPropagation="true" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    protected IEnumerable<MarcaDTO>? marcas;
+    protected RadzenDataGrid<MarcaDTO> grid0 = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await LoadMarcas();
+    }
+
+    private async Task LoadMarcas()
+    {
+        var result = await _mediator.Send(new ListMarcasQuery(null, null));
+        if (result.IsSuccess)
+        {
+            marcas = result.Value;
+        }
+    }
+
+    protected async Task AddButtonClick(MouseEventArgs args)
+    {
+        await DialogService.OpenAsync<AddMarca>("Nueva Marca", null);
+        await LoadMarcas();
+        await grid0.Reload();
+    }
+
+    protected async Task EditRow(MarcaDTO args)
+    {
+        await DialogService.OpenAsync<EditMarca>("Editar Marca", new Dictionary<string, object> { { "Id", args.Id } });
+        await LoadMarcas();
+        await grid0.Reload();
+    }
+
+    protected async Task GridDeleteButtonClick(MouseEventArgs args, MarcaDTO marca)
+    {
+        try
+        {
+            if (await DialogService.Confirm("¿Está seguro de borrar este elemento?") == true)
+            {
+                var result = await _mediator.Send(new DeleteMarcaCommand(marca.Id));
+                if (result.IsSuccess)
+                {
+                    await LoadMarcas();
+                    await grid0.Reload();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            logger.LogError(0, e, "Error al eliminar una marca");
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "No se pudo eliminar la marca"
+            });
+        }
+    }
+}

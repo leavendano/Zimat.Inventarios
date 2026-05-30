@@ -69,7 +69,7 @@
 
     protected async Task AddButtonClick(MouseEventArgs args)
     {
-        UseCases.Unidades.UnidadDTO item = await DialogService.OpenAsync<AddUnidad>("Nueva Unidad", null);
+        await DialogService.OpenAsync<AddUnidad>("Nueva Unidad", null);
         Result<IEnumerable<UnidadDTO>> result = await _mediator.Send(new ListUnidadesQuery(null, null,null));
 
         if (result.IsSuccess)

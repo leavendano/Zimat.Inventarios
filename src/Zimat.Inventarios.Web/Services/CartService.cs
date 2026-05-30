@@ -37,7 +37,8 @@ public class CartService
                 PrecioUnitario = articulo.PrecioPublico,
                 Cantidad = cantidad,
                 Unidad = articulo.Unidad,
-                Impuesto1 = articulo.Impuesto1
+                Impuesto1 = articulo.Impuesto1,
+                Impuesto2 = articulo.Impuesto2
             });
         }
         

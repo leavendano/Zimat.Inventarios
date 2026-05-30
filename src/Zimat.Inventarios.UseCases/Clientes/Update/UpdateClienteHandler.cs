@@ -19,6 +19,21 @@ public class UpdateClienteHandler(IRepository<Cliente> _repository) :
     existingItem.UpdateNombre(request.Nombre);
     existingItem.UpdateRfc(request.Rfc);
     existingItem.UpdateCodigoPostal(request.CodigoPostal);
+    existingItem.Calle = request.Calle;
+    existingItem.NumeroExterior = request.NumeroExterior;
+    existingItem.Colonia = request.Colonia;
+    existingItem.Ciudad = request.Ciudad;
+    existingItem.Estado = request.Estado;
+    existingItem.Pais = request.Pais;
+    existingItem.Telefono = request.Telefono;
+    existingItem.Email = request.Email;
+    existingItem.ContactoVentas = request.ContactoVentas;
+    existingItem.ContactoPago = request.ContactoPago;
+    existingItem.RegimenFiscal = request.RegimenFiscal;
+    existingItem.UsoCfdi = request.UsoCfdi;
+    existingItem.Observaciones = request.Observaciones;
+    existingItem.DiasCredito = request.DiasCredito;
+    existingItem.LimiteCredito = request.LimiteCredito;
     existingItem.UpdatedAt = DateTime.UtcNow;
 
     await _repository.UpdateAsync(existingItem, cancellationToken);

@@ -13,6 +13,8 @@ using Zimat.Inventarios.Core.ClienteAggregate;
 using Zimat.Inventarios.Core.UsuarioAggregate;
 using Zimat.Inventarios.Core.VentaAggregate;
 using Zimat.Inventarios.Core.TipoDocumentoAggregate;
+using Zimat.Inventarios.Core.KardexAggregate;
+using Zimat.Inventarios.Core.MarcaAggregate;
 
 namespace Zimat.Inventarios.Infrastructure.Data;
 public class AppDbContext : DbContext
@@ -28,8 +30,8 @@ public class AppDbContext : DbContext
 
  
   public DbSet<Articulo> Articulos => Set<Articulo>();
-  //public DbSet<ArticuloUnidad> ArticuloUnidades => Set<ArticuloUnidad>();
-  //public DbSet<Precio> Precios => Set<Precio>();
+  public DbSet<ArticuloUnidad> ArticuloUnidades => Set<ArticuloUnidad>();
+  public DbSet<Precio> Precios => Set<Precio>();
   public DbSet<Categoria> Categorias => Set<Categoria>();
   public DbSet<Departamento> Departamentos => Set<Departamento>();
   public DbSet<Familia> Familias => Set<Familia>();
@@ -43,6 +45,8 @@ public class AppDbContext : DbContext
   //public DbSet<VentaConcepto> VentaConceptos => Set<VentaConcepto>();
   public DbSet<Usuario> Usuarios => Set<Usuario>();
   public DbSet<TipoDocumento> TipoDocumentos => Set<TipoDocumento>();
+  public DbSet<Kardex> Kardexes => Set<Kardex>();
+  public DbSet<Marca> Marcas => Set<Marca>();
 
 
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 

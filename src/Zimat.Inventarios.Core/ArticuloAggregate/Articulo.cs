@@ -121,4 +121,26 @@ public class Articulo : EntityBase<Guid>, IAggregateRoot, IRegisterBase
     _articuloUnidades.Remove(articuloUnidad);
   }
 
+  public void AddPrecioToUnidad(Guid articuloUnidadId, Precio precio)
+  {
+    var articuloUnidad = _articuloUnidades.FirstOrDefault(x => x.Id == articuloUnidadId);
+    if (articuloUnidad == null)
+    {
+      throw new InvalidOperationException($"No se encontró ArticuloUnidad con Id {articuloUnidadId}");
+    }
+
+    articuloUnidad.AddPrecio(precio);
+  }
+
+  public void RemovePrecioFromUnidad(Guid articuloUnidadId, Guid precioId)
+  {
+    var articuloUnidad = _articuloUnidades.FirstOrDefault(x => x.Id == articuloUnidadId);
+    if (articuloUnidad == null)
+    {
+      throw new InvalidOperationException($"No se encontró ArticuloUnidad con Id {articuloUnidadId}");
+    }
+
+    articuloUnidad.RemovePrecio(precioId);
+  }
+
 }

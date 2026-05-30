@@ -10,7 +10,7 @@ public class CreateClienteHandler(IRepository<Cliente> _repository)
   public async Task<Result<Guid>> Handle(CreateClienteCommand request,
     CancellationToken cancellationToken)
   {
-    var newItem = new Cliente(request.Clave, request.Nombre, request.Rfc, request.CodigoPostal);
+    var newItem = request.Cliente.ToCliente();
     newItem.User = request.UserName;
 
     var createdItem = await _repository.AddAsync(newItem, cancellationToken);

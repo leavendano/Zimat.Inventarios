@@ -18,10 +18,10 @@ Key patterns: Clean Architecture, DDD, CQRS, Repository with Specifications, Dom
 
 ## Technology Stack
 
-- **.NET 8.0** with nullable reference types
+- **.NET 10.0** with nullable reference types
 - **Blazor Server** with Interactive Server Components
 - **Radzen Blazor Components** for UI (DataGrid, Forms)
-- **Entity Framework Core 8.0** with PostgreSQL (snake_case naming)
+- **Entity Framework Core 10.0** with PostgreSQL (snake_case naming)
 - **MediatR** for CQRS implementation
 - **FastEndpoints** for API endpoints
 - **OpenID Connect** authentication

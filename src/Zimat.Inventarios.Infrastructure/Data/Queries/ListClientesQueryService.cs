@@ -9,7 +9,9 @@ public class ListClientesQueryService(AppDbContext _db) : IListClientesQueryServ
 {
   public async Task<IEnumerable<ClienteDTO>> ListAsync(string? filtro, int? Skip, int? Take)
  {
-    var stringBuilder = new StringBuilder(@"SELECT id,clave , nombre, rfc, codigo_postal FROM Clientes ");
+    var stringBuilder = new StringBuilder(@"SELECT id,clave , nombre, rfc, codigo_postal, 
+            calle, numero_exterior,colonia, ciudad , estado, pais, telefono, email, contacto_ventas, contacto_pago,
+            regimen_fiscal, uso_cfdi, observaciones, dias_credito, limite_credito  FROM Clientes ");
 
 
     if (!String.IsNullOrEmpty(filtro))

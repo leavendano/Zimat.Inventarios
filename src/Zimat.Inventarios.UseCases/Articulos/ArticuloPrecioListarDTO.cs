@@ -8,6 +8,7 @@ public class ArticuloPrecioListarDTO
     public string Clave { get; set; } = string.Empty;
     public string Descripcion { get; set; } = string.Empty;
     public decimal Impuesto1 { get; set; }
+    public decimal Impuesto2 { get; set; }
     public string? RutaImagen { get; set; } 
     public decimal StockActual { get; set; }
     public Guid? UnidadId { get; set; }

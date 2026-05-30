@@ -16,7 +16,9 @@ public class PrecioConfiguration : IEntityTypeConfiguration<Precio>
             .HasPrecision(18, 6) // Precision and scale for decimal
             .IsRequired();
 
-        builder.Property(x => x.Id).HasColumnType("uuid");
+        builder.Property(x => x.Id)
+            .HasColumnType("uuid")
+            .ValueGeneratedNever();
 
         builder.HasIndex(c => new { c.ArticuloUnidadId,c.NumeroLista}).IsUnique();
 

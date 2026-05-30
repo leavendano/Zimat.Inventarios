@@ -17,7 +17,7 @@
 <RadzenStack>
     <RadzenRow AlignItems="AlignItems.Center">
         <RadzenColumn Size="12" SizeMD="8">
-            <RadzenText Text="Unidades del Artículo" TextStyle="TextStyle.H4" TagName="TagName.H2" style="margin: 0" />
+            @* <RadzenText Text="Unidades del Artículo." TextStyle="TextStyle.H4" TagName="TagName.H2" style="margin: 0" /> *@
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="4">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
@@ -27,7 +27,7 @@
     </RadzenRow>
     <RadzenRow>
         <RadzenColumn SizeMD=12>
-            <RadzenDataGrid @ref="grid0" AllowFiltering="true" FilterMode="FilterMode.Simple" AllowPaging="true" AllowSorting="true"
+            <RadzenDataGrid @ref="grid0" AllowFiltering="false" FilterMode="FilterMode.Simple" AllowPaging="true" AllowSorting="true"
                             ShowPagingSummary="true" PageSizeOptions=@(new int[]{5, 10, 20, 30})
                             Data="@articuloUnidades" TItem="ArticuloUnidadListarDTO">
                 <Columns>
@@ -48,8 +48,11 @@
                             @unidad.UpdatedAt.ToString("dd/MM/yyyy HH:mm")
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="ArticuloUnidadListarDTO" Filterable="false" Sortable="false" Width="140px" TextAlign="TextAlign.Center">
+                    <RadzenDataGridColumn TItem="ArticuloUnidadListarDTO" Filterable="false" Sortable="false" Width="200px" TextAlign="TextAlign.Center">
                         <Template Context="unidad">
+                            <RadzenButton ButtonStyle="ButtonStyle.Warning" Icon="attach_money" Size="ButtonSize.Small"
+                                          Shade="Shade.Lighter" Variant="Variant.Flat"
+                                          Click=@(args => PreciosButtonClick(args, unidad)) @onclick:stopPropagation="true" />
                             <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="edit" Size="ButtonSize.Small"
                                           Shade="Shade.Lighter" Variant="Variant.Flat"
                                           Click=@(args => EditButtonClick(args, unidad)) @onclick:stopPropagation="true" />
@@ -104,6 +107,17 @@
 
         await LoadData();
         await grid0.Reload();
+    }
+
+    protected async Task PreciosButtonClick(MouseEventArgs args, ArticuloUnidadListarDTO unidad)
+    {
+        await DialogService.OpenAsync<ArticuloPrecios>("Precios de la Unidad",
+            new Dictionary<string, object>
+            {
+                { "ArticuloId", Id },
+                { "ArticuloUnidadId", unidad.Id }
+            },
+            new DialogOptions() { Width = "800px", Height = "500px" });
     }
 
     protected async Task EditButtonClick(MouseEventArgs args, ArticuloUnidadListarDTO unidad)

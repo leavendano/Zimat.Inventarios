@@ -249,6 +249,35 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "kardexes",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    articulo_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    almacen_id = table.Column<int>(type: "integer", nullable: false),
+                    tipo_movimiento = table.Column<int>(type: "integer", nullable: false),
+                    fecha = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    cantidad = table.Column<decimal>(type: "numeric", nullable: false),
+                    costo_unitario = table.Column<decimal>(type: "numeric(18,6)", precision: 18, scale: 6, nullable: false),
+                    costo_total = table.Column<decimal>(type: "numeric(18,6)", precision: 18, scale: 6, nullable: false),
+                    referencia_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    user = table.Column<string>(type: "text", nullable: true),
+                    status = table.Column<int>(type: "integer", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_kardexes", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_kardexes_articulos_articulo_id",
+                        column: x => x.articulo_id,
+                        principalTable: "articulos",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ventas",
                 columns: table => new
                 {
@@ -326,7 +355,7 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "articulo_unidad",
+                name: "articulo_unidades",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -340,15 +369,15 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_articulo_unidad", x => x.id);
+                    table.PrimaryKey("pk_articulo_unidades", x => x.id);
                     table.ForeignKey(
-                        name: "fk_articulo_unidad_articulos_articulo_id",
+                        name: "fk_articulo_unidades_articulos_articulo_id",
                         column: x => x.articulo_id,
                         principalTable: "articulos",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "fk_articulo_unidad_unidades_unidad_id",
+                        name: "fk_articulo_unidades_unidades_unidad_id",
                         column: x => x.unidad_id,
                         principalTable: "unidades",
                         principalColumn: "id",
@@ -424,7 +453,7 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "precio",
+                name: "precios",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -439,24 +468,24 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_precio", x => x.id);
+                    table.PrimaryKey("pk_precios", x => x.id);
                     table.ForeignKey(
-                        name: "fk_precio_articulo_unidad_articulo_unidad_id",
+                        name: "fk_precios_articulo_unidades_articulo_unidad_id",
                         column: x => x.articulo_unidad_id,
-                        principalTable: "articulo_unidad",
+                        principalTable: "articulo_unidades",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "ix_articulo_unidad_articulo_id_unidad_id",
-                table: "articulo_unidad",
+                name: "ix_articulo_unidades_articulo_id_unidad_id",
+                table: "articulo_unidades",
                 columns: new[] { "articulo_id", "unidad_id" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "ix_articulo_unidad_unidad_id",
-                table: "articulo_unidad",
+                name: "ix_articulo_unidades_unidad_id",
+                table: "articulo_unidades",
                 column: "unidad_id");
 
             migrationBuilder.CreateIndex(
@@ -470,8 +499,13 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 column: "proveedor_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_precio_articulo_unidad_id_numero_lista",
-                table: "precio",
+                name: "ix_kardexes_articulo_id",
+                table: "kardexes",
+                column: "articulo_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_precios_articulo_unidad_id_numero_lista",
+                table: "precios",
                 columns: new[] { "articulo_unidad_id", "numero_lista" },
                 unique: true);
 
@@ -502,10 +536,13 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 name: "familias");
 
             migrationBuilder.DropTable(
+                name: "kardexes");
+
+            migrationBuilder.DropTable(
                 name: "lineas");
 
             migrationBuilder.DropTable(
-                name: "precio");
+                name: "precios");
 
             migrationBuilder.DropTable(
                 name: "tipo_documentos");
@@ -520,7 +557,7 @@ namespace Zimat.Inventarios.Infrastructure.Migrations
                 name: "compras");
 
             migrationBuilder.DropTable(
-                name: "articulo_unidad");
+                name: "articulo_unidades");
 
             migrationBuilder.DropTable(
                 name: "ventas");

@@ -91,7 +91,7 @@
 
     protected async Task EditRow(ProveedorDTO args)
     {
-        await DialogService.OpenAsync<EditArticulo>("Edit Articulo", new Dictionary<string, object> { { "Id", args.Id } });
+        await DialogService.OpenAsync<EditProveedor>("Editar Proveedor", new Dictionary<string, object> { { "Id", args.Id } });
         Result<IEnumerable<ProveedorDTO>> result = await _mediator.Send(new ListProveedoresQuery(null, null,null));
         if (result.IsSuccess)
         {
